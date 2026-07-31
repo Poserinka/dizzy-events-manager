@@ -1,100 +1,220 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dizzy\Events\Core;
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
-class Database {
+/**
+ * Database installer and table registry.
+ *
+ * Responsible only for:
+ *
+ * - database version
+ * - table names
+ * - installation
+ * - migrations
+ *
+ * @package Dizzy\Events\Core
+ */
+final class Database
+{
+    /**
+     * Database schema version.
+     */
+    public const VERSION = '1.0.0';
 
     /**
-     * Database version.
+     * Table registry.
+     *
+     * @return array<string,string>
      */
-    const VERSION = '1.0.0';
-
-    /**
-     * Table names.
-     */
-    public static function tables() {
-
+    public static function tables(): array
+    {
         global $wpdb;
 
-        return array(
-            'events'      => $wpdb->prefix . 'dizzy_events',
-            'occurrences' => $wpdb->prefix . 'dizzy_event_occurrences',
-            'venues'      => $wpdb->prefix . 'dizzy_venues',
-            'artists'     => $wpdb->prefix . 'dizzy_artists',
-        );
+        return [
 
+            Config::TABLE_OCCURRENCES =>
+                $wpdb->prefix . 'dizzy_event_occurrences',
+
+            Config::TABLE_ARTISTS =>
+                $wpdb->prefix . 'dizzy_artists',
+
+            Config::TABLE_EVENT_ARTIST =>
+                $wpdb->prefix . 'dizzy_event_artists',
+
+            Config::TABLE_LOGS =>
+                $wpdb->prefix . 'dizzy_logs',
+
+        ];
     }
 
     /**
-     * Install database.
+     * Returns one table name.
      */
-    public static function install() {
+    public static function table(string $key): string
+    {
+        $tables = self::tables();
 
-        self::create_tables();
-
-        update_option(
-            'dizzy_events_db_version',
-            self::VERSION
-        );
-
+        return $tables[$key] ?? '';
     }
 
     /**
-     * Upgrade database if required.
+     * Install or upgrade database.
      */
-    public static function maybe_upgrade() {
-
+    public static function install(): void
+    {
         $installed = get_option(
-            'dizzy_events_db_version'
+            Config::OPTION_DB_VERSION
         );
 
-        if ( version_compare( $installed, self::VERSION, '<' ) ) {
-
-            self::create_tables();
-
-            update_option(
-                'dizzy_events_db_version',
-                self::VERSION
-            );
-
+        if ($installed === self::VERSION) {
+            return;
         }
 
+        self::createTables();
+
+        update_option(
+            Config::OPTION_DB_VERSION,
+            self::VERSION
+        );
     }
 
     /**
-     * Create tables.
+     * Creates plugin tables.
      */
-    protected static function create_tables() {
-
+    private static function createTables(): void
+    {
         global $wpdb;
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         $charset = $wpdb->get_charset_collate();
 
-        $tables = self::tables();
+        $occurrences = self::table(
+            Config::TABLE_OCCURRENCES
+        );
 
-        $sql = [];
+        $artists = self::table(
+            Config::TABLE_ARTISTS
+        );
 
-        $sql[] = "
-        CREATE TABLE {$tables['occurrences']} (
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            event_id BIGINT UNSIGNED NOT NULL,
-            start_datetime DATETIME NOT NULL,
-            end_datetime DATETIME NULL,
-            status VARCHAR(20) DEFAULT 'publish',
-            PRIMARY KEY (id),
-            KEY event_id (event_id),
-            KEY start_datetime (start_datetime)
-        ) {$charset};
-        ";
+        $relations = self::table(
+            Config::TABLE_EVENT_ARTIST
+        );
 
-        foreach ( $sql as $query ) {
-            dbDelta( $query );
-        }
+        $logs = self::table(
+            Config::TABLE_LOGS
+        );
 
+        dbDelta(
+"
+CREATE TABLE {$occurrences} (
+
+id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+event_id BIGINT UNSIGNED NOT NULL,
+
+start_datetime DATETIME NOT NULL,
+
+end_datetime DATETIME NULL,
+
+all_day TINYINT(1) NOT NULL DEFAULT 0,
+
+timezone VARCHAR(100) NULL,
+
+status VARCHAR(20) DEFAULT 'publish',
+
+created_at DATETIME NOT NULL,
+
+updated_at DATETIME NOT NULL,
+
+PRIMARY KEY (id),
+
+KEY event_id (event_id),
+
+KEY start_datetime (start_datetime)
+
+) {$charset};
+"
+);
+
+        dbDelta(
+"
+CREATE TABLE {$artists} (
+
+id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+name VARCHAR(255) NOT NULL,
+
+slug VARCHAR(255) NOT NULL,
+
+image TEXT NULL,
+
+spotify TEXT NULL,
+
+instagram TEXT NULL,
+
+facebook TEXT NULL,
+
+website TEXT NULL,
+
+created_at DATETIME NOT NULL,
+
+updated_at DATETIME NOT NULL,
+
+PRIMARY KEY(id),
+
+UNIQUE KEY slug(slug)
+
+) {$charset};
+"
+);
+
+        dbDelta(
+"
+CREATE TABLE {$relations} (
+
+event_id BIGINT UNSIGNED NOT NULL,
+
+artist_id BIGINT UNSIGNED NOT NULL,
+
+role VARCHAR(100) NULL,
+
+PRIMARY KEY(event_id,artist_id),
+
+KEY artist_id(artist_id)
+
+) {$charset};
+"
+);
+
+        dbDelta(
+"
+CREATE TABLE {$logs} (
+
+id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+level VARCHAR(20) NOT NULL,
+
+module VARCHAR(100) NULL,
+
+message TEXT NOT NULL,
+
+context LONGTEXT NULL,
+
+created_at DATETIME NOT NULL,
+
+PRIMARY KEY(id),
+
+KEY level(level),
+
+KEY created_at(created_at)
+
+) {$charset};
+"
+);
     }
-
 }
