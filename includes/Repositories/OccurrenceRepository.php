@@ -4,128 +4,137 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
-use DateTimeInterface;
-use Dizzy\Events\Core\Config;
-use Dizzy\Events\Core\DB;
+use Dizzy\Events\Models\Occurrence;
 
 defined('ABSPATH') || exit;
 
 /**
- * Occurrence repository.
+ * Repository for event occurrences.
  *
- * Handles recurring event dates.
+ * Handles database operations related to event occurrences.
+ *
+ * @package Dizzy\Events\Repositories
  */
 final class OccurrenceRepository extends AbstractRepository
 {
-    protected string $table = Config::TABLE_OCCURRENCES;
+    /**
+     * Database table key.
+     */
+    protected string $table = 'occurrences';
 
     /**
-     * Returns all upcoming occurrences.
+     * Model handled by this repository.
      *
-     * @return array<object>
+     * @return class-string<Occurrence>
      */
-    public function findUpcoming(
-        int $limit = 50
-    ): array {
-
-        $sql = sprintf(
-            "
-            SELECT *
-            FROM %s
-            WHERE start_datetime >= UTC_TIMESTAMP()
-            ORDER BY start_datetime ASC
-            LIMIT %%d
-            ",
-            $this->table()
-        );
-
-        return DB::getResults(
-            $sql,
-            [$limit]
-        );
-    }
-
-    /**
-     * Today's occurrences.
-     *
-     * @return array<object>
-     */
-    public function findToday(): array
+    protected function modelClass(): string
     {
-        $sql = sprintf(
-            "
-            SELECT *
-            FROM %s
-            WHERE DATE(start_datetime)=UTC_DATE()
-            ORDER BY start_datetime ASC
-            ",
-            $this->table()
-        );
-
-        return DB::getResults($sql);
+        return Occurrence::class;
     }
 
     /**
-     * Find occurrences between dates.
-     *
-     * @return array<object>
+     * Find occurrence by ID.
      */
-    public function findBetween(
-        DateTimeInterface $from,
-        DateTimeInterface $to
-    ): array {
+    public function findById(
+        int $id
+    ): ?Occurrence {
 
-        $sql = sprintf(
+        return $this->findOne(
             "
             SELECT *
-            FROM %s
-            WHERE start_datetime
-            BETWEEN %%s AND %%s
-            ORDER BY start_datetime
+            FROM {$this->table()}
+            WHERE id = %d
+            LIMIT 1
             ",
-            $this->table()
-        );
-
-        return DB::getResults(
-            $sql,
             [
-                $from->format('Y-m-d H:i:s'),
-                $to->format('Y-m-d H:i:s'),
+                $id
             ]
         );
     }
 
     /**
-     * Delete expired occurrences.
+     * Find upcoming occurrences.
+     *
+     * @return array<Occurrence>
      */
-    public function deleteExpired(): bool
-    {
-        $sql = sprintf(
-            "
-            DELETE
-            FROM %s
-            WHERE end_datetime < UTC_TIMESTAMP()
-            ",
-            $this->table()
-        );
+    public function findUpcoming(
+        int $limit = 20,
+        int $offset = 0
+    ): array {
 
-        return false !== DB::query($sql);
+        return $this->findMany(
+            "
+            SELECT *
+            FROM {$this->table()}
+            WHERE start_datetime >= %s
+            AND status = %s
+            ORDER BY start_datetime ASC
+            LIMIT %d OFFSET %d
+            ",
+            [
+                current_time('mysql'),
+                'publish',
+                $limit,
+                $offset,
+            ]
+        );
     }
 
     /**
-     * Count upcoming.
+     * Find occurrences for a specific event.
+     *
+     * @return array<Occurrence>
      */
-    public function countUpcoming(): int
-    {
-        $sql = sprintf(
-            "
-            SELECT COUNT(*)
-            FROM %s
-            WHERE start_datetime>=UTC_TIMESTAMP()
-            ",
-            $this->table()
-        );
+    public function findByEventId(
+        int $eventId
+    ): array {
 
-        return (int) DB::getVar($sql);
+        return $this->findMany(
+            "
+            SELECT *
+            FROM {$this->table()}
+            WHERE event_id = %d
+            ORDER BY start_datetime ASC
+            ",
+            [
+                $eventId
+            ]
+        );
+    }
+
+    /**
+     * Find occurrences between dates.
+     *
+     * @return array<Occurrence>
+     */
+    public function findBetween(
+        string $start,
+        string $end
+    ): array {
+
+        return $this->findMany(
+            "
+            SELECT *
+            FROM {$this->table()}
+            WHERE start_datetime BETWEEN %s AND %s
+            ORDER BY start_datetime ASC
+            ",
+            [
+                $start,
+                $end,
+            ]
+        );
+    }
+
+    /**
+     * Remove expired occurrences.
+     */
+    public function deleteExpired(): bool
+    {
+        return $this->delete(
+            [
+                'status' => 'expired',
+            ]
+        );
     }
 }
