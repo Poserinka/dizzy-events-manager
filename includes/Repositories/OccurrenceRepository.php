@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
+use Dizzy\Events\Enums\OccurrenceStatus;
 use Dizzy\Events\Models\Occurrence;
 
 defined('ABSPATH') || exit;
@@ -47,7 +48,7 @@ final class OccurrenceRepository extends AbstractRepository
             LIMIT 1
             ",
             [
-                $id
+                $id,
             ]
         );
     }
@@ -73,7 +74,7 @@ final class OccurrenceRepository extends AbstractRepository
             ",
             [
                 current_time('mysql'),
-                'publish',
+                OccurrenceStatus::PUBLISHED->value,
                 $limit,
                 $offset,
             ]
@@ -81,7 +82,7 @@ final class OccurrenceRepository extends AbstractRepository
     }
 
     /**
-     * Find occurrences for a specific event.
+     * Find occurrences for an event.
      *
      * @return array<Occurrence>
      */
@@ -97,7 +98,7 @@ final class OccurrenceRepository extends AbstractRepository
             ORDER BY start_datetime ASC
             ",
             [
-                $eventId
+                $eventId,
             ]
         );
     }
@@ -127,13 +128,20 @@ final class OccurrenceRepository extends AbstractRepository
     }
 
     /**
-     * Remove expired occurrences.
+     * Mark old occurrences as expired.
+     *
+     * @param string $before Date limit.
      */
-    public function deleteExpired(): bool
-    {
-        return $this->delete(
+    public function expireBefore(
+        string $before
+    ): bool {
+
+        return $this->update(
             [
-                'status' => 'expired',
+                'status' => OccurrenceStatus::EXPIRED->value,
+            ],
+            [
+                'status' => OccurrenceStatus::PUBLISHED->value,
             ]
         );
     }
