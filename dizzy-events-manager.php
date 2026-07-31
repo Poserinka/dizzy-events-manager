@@ -71,4 +71,4 @@ register_deactivation_hook(
 |--------------------------------------------------------------------------
 */
 
-DizzyEvents\Core\Plugin::run();
+DizzyEvents\Core\Plugin::init();
