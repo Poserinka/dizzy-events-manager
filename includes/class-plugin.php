@@ -31,6 +31,8 @@ class Dizzy_Plugin {
 
         new Dizzy_Artists_Post_Type();
 
+        new Dizzy_Event_Meta_Boxes();
+
 
         /**
          * Load text domain
