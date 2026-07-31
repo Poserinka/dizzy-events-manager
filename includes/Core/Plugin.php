@@ -51,19 +51,15 @@ final class Plugin {
 	 */
 	private static function boot_modules(): void {
 
-		foreach ( Modules::all() as $module ) {
+foreach ( Modules::all() as $module ) {
 
-			if ( ! class_exists( $module ) ) {
-				continue;
-			}
-
-			if ( ! method_exists( $module, 'init' ) ) {
-				continue;
-			}
-
-			$module::init();
-
-		}
-
+	if (
+		is_string( $module ) &&
+		class_exists( $module ) &&
+		is_callable( array( $module, 'init' ) )
+	) {
+		$module::init();
 	}
+
+}
 }
