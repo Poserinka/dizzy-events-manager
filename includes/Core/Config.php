@@ -13,6 +13,7 @@ defined('ABSPATH') || exit;
  * throughout the codebase.
  *
  * @package Dizzy\Events\Core
+ 
  */
 final class Config
 {
