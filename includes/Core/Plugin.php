@@ -88,15 +88,15 @@ final class Plugin {
 	 */
 	private static function boot_modules(): void {
 
-		foreach ( self::MODULES as $module ) {
+		foreach ( Modules::all() as $module ) {
 
-			if (
-				class_exists( $module ) &&
-				method_exists( $module, 'init' )
-			) {
-				$module::init();
-			}
-		}
+	if (
+		class_exists( $module ) &&
+		method_exists( $module, 'init' )
+	) {
+		$module::init();
+	}
+}
 
 	}
 }
