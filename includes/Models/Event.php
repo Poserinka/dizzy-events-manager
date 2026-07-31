@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Models;
 
 use DateTimeImmutable;
-use Dizzy\Events\Contracts\HydratesFromRow;
+use Dizzy\Events\Contracts\Hydrates;
 use Dizzy\Events\Enums\EventStatus;
 
 defined('ABSPATH') || exit;
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
  *
  * @package Dizzy\Events\Models
  */
-readonly class Event implements HydratesFromRow
+readonly class Event implements Hydrates
 {
     public function __construct(
         public int $id,
@@ -31,31 +31,31 @@ readonly class Event implements HydratesFromRow
     }
 
     /**
-     * Create event from database row.
+     * Create event from source object.
      *
-     * @param object $row Database row.
+     * @param object $source Source object.
      */
-    public static function fromRow(object $row): static
+    public static function from(object $source): static
     {
         return new self(
-            id: (int) $row->id,
+            id: (int) $source->id,
 
-            title: (string) $row->title,
+            title: (string) $source->title,
 
-            slug: (string) $row->slug,
+            slug: (string) $source->slug,
 
-            content: (string) ($row->content ?? ''),
+            content: (string) ($source->content ?? ''),
 
             status: EventStatus::from(
-                (string) $row->status
+                (string) $source->status
             ),
 
             createdAt: new DateTimeImmutable(
-                $row->created_at
+                $source->created_at
             ),
 
             updatedAt: new DateTimeImmutable(
-                $row->updated_at
+                $source->updated_at
             ),
         );
     }
@@ -78,11 +78,11 @@ readonly class Event implements HydratesFromRow
 
             'status' => $this->status->value,
 
-            'created_at' =>
-                $this->createdAt->format('Y-m-d H:i:s'),
+            'created_at' => $this->createdAt
+                ->format('Y-m-d H:i:s'),
 
-            'updated_at' =>
-                $this->updatedAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt
+                ->format('Y-m-d H:i:s'),
         ];
     }
 }
