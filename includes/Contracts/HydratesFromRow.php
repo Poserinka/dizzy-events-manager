@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
  *
  * @package Dizzy\Events\Contracts
  */
-interface DatabaseModel
+interface HydratesFromRow
 {
     /**
      * Create a model instance from a database row.
