@@ -1,8 +1,6 @@
 <?php
 /**
- * Module Registry
- *
- * Registers all plugin modules.
+ * Module Registry.
  *
  * @package DizzyEventsManager
  */
@@ -14,12 +12,12 @@ namespace DizzyEvents\Core;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Module registry.
+ * Registers all plugin modules.
  */
 final class Modules {
 
 	/**
-	 * Returns all registered modules.
+	 * Get registered modules.
 	 *
 	 * @return array<class-string>
 	 */
@@ -27,7 +25,9 @@ final class Modules {
 
 		$modules = array(
 
+			// Core.
 			Assets::class,
+			Hooks::class,
 
 			// Admin.
 			// \DizzyEvents\Admin\Admin::class,
@@ -56,10 +56,21 @@ final class Modules {
 		);
 
 		/**
-		 * Filters the registered plugin modules.
+		 * Filters the registered modules.
+		 *
+		 * @since 1.0.0
 		 *
 		 * @param array<class-string> $modules Registered modules.
 		 */
-		return apply_filters( 'dizzy_events_modules', $modules );
+		$modules = apply_filters( 'dizzy_events_modules', $modules );
+
+		return array_values(
+			array_unique(
+				array_filter(
+					$modules,
+					static fn ( $module ) => is_string( $module )
+				)
+			)
+		);
 	}
 }
