@@ -317,15 +317,19 @@ foreach ( dizzy_get_time_options() as $time ) {
 
         $fields = array(
 
-            'event_date',
+    'event_date',
 
-            'event_venue',
+    'event_start_time',
 
-            'event_address',
+    'event_end_time',
 
-            'event_maps'
+    'event_venue',
 
-        );
+    'event_address',
+
+    'event_maps'
+
+);
 
 
 
