@@ -7,147 +7,91 @@ namespace Dizzy\Events\Repositories;
 use Dizzy\Events\Core\Database;
 use Dizzy\Events\Core\DB;
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
  * Base repository.
  *
- * Provides common CRUD methods for plugin tables.
+ * Provides common write operations for plugin tables.
  *
  * @package Dizzy\Events\Repositories
  */
-abstract class AbstractRepository {
+abstract class AbstractRepository
+{
+    /**
+     * Logical table key.
+     *
+     * @var string
+     */
+    protected string $table;
 
-	/**
-	 * Logical table key.
-	 *
-	 * @var string
-	 */
-	protected string $table;
+    /**
+     * Returns the physical database table name.
+     */
+    protected function table(): string
+    {
+        return Database::table($this->table);
+    }
 
-	/**
-	 * Returns physical table name.
-	 */
-	protected function table(): string {
-		return Database::table( $this->table );
-	}
+    /**
+     * Insert a record.
+     *
+     * @param array<string,mixed> $data   Data.
+     * @param array<int,string>   $format Formats.
+     */
+    protected function insert(
+        array $data,
+        array $format = []
+    ): int {
 
-	/**
-	 * Find by primary key.
-	 *
-	 * @param int $id Record ID.
-	 *
-	 * @return object|null
-	 */
-	public function find( int $id ): ?object {
+        DB::insert(
+            $this->table(),
+            $data,
+            $format
+        );
 
-		$sql = sprintf(
-			'SELECT * FROM %s WHERE id = %%d LIMIT 1',
-			$this->table()
-		);
+        return DB::insertId();
+    }
 
-		return DB::getRow(
-			$sql,
-			array( $id )
-		);
-	}
+    /**
+     * Update records.
+     *
+     * @param array<string,mixed> $data         Data.
+     * @param array<string,mixed> $where        Where.
+     * @param array<int,string>   $format       Formats.
+     * @param array<int,string>   $whereFormat  Where formats.
+     */
+    protected function update(
+        array $data,
+        array $where,
+        array $format = [],
+        array $whereFormat = []
+    ): bool {
 
-	/**
-	 * Insert row.
-	 *
-	 * @param array $data Data.
-	 * @param array $format Formats.
-	 *
-	 * @return int Insert ID.
-	 */
-	protected function insert(
-		array $data,
-		array $format = array()
-	): int {
+        return DB::update(
+            $this->table(),
+            $data,
+            $where,
+            $format,
+            $whereFormat
+        );
+    }
 
-		DB::insert(
-			$this->table(),
-			$data,
-			$format
-		);
+    /**
+     * Delete records.
+     *
+     * @param array<string,mixed> $where Where clause.
+     * @param array<int,string>   $whereFormat Where formats.
+     */
+    protected function delete(
+        array $where,
+        array $whereFormat = []
+    ): bool {
 
-		return DB::insertId();
-	}
-
-	/**
-	 * Update rows.
-	 *
-	 * @param array $data Data.
-	 * @param array $where Where clause.
-	 * @param array $format Formats.
-	 * @param array $where_format Where formats.
-	 *
-	 * @return bool
-	 */
-	protected function update(
-		array $data,
-		array $where,
-		array $format = array(),
-		array $where_format = array()
-	): bool {
-
-		return DB::update(
-			$this->table(),
-			$data,
-			$where,
-			$format,
-			$where_format
-		);
-	}
-
-	/**
-	 * Delete rows.
-	 *
-	 * @param array $where Where clause.
-	 * @param array $where_format Where formats.
-	 *
-	 * @return bool
-	 */
-	protected function delete(
-		array $where,
-		array $where_format = array()
-	): bool {
-
-		return DB::delete(
-			$this->table(),
-			$where,
-			$where_format
-		);
-	}
-
-	/**
-	 * Returns all rows.
-	 *
-	 * @return array
-	 */
-	public function all(): array {
-
-		$sql = sprintf(
-			'SELECT * FROM %s',
-			$this->table()
-		);
-
-		return DB::getResults( $sql );
-	}
-
-	/**
-	 * Returns total row count.
-	 *
-	 * @return int
-	 */
-	public function count(): int {
-
-		$sql = sprintf(
-			'SELECT COUNT(*) FROM %s',
-			$this->table()
-		);
-
-		return (int) DB::getVar( $sql );
-	}
-
+        return DB::delete(
+            $this->table(),
+            $where,
+            $whereFormat
+        );
+    }
 }
