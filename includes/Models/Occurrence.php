@@ -6,7 +6,7 @@ namespace Dizzy\Events\Models;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Dizzy\Events\Contracts\HydratesFromRow;
+use Dizzy\Events\Contracts\Hydrates;
 use Dizzy\Events\Core\Config;
 use InvalidArgumentException;
 
@@ -19,7 +19,7 @@ defined('ABSPATH') || exit;
  *
  * @package Dizzy\Events\Models
  */
-readonly class Occurrence implements HydratesFromRow
+readonly class Occurrence implements Hydrates
 {
     public function __construct(
         public int $id,
@@ -35,53 +35,53 @@ readonly class Occurrence implements HydratesFromRow
     }
 
     /**
-     * Create an Occurrence from a database row.
+     * Create an occurrence from a source object.
      *
      * @throws InvalidArgumentException
      */
-    public static function fromRow(object $row): static
+    public static function from(object $source): static
     {
         $timezone = self::createTimezone(
-            $row->timezone ?? Config::DEFAULT_TIMEZONE
+            $source->timezone ?? Config::DEFAULT_TIMEZONE
         );
 
         return new self(
-            id: (int) $row->id,
+            id: (int) $source->id,
 
-            eventId: (int) $row->event_id,
+            eventId: (int) $source->event_id,
 
             startDateTime: new DateTimeImmutable(
-                $row->start_datetime,
+                $source->start_datetime,
                 $timezone
             ),
 
-            endDateTime: empty($row->end_datetime)
+            endDateTime: empty($source->end_datetime)
                 ? null
                 : new DateTimeImmutable(
-                    $row->end_datetime,
+                    $source->end_datetime,
                     $timezone
                 ),
 
-            allDay: (bool) $row->all_day,
+            allDay: (bool) $source->all_day,
 
             timezone: $timezone->getName(),
 
-            status: (string) $row->status,
+            status: (string) $source->status,
 
             createdAt: new DateTimeImmutable(
-                $row->created_at,
+                $source->created_at,
                 $timezone
             ),
 
             updatedAt: new DateTimeImmutable(
-                $row->updated_at,
+                $source->updated_at,
                 $timezone
             ),
         );
     }
 
     /**
-     * Convert the model to an array.
+     * Convert model to array.
      *
      * @return array<string,mixed>
      */
@@ -101,7 +101,7 @@ readonly class Occurrence implements HydratesFromRow
     }
 
     /**
-     * Determine whether the occurrence has ended.
+     * Determine whether occurrence has ended.
      */
     public function hasEnded(): bool
     {
@@ -113,7 +113,7 @@ readonly class Occurrence implements HydratesFromRow
     }
 
     /**
-     * Determine whether the occurrence is currently running.
+     * Determine whether occurrence is currently running.
      */
     public function isRunning(): bool
     {
@@ -128,7 +128,7 @@ readonly class Occurrence implements HydratesFromRow
     }
 
     /**
-     * Determine whether the occurrence starts in the future.
+     * Determine whether occurrence starts in future.
      */
     public function isUpcoming(): bool
     {
@@ -136,15 +136,17 @@ readonly class Occurrence implements HydratesFromRow
     }
 
     /**
-     * Create a timezone instance.
+     * Create timezone instance.
      */
-    private static function createTimezone(string $timezone): DateTimeZone
-    {
+    private static function createTimezone(
+        string $timezone
+    ): DateTimeZone {
+
         return new DateTimeZone($timezone);
     }
 
     /**
-     * Current time in the occurrence timezone.
+     * Current time in occurrence timezone.
      */
     private function now(): DateTimeImmutable
     {
