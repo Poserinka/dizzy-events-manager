@@ -1,1 +1,65 @@
+```json
+{
+    "name": "poserinka/dizzy-events-manager",
+    "description": "Professional WordPress Event Management Plugin for Jazzcafé Dizzy Rotterdam.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
 
+    "authors": [
+        {
+            "name": "Poserinka Design",
+            "homepage": "https://github.com/Poserinka"
+        }
+    ],
+
+    "require": {
+        "php": "^8.1"
+    },
+
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "sirbrillig/phpcs-variable-analysis": "^2.12",
+        "wp-coding-standards/wpcs": "^3.2"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "DizzyEvents\\": "includes/"
+        }
+    },
+
+    "autoload-dev": {
+
+    },
+
+    "scripts": {
+
+        "phpcs": "phpcs",
+
+        "phpcbf": "phpcbf",
+
+        "phpstan": "phpstan analyse",
+
+        "test": [
+            "@phpcs",
+            "@phpstan"
+        ]
+    },
+
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        }
+    },
+
+    "minimum-stability": "stable",
+
+    "prefer-stable": true
+}
+```
