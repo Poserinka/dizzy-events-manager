@@ -6,177 +6,222 @@ namespace Dizzy\Events\Core;
 
 use wpdb;
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
- * Lightweight database wrapper.
+ * Lightweight wrapper around the global wpdb instance.
  *
- * All direct interaction with wpdb should happen through this class.
+ * All direct database access should go through this class.
  *
  * @package Dizzy\Events\Core
  */
-final class DB {
+final class DB
+{
+    /**
+     * Prevent instantiation.
+     */
+    private function __construct()
+    {
+    }
 
-	/**
-	 * Prevent instantiation.
-	 */
-	private function __construct() {}
+    /**
+     * Returns the global wpdb instance.
+     */
+    public static function instance(): wpdb
+    {
+        global $wpdb;
 
-	/**
-	 * Returns the wpdb instance.
-	 */
-	public static function instance(): wpdb {
+        return $wpdb;
+    }
 
-		global $wpdb;
+    /**
+     * Prepare a SQL statement.
+     *
+     * @param string              $query SQL query.
+     * @param array<int, mixed>   $args  Query arguments.
+     */
+    public static function prepare(
+        string $query,
+        array $args = []
+    ): string {
 
-		return $wpdb;
-	}
+        if ($args === []) {
+            return $query;
+        }
 
-	/**
-	 * Insert a row.
-	 */
-	public static function insert(
-		string $table,
-		array $data,
-		array $format = array()
-	): bool {
+        return self::instance()->prepare(
+            $query,
+            $args
+        );
+    }
 
-		return false !== self::instance()->insert(
-			$table,
-			$data,
-			$format
-		);
-	}
+    /**
+     * Insert a record.
+     *
+     * @param array<string,mixed> $data
+     * @param array<int,string>   $format
+     */
+    public static function insert(
+        string $table,
+        array $data,
+        array $format = []
+    ): bool {
 
-	/**
-	 * Update rows.
-	 */
-	public static function update(
-		string $table,
-		array $data,
-		array $where,
-		array $format = array(),
-		array $where_format = array()
-	): bool {
+        return self::instance()->insert(
+            $table,
+            $data,
+            $format
+        ) !== false;
+    }
 
-		return false !== self::instance()->update(
-			$table,
-			$data,
-			$where,
-			$format,
-			$where_format
-		);
-	}
+    /**
+     * Update records.
+     *
+     * @param array<string,mixed> $data
+     * @param array<string,mixed> $where
+     * @param array<int,string>   $format
+     * @param array<int,string>   $whereFormat
+     */
+    public static function update(
+        string $table,
+        array $data,
+        array $where,
+        array $format = [],
+        array $whereFormat = []
+    ): bool {
 
-	/**
-	 * Delete rows.
-	 */
-	public static function delete(
-		string $table,
-		array $where,
-		array $where_format = array()
-	): bool {
+        return self::instance()->update(
+            $table,
+            $data,
+            $where,
+            $format,
+            $whereFormat
+        ) !== false;
+    }
 
-		return false !== self::instance()->delete(
-			$table,
-			$where,
-			$where_format
-		);
-	}
+    /**
+     * Delete records.
+     *
+     * @param array<string,mixed> $where
+     * @param array<int,string>   $whereFormat
+     */
+    public static function delete(
+        string $table,
+        array $where,
+        array $whereFormat = []
+    ): bool {
 
-	/**
-	 * Returns one row.
-	 */
-	public static function getRow(
-		string $query,
-		array $args = array()
-	): ?object {
+        return self::instance()->delete(
+            $table,
+            $where,
+            $whereFormat
+        ) !== false;
+    }
 
-		if ( ! empty( $args ) ) {
-			$query = self::instance()->prepare(
-				$query,
-				$args
-			);
-		}
+    /**
+     * Get a single row.
+     */
+    public static function getRow(
+        string $query,
+        array $args = []
+    ): ?object {
 
-		return self::instance()->get_row( $query );
-	}
+        return self::instance()->get_row(
+            self::prepare($query, $args)
+        );
+    }
 
-	/**
-	 * Returns multiple rows.
-	 */
-	public static function getResults(
-		string $query,
-		array $args = array()
-	): array {
+    /**
+     * Get multiple rows.
+     *
+     * @return array<object>
+     */
+    public static function getResults(
+        string $query,
+        array $args = []
+    ): array {
 
-		if ( ! empty( $args ) ) {
-			$query = self::instance()->prepare(
-				$query,
-				$args
-			);
-		}
+        return self::instance()->get_results(
+            self::prepare($query, $args)
+        );
+    }
 
-		return self::instance()->get_results( $query );
-	}
+    /**
+     * Get a single value.
+     */
+    public static function getVar(
+        string $query,
+        array $args = []
+    ): mixed {
 
-	/**
-	 * Returns a single value.
-	 */
-	public static function getVar(
-		string $query,
-		array $args = array()
-	): mixed {
+        return self::instance()->get_var(
+            self::prepare($query, $args)
+        );
+    }
 
-		if ( ! empty( $args ) ) {
-			$query = self::instance()->prepare(
-				$query,
-				$args
-			);
-		}
+    /**
+     * Get first column as array.
+     *
+     * @return array<int,mixed>
+     */
+    public static function getColumn(
+        string $query,
+        array $args = []
+    ): array {
 
-		return self::instance()->get_var( $query );
-	}
+        return self::instance()->get_col(
+            self::prepare($query, $args)
+        );
+    }
 
-	/**
-	 * Execute raw SQL.
-	 */
-	public static function query(
-		string $query,
-		array $args = array()
-	): int|false {
+    /**
+     * Returns true if at least one row exists.
+     */
+    public static function exists(
+        string $query,
+        array $args = []
+    ): bool {
 
-		if ( ! empty( $args ) ) {
-			$query = self::instance()->prepare(
-				$query,
-				$args
-			);
-		}
+        return self::getVar(
+            $query,
+            $args
+        ) !== null;
+    }
 
-		return self::instance()->query( $query );
-	}
+    /**
+     * Execute SQL.
+     */
+    public static function query(
+        string $query,
+        array $args = []
+    ): int|false {
 
-	/**
-	 * Last insert id.
-	 */
-	public static function insertId(): int {
+        return self::instance()->query(
+            self::prepare($query, $args)
+        );
+    }
 
-		return (int) self::instance()->insert_id;
-	}
+    /**
+     * Last insert ID.
+     */
+    public static function insertId(): int
+    {
+        return (int) self::instance()->insert_id;
+    }
 
-	/**
-	 * Rows affected.
-	 */
-	public static function rowsAffected(): int {
+    /**
+     * Last error.
+     */
+    public static function lastError(): string
+    {
+        return self::instance()->last_error;
+    }
 
-		return (int) self::instance()->rows_affected;
-	}
-
-	/**
-	 * Last database error.
-	 */
-	public static function lastError(): string {
-
-		return self::instance()->last_error;
-	}
+    /**
+     * Rows affected.
+     */
+    public static function rowsAffected(): int
+    {
+        return (int) self::instance()->rows_affected;
+    }
 }
