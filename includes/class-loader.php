@@ -1,52 +1,97 @@
 <?php
+/**
+ * Plugin Loader
+ *
+ * Loads all required plugin classes.
+ *
+ * @package DizzyEventsManager
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 class Dizzy_Loader {
 
+	/**
+	 * Initialize loader.
+	 *
+	 * @return void
+	 */
+	public static function init() {
 
-    /**
-     * Load required classes
-     */
-    public static function init() {
+		self::load_core();
+		self::load_events();
+		self::load_admin();
 
+	}
 
-        $classes = array(
+	/**
+	 * Load core classes.
+	 *
+	 * @return void
+	 */
+	private static function load_core() {
 
-            'class-activator.php',
+		self::require_files(
+			array(
+				'class-activator.php',
+				'class-deactivator.php',
+				'class-plugin.php',
+			)
+		);
 
-            'class-deactivator.php',
+	}
 
-            'class-plugin.php',
+	/**
+	 * Load event related classes.
+	 *
+	 * @return void
+	 */
+	private static function load_events() {
 
-            'class-events-post-type.php',
+		self::require_files(
+			array(
+				'class-events-post-type.php',
+				'class-artists-post-type.php',
+				'class-event-meta-boxes.php',
+			)
+		);
 
-            'class-artists-post-type.php',
+	}
 
-            'class-admin-menu.php',
+	/**
+	 * Load admin classes.
+	 *
+	 * @return void
+	 */
+	private static function load_admin() {
 
-            'class-event-meta-boxes.php',
+		self::require_files(
+			array(
+				'class-admin-menu.php',
+			)
+		);
 
-        );
+	}
 
+	/**
+	 * Require plugin files.
+	 *
+	 * @param array $files List of files.
+	 *
+	 * @return void
+	 */
+	private static function require_files( array $files ) {
 
-        foreach ( $classes as $class ) {
+		foreach ( $files as $file ) {
 
+			$path = DIZZY_EVENTS_PATH . 'includes/' . $file;
 
-            $file = DIZZY_EVENTS_PATH . 'includes/' . $class;
+			if ( is_readable( $path ) ) {
+				require_once $path;
+			}
+		}
 
-
-            if ( file_exists( $file ) ) {
-
-                require_once $file;
-
-            }
-
-        }
-
-
-    }
-
+	}
 }
