@@ -9,16 +9,22 @@ declare(strict_types=1);
 
 namespace DizzyEvents\Core;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
+/**
+ * Plugin autoloader.
+ */
 final class Autoloader {
 
 	/**
-	 * Base namespace.
+	 * Root namespace.
 	 */
-	private const BASE_NAMESPACE = 'DizzyEvents\\';
+	private const NAMESPACE = 'DizzyEvents\\';
+
+	/**
+	 * Plugin includes directory.
+	 */
+	private const BASE_DIRECTORY = DIZZY_EVENTS_PATH . 'includes/';
 
 	/**
 	 * Register autoloader.
@@ -26,34 +32,43 @@ final class Autoloader {
 	 * @return void
 	 */
 	public static function register(): void {
-		spl_autoload_register( array( self::class, 'autoload' ) );
+
+		spl_autoload_register(
+			array(
+				self::class,
+				'load',
+			)
+		);
+
 	}
 
 	/**
-	 * Autoload classes.
+	 * Load class.
 	 *
-	 * @param string $class Fully qualified class name.
+	 * @param string $class Fully-qualified class name.
 	 *
 	 * @return void
 	 */
-	private static function autoload( string $class ): void {
+	private static function load( string $class ): void {
 
-		// Ignore other namespaces.
-		if ( strpos( $class, self::BASE_NAMESPACE ) !== 0 ) {
+		// Ignore external namespaces.
+		if ( strncmp( $class, self::NAMESPACE, strlen( self::NAMESPACE ) ) !== 0 ) {
 			return;
 		}
 
-		// Remove namespace prefix.
-		$relative_class = substr( $class, strlen( self::BASE_NAMESPACE ) );
+		$relative = substr( $class, strlen( self::NAMESPACE ) );
 
-		// Namespace -> directory.
-		$file = DIZZY_EVENTS_PATH
-			. 'includes/'
-			. str_replace( '\\', DIRECTORY_SEPARATOR, $relative_class )
-			. '.php';
+		$file = self::BASE_DIRECTORY .
+			str_replace(
+				'\\',
+				DIRECTORY_SEPARATOR,
+				$relative
+			) .
+			'.php';
 
 		if ( is_readable( $file ) ) {
 			require_once $file;
 		}
+
 	}
 }
