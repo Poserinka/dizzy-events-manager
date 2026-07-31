@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
-use Dizzy\Events\Contracts\HydratesFromRow;
+use Dizzy\Events\Contracts\Hydrates;
 use Dizzy\Events\Core\Database;
 use Dizzy\Events\Core\DB;
 
@@ -27,12 +27,12 @@ abstract class AbstractRepository
     /**
      * Returns the model class handled by this repository.
      *
-     * @return class-string<HydratesFromRow>
+     * @return class-string<Hydrates>
      */
     abstract protected function modelClass(): string;
 
     /**
-     * Returns the physical table name.
+     * Returns physical table name.
      */
     protected function table(): string
     {
@@ -48,7 +48,7 @@ abstract class AbstractRepository
     protected function findOne(
         string $query,
         array $args = []
-    ): ?HydratesFromRow {
+    ): ?Hydrates {
 
         return $this->hydrate(
             DB::getRow(
@@ -64,7 +64,7 @@ abstract class AbstractRepository
      * @param string $query SQL query.
      * @param array<int,mixed> $args Query arguments.
      *
-     * @return array<HydratesFromRow>
+     * @return array<Hydrates>
      */
     protected function findMany(
         string $query,
@@ -80,36 +80,36 @@ abstract class AbstractRepository
     }
 
     /**
-     * Hydrate a single model.
+     * Hydrate single model.
      */
     protected function hydrate(
-        ?object $row
-    ): ?HydratesFromRow {
+        ?object $source
+    ): ?Hydrates {
 
-        if ($row === null) {
+        if ($source === null) {
             return null;
         }
 
         $model = $this->modelClass();
 
-        return $model::fromRow($row);
+        return $model::from($source);
     }
 
     /**
      * Hydrate multiple models.
      *
-     * @param array<object> $rows
+     * @param array<object> $sources
      *
-     * @return array<HydratesFromRow>
+     * @return array<Hydrates>
      */
     protected function hydrateMany(
-        array $rows
+        array $sources
     ): array {
 
         $items = [];
 
-        foreach ($rows as $row) {
-            $items[] = $this->hydrate($row);
+        foreach ($sources as $source) {
+            $items[] = $this->hydrate($source);
         }
 
         return $items;
