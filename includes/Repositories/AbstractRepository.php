@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
 /**
  * Base repository.
  *
- * Provides common write operations and model hydration.
+ * Provides common database operations and model hydration.
  *
  * @package Dizzy\Events\Repositories
  */
@@ -32,7 +32,7 @@ abstract class AbstractRepository
     abstract protected function modelClass(): string;
 
     /**
-     * Returns the physical database table name.
+     * Returns the physical table name.
      */
     protected function table(): string
     {
@@ -40,10 +40,52 @@ abstract class AbstractRepository
     }
 
     /**
-     * Hydrate a model from a database row.
+     * Find one model.
+     *
+     * @param string $query SQL query.
+     * @param array<int,mixed> $args Query arguments.
      */
-    protected function hydrate(?object $row): ?HydratesFromRow
-    {
+    protected function findOne(
+        string $query,
+        array $args = []
+    ): ?HydratesFromRow {
+
+        return $this->hydrate(
+            DB::getRow(
+                $query,
+                $args
+            )
+        );
+    }
+
+    /**
+     * Find multiple models.
+     *
+     * @param string $query SQL query.
+     * @param array<int,mixed> $args Query arguments.
+     *
+     * @return array<HydratesFromRow>
+     */
+    protected function findMany(
+        string $query,
+        array $args = []
+    ): array {
+
+        return $this->hydrateMany(
+            DB::getResults(
+                $query,
+                $args
+            )
+        );
+    }
+
+    /**
+     * Hydrate a single model.
+     */
+    protected function hydrate(
+        ?object $row
+    ): ?HydratesFromRow {
+
         if ($row === null) {
             return null;
         }
@@ -57,10 +99,13 @@ abstract class AbstractRepository
      * Hydrate multiple models.
      *
      * @param array<object> $rows
+     *
      * @return array<HydratesFromRow>
      */
-    protected function hydrateMany(array $rows): array
-    {
+    protected function hydrateMany(
+        array $rows
+    ): array {
+
         $items = [];
 
         foreach ($rows as $row) {
@@ -80,6 +125,7 @@ abstract class AbstractRepository
         array $data,
         array $format = []
     ): int {
+
         DB::insert(
             $this->table(),
             $data,
@@ -103,6 +149,7 @@ abstract class AbstractRepository
         array $format = [],
         array $whereFormat = []
     ): bool {
+
         return DB::update(
             $this->table(),
             $data,
@@ -122,6 +169,7 @@ abstract class AbstractRepository
         array $where,
         array $whereFormat = []
     ): bool {
+
         return DB::delete(
             $this->table(),
             $where,
