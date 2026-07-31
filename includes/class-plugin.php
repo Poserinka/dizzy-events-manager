@@ -1,75 +1,76 @@
 <?php
+/**
+ * Core Plugin Class
+ *
+ * @package DizzyEventsManager
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
-
 
 class Dizzy_Plugin {
 
+	/**
+	 * Boot plugin.
+	 *
+	 * @return void
+	 */
+	public static function run() {
 
-    /**
-     * Start plugin
-     */
-    public static function run() {
+		self::load_textdomain();
+		self::boot_modules();
 
+	}
 
-        /**
-         * Load admin functionality
-         */
-        if ( is_admin() ) {
+	/**
+	 * Load translations.
+	 *
+	 * @return void
+	 */
+	private static function load_textdomain() {
 
-            new Dizzy_Admin_Menu();
+		load_plugin_textdomain(
+			DIZZY_EVENTS_TEXTDOMAIN,
+			false,
+			dirname( DIZZY_EVENTS_BASENAME ) . '/languages'
+		);
 
-        }
+	}
 
+	/**
+	 * Initialize all plugin modules.
+	 *
+	 * @return void
+	 */
+	private static function boot_modules() {
 
-        /**
-         * Register post types
-         */
-        new Dizzy_Events_Post_Type();
+		$modules = array(
 
-        new Dizzy_Artists_Post_Type();
+			'Dizzy_Assets',
+			'Dizzy_Admin',
+			'Dizzy_Events',
+			'Dizzy_Reservations',
+			'Dizzy_Checkin',
+			'Dizzy_Reports',
+			'Dizzy_Posters',
+			'Dizzy_Social',
 
-        new Dizzy_Event_Meta_Boxes();
+		);
 
+		foreach ( $modules as $module ) {
 
-        /**
-         * Load text domain
-         */
-        add_action(
-            'plugins_loaded',
-            array(
-                __CLASS__,
-                'load_textdomain'
-            )
-        );
+			if (
+				class_exists( $module ) &&
+				method_exists( $module, 'init' )
+			) {
 
+				$module::init();
 
-    }
+			}
 
+		}
 
-
-    /**
-     * Load translations
-     */
-    public static function load_textdomain() {
-
-
-        load_plugin_textdomain(
-
-            DIZZY_EVENTS_TEXTDOMAIN,
-
-            false,
-
-            dirname(
-                DIZZY_EVENTS_BASENAME
-            ) . '/languages/'
-
-        );
-
-
-    }
-
+	}
 
 }
