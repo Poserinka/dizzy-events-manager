@@ -1,10 +1,11 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Untitled Document</title>
-</head>
+class Deactivator {
 
-<body>
-</body>
-</html>
+    public static function deactivate(): void {
+
+        Scheduler::clear();
+
+        flush_rewrite_rules();
+
+    }
+
+}
