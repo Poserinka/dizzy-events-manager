@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
+use Dizzy\Events\Contracts\HydratesFromRow;
 use Dizzy\Events\Core\Database;
 use Dizzy\Events\Core\DB;
 
@@ -12,7 +13,7 @@ defined('ABSPATH') || exit;
 /**
  * Base repository.
  *
- * Provides common write operations for plugin tables.
+ * Provides common write operations and model hydration.
  *
  * @package Dizzy\Events\Repositories
  */
@@ -20,10 +21,15 @@ abstract class AbstractRepository
 {
     /**
      * Logical table key.
-     *
-     * @var string
      */
     protected string $table;
+
+    /**
+     * Returns the model class handled by this repository.
+     *
+     * @return class-string<HydratesFromRow>
+     */
+    abstract protected function modelClass(): string;
 
     /**
      * Returns the physical database table name.
@@ -34,16 +40,46 @@ abstract class AbstractRepository
     }
 
     /**
+     * Hydrate a model from a database row.
+     */
+    protected function hydrate(?object $row): ?HydratesFromRow
+    {
+        if ($row === null) {
+            return null;
+        }
+
+        $model = $this->modelClass();
+
+        return $model::fromRow($row);
+    }
+
+    /**
+     * Hydrate multiple models.
+     *
+     * @param array<object> $rows
+     * @return array<HydratesFromRow>
+     */
+    protected function hydrateMany(array $rows): array
+    {
+        $items = [];
+
+        foreach ($rows as $row) {
+            $items[] = $this->hydrate($row);
+        }
+
+        return $items;
+    }
+
+    /**
      * Insert a record.
      *
-     * @param array<string,mixed> $data   Data.
-     * @param array<int,string>   $format Formats.
+     * @param array<string,mixed> $data
+     * @param array<int,string> $format
      */
     protected function insert(
         array $data,
         array $format = []
     ): int {
-
         DB::insert(
             $this->table(),
             $data,
@@ -56,10 +92,10 @@ abstract class AbstractRepository
     /**
      * Update records.
      *
-     * @param array<string,mixed> $data         Data.
-     * @param array<string,mixed> $where        Where.
-     * @param array<int,string>   $format       Formats.
-     * @param array<int,string>   $whereFormat  Where formats.
+     * @param array<string,mixed> $data
+     * @param array<string,mixed> $where
+     * @param array<int,string> $format
+     * @param array<int,string> $whereFormat
      */
     protected function update(
         array $data,
@@ -67,7 +103,6 @@ abstract class AbstractRepository
         array $format = [],
         array $whereFormat = []
     ): bool {
-
         return DB::update(
             $this->table(),
             $data,
@@ -80,14 +115,13 @@ abstract class AbstractRepository
     /**
      * Delete records.
      *
-     * @param array<string,mixed> $where Where clause.
-     * @param array<int,string>   $whereFormat Where formats.
+     * @param array<string,mixed> $where
+     * @param array<int,string> $whereFormat
      */
     protected function delete(
         array $where,
         array $whereFormat = []
     ): bool {
-
         return DB::delete(
             $this->table(),
             $where,
