@@ -152,6 +152,73 @@ $end_time = get_post_meta(
             value="<?php echo esc_attr($date); ?>"
         >
 
+<p>
+    <label>
+        <strong>Start Time</strong>
+    </label>
+</p>
+
+<select name="event_start_time">
+
+<?php
+
+foreach ( dizzy_get_time_options() as $time ) {
+
+    ?>
+
+    <option value="<?php echo esc_attr($time); ?>"
+        <?php selected(
+            $start_time,
+            $time
+        ); ?>
+    >
+
+        <?php echo esc_html($time); ?>
+
+    </option>
+
+    <?php
+
+}
+
+?>
+
+</select>
+
+
+<p>
+    <label>
+        <strong>End Time</strong>
+    </label>
+</p>
+
+<select name="event_end_time">
+
+<?php
+
+foreach ( dizzy_get_time_options() as $time ) {
+
+    ?>
+
+    <option value="<?php echo esc_attr($time); ?>"
+        <?php selected(
+            $end_time,
+            $time
+        ); ?>
+    >
+
+        <?php echo esc_html($time); ?>
+
+    </option>
+
+    <?php
+
+}
+
+?>
+
+</select>
+
 
         <p>
             <label>
