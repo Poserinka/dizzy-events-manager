@@ -6,6 +6,8 @@ namespace Dizzy\Events\Models;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Dizzy\Events\Contracts\HydratesFromRow;
+use Dizzy\Events\Core\Config;
 use InvalidArgumentException;
 
 defined('ABSPATH') || exit;
@@ -13,11 +15,11 @@ defined('ABSPATH') || exit;
 /**
  * Immutable occurrence model.
  *
- * Represents a single event occurrence.
+ * Represents a single occurrence of an event.
  *
  * @package Dizzy\Events\Models
  */
-readonly class Occurrence
+readonly class Occurrence implements HydratesFromRow
 {
     public function __construct(
         public int $id,
@@ -37,14 +39,15 @@ readonly class Occurrence
      *
      * @throws InvalidArgumentException
      */
-    public static function fromRow(object $row): self
+    public static function fromRow(object $row): static
     {
-        $timezone = new DateTimeZone(
-            $row->timezone ?: 'Europe/Amsterdam'
+        $timezone = self::createTimezone(
+            $row->timezone ?? Config::DEFAULT_TIMEZONE
         );
 
         return new self(
             id: (int) $row->id,
+
             eventId: (int) $row->event_id,
 
             startDateTime: new DateTimeImmutable(
@@ -61,7 +64,7 @@ readonly class Occurrence
 
             allDay: (bool) $row->all_day,
 
-            timezone: $row->timezone ?: 'Europe/Amsterdam',
+            timezone: $timezone->getName(),
 
             status: (string) $row->status,
 
@@ -73,47 +76,32 @@ readonly class Occurrence
             updatedAt: new DateTimeImmutable(
                 $row->updated_at,
                 $timezone
-            )
+            ),
         );
     }
 
     /**
-     * Convert model to array.
-     *
-     * Mainly used by REST API responses.
+     * Convert the model to an array.
      *
      * @return array<string,mixed>
      */
     public function toArray(): array
     {
         return [
-
             'id' => $this->id,
-
             'event_id' => $this->eventId,
-
-            'start_datetime' =>
-                $this->startDateTime->format('Y-m-d H:i:s'),
-
-            'end_datetime' =>
-                $this->endDateTime?->format('Y-m-d H:i:s'),
-
+            'start_datetime' => $this->startDateTime->format('Y-m-d H:i:s'),
+            'end_datetime' => $this->endDateTime?->format('Y-m-d H:i:s'),
             'all_day' => $this->allDay,
-
             'timezone' => $this->timezone,
-
             'status' => $this->status,
-
-            'created_at' =>
-                $this->createdAt->format('Y-m-d H:i:s'),
-
-            'updated_at' =>
-                $this->updatedAt->format('Y-m-d H:i:s'),
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
     }
 
     /**
-     * Check whether occurrence has ended.
+     * Determine whether the occurrence has ended.
      */
     public function hasEnded(): bool
     {
@@ -121,42 +109,48 @@ readonly class Occurrence
             return false;
         }
 
-        return $this->endDateTime < new DateTimeImmutable(
-            'now',
-            new DateTimeZone($this->timezone)
-        );
+        return $this->endDateTime < $this->now();
     }
 
     /**
-     * Check whether occurrence is currently running.
+     * Determine whether the occurrence is currently running.
      */
     public function isRunning(): bool
     {
-        $now = new DateTimeImmutable(
-            'now',
-            new DateTimeZone($this->timezone)
-        );
+        $now = $this->now();
 
         if ($this->startDateTime > $now) {
             return false;
         }
 
-        if ($this->endDateTime === null) {
-            return true;
-        }
-
-        return $this->endDateTime >= $now;
+        return $this->endDateTime === null
+            || $this->endDateTime >= $now;
     }
 
     /**
-     * Returns true when occurrence starts in the future.
+     * Determine whether the occurrence starts in the future.
      */
     public function isUpcoming(): bool
     {
-        return $this->startDateTime >
-            new DateTimeImmutable(
-                'now',
-                new DateTimeZone($this->timezone)
-            );
+        return $this->startDateTime > $this->now();
+    }
+
+    /**
+     * Create a timezone instance.
+     */
+    private static function createTimezone(string $timezone): DateTimeZone
+    {
+        return new DateTimeZone($timezone);
+    }
+
+    /**
+     * Current time in the occurrence timezone.
+     */
+    private function now(): DateTimeImmutable
+    {
+        return new DateTimeImmutable(
+            'now',
+            self::createTimezone($this->timezone)
+        );
     }
 }
