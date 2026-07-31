@@ -1,44 +1,39 @@
 <?php
-/**
- * Plugin Activator.
- *
- * Runs once when the plugin is activated.
- *
- * @package DizzyEventsManager
- */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+namespace Dizzy\Events\Core;
 
-class Dizzy_Activator {
+defined( 'ABSPATH' ) || exit;
 
-	/**
-	 * Activate plugin.
-	 *
-	 * @return void
-	 */
-	public static function activate() {
+class Activator {
 
-		// Install database and plugin defaults.
-		if ( class_exists( 'Dizzy_Installer' ) ) {
-			Dizzy_Installer::install();
-		}
+    /**
+     * Plugin activation.
+     *
+     * @return void
+     */
+    public static function activate(): void {
 
-		// Store current plugin version.
-		update_option(
-			'dizzy_events_version',
-			DIZZY_EVENTS_VERSION
-		);
+        // Create or update database tables.
+        Database::install();
 
-		// Store current database version.
-		update_option(
-			'dizzy_events_db_version',
-			DIZZY_EVENTS_DB_VERSION
-		);
+        // Register scheduled events.
+        Scheduler::register();
 
-		// Refresh rewrite rules.
-		flush_rewrite_rules();
+        // Store plugin version.
+        update_option(
+            'dizzy_events_version',
+            DIZZY_EVENTS_VERSION
+        );
 
-	}
+        // Store installation timestamp.
+        if ( ! get_option( 'dizzy_events_installed_at' ) ) {
+            update_option(
+                'dizzy_events_installed_at',
+                current_time( 'mysql', true )
+            );
+        }
+
+        // Flush rewrite rules.
+        flush_rewrite_rules();
+    }
 }
