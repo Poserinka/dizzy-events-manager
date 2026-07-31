@@ -1,1 +1,17 @@
+```yaml
+parameters:
+    level: 6
+
+    paths:
+        - includes
+        - dizzy-events-manager.php
+
+    tmpDir: .cache/phpstan
+
+    treatPhpDocTypesAsCertain: true
+
+    reportUnmatchedIgnoredErrors: false
+
+includes: []
+```
 
