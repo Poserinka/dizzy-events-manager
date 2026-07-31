@@ -82,6 +82,19 @@ class Dizzy_Event_Meta_Boxes {
             true
         );
 
+        $start_time = get_post_meta(
+    $post->ID,
+    '_event_start_time',
+    true
+);
+
+
+$end_time = get_post_meta(
+    $post->ID,
+    '_event_end_time',
+    true
+);
+
 
         $venue = get_post_meta(
             $post->ID,
