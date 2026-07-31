@@ -1,24 +1,67 @@
 <?php
 /**
- * Core Plugin Class
+ * Core Plugin Bootstrap.
  *
  * @package DizzyEventsManager
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+declare(strict_types=1);
 
-class Dizzy_Plugin {
+namespace DizzyEvents\Core;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Main plugin bootstrap class.
+ */
+final class Plugin {
 
 	/**
-	 * Boot plugin.
+	 * Plugin modules.
+	 *
+	 * Every module must expose a static init() method.
+	 *
+	 * @var array<class-string>
+	 */
+	private const MODULES = array(
+
+		Assets::class,
+
+		// Admin
+		// \DizzyEvents\Admin\Admin::class,
+
+		// Events
+		// \DizzyEvents\Events\EventManager::class,
+
+		// Artists
+		// \DizzyEvents\Artists\ArtistManager::class,
+
+		// Reservations
+		// \DizzyEvents\Reservations\ReservationManager::class,
+
+		// Check-in
+		// \DizzyEvents\Checkin\CheckinManager::class,
+
+		// Reports
+		// \DizzyEvents\Reports\ReportManager::class,
+
+		// Posters
+		// \DizzyEvents\Posters\PosterGenerator::class,
+
+		// Social
+		// \DizzyEvents\Social\SocialExporter::class,
+
+	);
+
+	/**
+	 * Bootstrap plugin.
 	 *
 	 * @return void
 	 */
-	public static function run() {
+	public static function init(): void {
 
 		self::load_textdomain();
+
 		self::boot_modules();
 
 	}
@@ -28,7 +71,7 @@ class Dizzy_Plugin {
 	 *
 	 * @return void
 	 */
-	private static function load_textdomain() {
+	private static function load_textdomain(): void {
 
 		load_plugin_textdomain(
 			DIZZY_EVENTS_TEXTDOMAIN,
@@ -39,38 +82,21 @@ class Dizzy_Plugin {
 	}
 
 	/**
-	 * Initialize all plugin modules.
+	 * Initialize all modules.
 	 *
 	 * @return void
 	 */
-	private static function boot_modules() {
+	private static function boot_modules(): void {
 
-		$modules = array(
-
-			'Dizzy_Assets',
-			'Dizzy_Admin',
-			'Dizzy_Events',
-			'Dizzy_Reservations',
-			'Dizzy_Checkin',
-			'Dizzy_Reports',
-			'Dizzy_Posters',
-			'Dizzy_Social',
-
-		);
-
-		foreach ( $modules as $module ) {
+		foreach ( self::MODULES as $module ) {
 
 			if (
 				class_exists( $module ) &&
 				method_exists( $module, 'init' )
 			) {
-
 				$module::init();
-
 			}
-
 		}
 
 	}
-
 }
