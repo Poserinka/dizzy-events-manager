@@ -27,6 +27,8 @@ class Dizzy_Loader {
 
             'class-admin-menu.php',
 
+            'class-event-meta-boxes.php',
+
         );
 
 
