@@ -1,6 +1,6 @@
 <?php
 /**
- * Core Plugin Bootstrap.
+ * Main Plugin Bootstrap.
  *
  * @package DizzyEventsManager
  */
@@ -17,44 +17,7 @@ defined( 'ABSPATH' ) || exit;
 final class Plugin {
 
 	/**
-	 * Plugin modules.
-	 *
-	 * Every module must expose a static init() method.
-	 *
-	 * @var array<class-string>
-	 */
-	private const MODULES = array(
-
-		Assets::class,
-
-		// Admin
-		// \DizzyEvents\Admin\Admin::class,
-
-		// Events
-		// \DizzyEvents\Events\EventManager::class,
-
-		// Artists
-		// \DizzyEvents\Artists\ArtistManager::class,
-
-		// Reservations
-		// \DizzyEvents\Reservations\ReservationManager::class,
-
-		// Check-in
-		// \DizzyEvents\Checkin\CheckinManager::class,
-
-		// Reports
-		// \DizzyEvents\Reports\ReportManager::class,
-
-		// Posters
-		// \DizzyEvents\Posters\PosterGenerator::class,
-
-		// Social
-		// \DizzyEvents\Social\SocialExporter::class,
-
-	);
-
-	/**
-	 * Bootstrap plugin.
+	 * Initialize the plugin.
 	 *
 	 * @return void
 	 */
@@ -67,7 +30,7 @@ final class Plugin {
 	}
 
 	/**
-	 * Load translations.
+	 * Load plugin translations.
 	 *
 	 * @return void
 	 */
@@ -82,7 +45,7 @@ final class Plugin {
 	}
 
 	/**
-	 * Initialize all modules.
+	 * Initialize all registered modules.
 	 *
 	 * @return void
 	 */
@@ -90,13 +53,17 @@ final class Plugin {
 
 		foreach ( Modules::all() as $module ) {
 
-	if (
-		class_exists( $module ) &&
-		method_exists( $module, 'init' )
-	) {
-		$module::init();
-	}
-}
+			if ( ! class_exists( $module ) ) {
+				continue;
+			}
+
+			if ( ! method_exists( $module, 'init' ) ) {
+				continue;
+			}
+
+			$module::init();
+
+		}
 
 	}
 }
