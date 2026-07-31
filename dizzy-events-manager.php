@@ -53,11 +53,11 @@ DizzyEvents\Core\Autoloader::register();
  * Activation hook.
  */
 register_activation_hook(
-	DIZZY_EVENTS_FILE,
-	array(
-		DizzyEvents\Core\Activator::class,
-		'activate',
-	)
+    __FILE__,
+    array(
+        \Dizzy\Events\Core\Activator::class,
+        'activate',
+    )
 );
 
 /**
