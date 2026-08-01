@@ -63,6 +63,44 @@ final class EventService
     }
 
     /**
+     * Get upcoming event presentation data.
+     *
+     * @return array<int, array{
+     *     event: Event,
+     *     details: EventDetails,
+     *     occurrences: array<Occurrence>
+     * }>
+     */
+    public function getUpcomingEventData(int $limit = 20): array
+    {
+        $events = $this->getUpcomingEvents($limit);
+
+        if ($events === []) {
+            return [];
+        }
+
+        $eventIds = array_map(
+            static function (Event $event): int {
+                return $event->id;
+            },
+            $events
+        );
+        $occurrencesByEvent = $this->occurrenceRepository
+            ->findUpcomingByEventIds($eventIds);
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'event'       => $event,
+                'details'     => $this->getEventDetails($event->id),
+                'occurrences' => $occurrencesByEvent[$event->id] ?? [],
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
      * Get upcoming occurrences.
      *
      * @return array<Occurrence>
