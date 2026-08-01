@@ -58,13 +58,13 @@ readonly class EventDetails
             address: self::stringValue(
                 self::metaValue($meta, 'address')
             ) ?? self::DEFAULT_ADDRESS,
-            mapsUrl: self::stringValue(
+            mapsUrl: self::urlValue(
                 self::metaValue($meta, 'maps_url')
             ) ?? self::DEFAULT_MAPS_URL,
-            ticketUrl: self::stringValue(
+            ticketUrl: self::urlValue(
                 self::metaValue($meta, 'ticket_url')
             ),
-            ticketPrice: self::floatValue(
+            ticketPrice: self::priceValue(
                 self::metaValue($meta, 'ticket_price')
             ),
             featured: self::boolValue(
@@ -82,8 +82,8 @@ readonly class EventDetails
     {
         $value = $meta[$key] ?? $meta['_dizzy_' . $key] ?? null;
 
-        if (is_array($value)) {
-            return $value[0] ?? null;
+        while (is_array($value)) {
+            $value = $value[0] ?? null;
         }
 
         return $value;
@@ -104,15 +104,39 @@ readonly class EventDetails
     }
 
     /**
-     * Normalize a float value.
+     * Normalize a URL value.
      */
-    private static function floatValue(mixed $value): ?float
+    private static function urlValue(mixed $value): ?string
     {
-        if (! is_scalar($value) || $value === '') {
+        $value = self::stringValue($value);
+
+        if ($value === null) {
             return null;
         }
 
-        return is_numeric($value) ? (float) $value : null;
+        $url = esc_url_raw($value, ['http', 'https']);
+
+        return $url === '' ? null : $url;
+    }
+
+    /**
+     * Normalize a non-negative ticket price.
+     */
+    private static function priceValue(mixed $value): ?float
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $value = str_replace(',', '.', trim((string) $value));
+
+        if ($value === '' || ! is_numeric($value)) {
+            return null;
+        }
+
+        $price = (float) $value;
+
+        return $price < 0 ? null : $price;
     }
 
     /**
@@ -120,6 +144,10 @@ readonly class EventDetails
      */
     private static function boolValue(mixed $value): bool
     {
+        while (is_array($value)) {
+            $value = $value[0] ?? null;
+        }
+
         return in_array(
             $value,
             [true, 1, '1', 'true', 'yes', 'on'],
