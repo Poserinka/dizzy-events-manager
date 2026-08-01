@@ -117,10 +117,27 @@ final class EventService
      */
     public function groupOccurrences(array $occurrences): array
     {
-        return [
-            'upcoming' => $this->filterAndSortOccurrences($occurrences, true),
-            'past'     => $this->filterAndSortOccurrences($occurrences, false),
+        $grouped = [
+            'upcoming' => [],
+            'past'     => [],
         ];
+
+        foreach ($occurrences as $occurrence) {
+            if (! $occurrence instanceof Occurrence) {
+                continue;
+            }
+
+            $group = $occurrence->isUpcoming()
+                ? 'upcoming'
+                : 'past';
+
+            $grouped[$group][] = $occurrence;
+        }
+
+        $this->sortOccurrences($grouped['upcoming']);
+        $this->sortOccurrences($grouped['past']);
+
+        return $grouped;
     }
 
     /**
@@ -130,10 +147,11 @@ final class EventService
      */
     public function getUpcomingOccurrences(int $eventId): array
     {
-        return $this->filterAndSortOccurrences(
-            $this->occurrenceRepository->findByEventId($eventId),
-            true
+        $grouped = $this->groupOccurrences(
+            $this->occurrenceRepository->findByEventId($eventId)
         );
+
+        return $grouped['upcoming'];
     }
 
     /**
@@ -143,10 +161,11 @@ final class EventService
      */
     public function getPastOccurrences(int $eventId): array
     {
-        return $this->filterAndSortOccurrences(
-            $this->occurrenceRepository->findByEventId($eventId),
-            false
+        $grouped = $this->groupOccurrences(
+            $this->occurrenceRepository->findByEventId($eventId)
         );
+
+        return $grouped['past'];
     }
 
     /**
@@ -178,27 +197,14 @@ final class EventService
     }
 
     /**
-     * Filter occurrences by temporal state and sort them chronologically.
+     * Sort occurrence records chronologically.
      *
      * @param array<Occurrence> $occurrences Occurrence records.
-     *
-     * @return array<Occurrence>
      */
-    private function filterAndSortOccurrences(
-        array $occurrences,
-        bool $upcoming
-    ): array {
-        $filtered = array_values(
-            array_filter(
-                $occurrences,
-                static function (Occurrence $occurrence) use ($upcoming): bool {
-                    return $occurrence->isUpcoming() === $upcoming;
-                }
-            )
-        );
-
+    private function sortOccurrences(array &$occurrences): void
+    {
         usort(
-            $filtered,
+            $occurrences,
             static function (
                 Occurrence $first,
                 Occurrence $second
@@ -210,7 +216,5 @@ final class EventService
                     : $first->id <=> $second->id;
             }
         );
-
-        return $filtered;
     }
 }
