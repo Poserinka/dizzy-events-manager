@@ -60,22 +60,14 @@ final class SingleEvent
             return $template;
         }
 
-        $data['upcomingOccurrences'] = array_values(
-            array_filter(
-                $data['occurrences'],
-                static function (Occurrence $occurrence): bool {
-                    return $occurrence->isUpcoming();
-                }
-            )
+        $data['upcomingOccurrences'] = $this->filterAndSortOccurrences(
+            $data['occurrences'],
+            true
         );
 
-        $data['pastOccurrences'] = array_values(
-            array_filter(
-                $data['occurrences'],
-                static function (Occurrence $occurrence): bool {
-                    return ! $occurrence->isUpcoming();
-                }
-            )
+        $data['pastOccurrences'] = $this->filterAndSortOccurrences(
+            $data['occurrences'],
+            false
         );
 
         set_query_var('dizzy_event_data', $data);
@@ -88,5 +80,41 @@ final class SingleEvent
         }
 
         return $template;
+    }
+
+    /**
+     * Filter occurrences by time group and sort them chronologically.
+     *
+     * @param array<Occurrence> $occurrences Occurrences to filter.
+     *
+     * @return array<Occurrence>
+     */
+    private function filterAndSortOccurrences(
+        array $occurrences,
+        bool $upcoming
+    ): array {
+        $filtered = array_values(
+            array_filter(
+                $occurrences,
+                static function (Occurrence $occurrence) use ($upcoming): bool {
+                    return $occurrence->isUpcoming() === $upcoming;
+                }
+            )
+        );
+
+        usort(
+            $filtered,
+            static function (Occurrence $first, Occurrence $second): int {
+                $dateComparison = $first->startDateTime <=> $second->startDateTime;
+
+                if ($dateComparison !== 0) {
+                    return $dateComparison;
+                }
+
+                return $first->id <=> $second->id;
+            }
+        );
+
+        return $filtered;
     }
 }
