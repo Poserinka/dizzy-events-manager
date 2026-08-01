@@ -21,13 +21,14 @@ defined('ABSPATH') || exit;
  */
 final class EventService
 {
+    /**
+     * Create the event service.
+     */
     public function __construct(
         private EventRepository $eventRepository,
         private OccurrenceRepository $occurrenceRepository,
     ) {
     }
-
-
 
     /**
      * Get event with occurrences and details.
@@ -38,199 +39,89 @@ final class EventService
      *     details: EventDetails
      * }|null
      */
-    public function getEvent(
-        int $eventId
-    ): ?array {
+    public function getEvent(int $eventId): ?array
+    {
+        $event = $this->eventRepository->findById($eventId);
 
-
-        $event =
-            $this->eventRepository
-                ->findById(
-                    $eventId
-                );
-
-
-        if (
-            $event === null
-        ) {
+        if ($event === null) {
             return null;
         }
 
-
-
         return [
-
-            'event' =>
-                $event,
-
-
-            'occurrences' =>
-                $this->occurrenceRepository
-                    ->findByEventId(
-                        $eventId
-                    ),
-
-
-            'details' =>
-                $this->getEventDetails(
-                    $eventId
-                ),
-
+            'event'       => $event,
+            'occurrences' => $this->occurrenceRepository->findByEventId($eventId),
+            'details'     => $this->getEventDetails($eventId),
         ];
     }
-
-
-
-
 
     /**
      * Get event details.
      */
-    public function getEventDetails(
-        int $eventId
-    ): EventDetails {
-
-
-        return EventDetails::fromMeta(
-
-            get_post_meta(
-                $eventId
-            )
-
-        );
+    public function getEventDetails(int $eventId): EventDetails
+    {
+        return EventDetails::fromMeta(get_post_meta($eventId));
     }
-
-
-
-
 
     /**
      * Get upcoming occurrences.
      *
      * @return array<Occurrence>
      */
-    public function getUpcomingOccurrences(
-        int $eventId
-    ): array {
-
-
-        $occurrences =
-            $this->occurrenceRepository
-                ->findByEventId(
-                    $eventId
-                );
-
+    public function getUpcomingOccurrences(int $eventId): array
+    {
+        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
 
         return array_values(
-
             array_filter(
-
                 $occurrences,
-
-                static function (
-                    Occurrence $occurrence
-                ): bool {
-
+                static function (Occurrence $occurrence): bool {
                     return $occurrence->isUpcoming();
-
                 }
-
             )
-
         );
     }
-
-
-
-
 
     /**
      * Get past occurrences.
      *
      * @return array<Occurrence>
      */
-    public function getPastOccurrences(
-        int $eventId
-    ): array {
-
-
-        $occurrences =
-            $this->occurrenceRepository
-                ->findByEventId(
-                    $eventId
-                );
-
+    public function getPastOccurrences(int $eventId): array
+    {
+        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
 
         return array_values(
-
             array_filter(
-
                 $occurrences,
-
-                static function (
-                    Occurrence $occurrence
-                ): bool {
-
+                static function (Occurrence $occurrence): bool {
                     return ! $occurrence->isUpcoming();
-
                 }
-
             )
-
         );
     }
-
-
-
-
 
     /**
      * Get upcoming published events.
      *
      * @return array<Event>
      */
-    public function getUpcomingEvents(
-        int $limit = 20
-    ): array {
-
-
-        return $this->eventRepository
-            ->findPublished(
-                $limit
-            );
+    public function getUpcomingEvents(int $limit = 20): array
+    {
+        return $this->eventRepository->findPublished($limit);
     }
-
-
-
-
 
     /**
      * Check whether event has future occurrences.
      */
-    public function hasUpcomingOccurrences(
-        int $eventId
-    ): bool {
+    public function hasUpcomingOccurrences(int $eventId): bool
+    {
+        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
 
-
-        $occurrences =
-            $this->occurrenceRepository
-                ->findByEventId(
-                    $eventId
-                );
-
-
-        foreach (
-            $occurrences as $occurrence
-        ) {
-
-            if (
-                $occurrence->isUpcoming()
-            ) {
+        foreach ($occurrences as $occurrence) {
+            if ($occurrence->isUpcoming()) {
                 return true;
             }
-
         }
-
 
         return false;
     }
