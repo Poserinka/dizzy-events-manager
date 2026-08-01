@@ -10,8 +10,9 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-$visibleDates   = $event->cardDates();
-$remainingDates = $event->remainingCardDateCount();
+$datePresentation = $event->cardDatePresentation();
+$visibleDates     = $datePresentation['visible'];
+$remainingDates   = $datePresentation['remaining'];
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
