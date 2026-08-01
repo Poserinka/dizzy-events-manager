@@ -17,6 +17,10 @@ defined('ABSPATH') || exit;
  */
 readonly class EventViewData
 {
+    private const DEFAULT_CARD_DATE_LIMIT = 3;
+
+    private const MAX_CARD_DATE_LIMIT = 10;
+
     /**
      * Create event view data.
      *
@@ -72,6 +76,41 @@ readonly class EventViewData
             ticketPrice: $details->ticketPrice,
             featured: $details->featured,
             dates: $dates,
+        );
+    }
+
+    /**
+     * Get dates displayed on an event card.
+     *
+     * @return array<OccurrenceViewData>
+     */
+    public function cardDates(): array
+    {
+        return array_slice($this->dates, 0, $this->cardDateLimit());
+    }
+
+    /**
+     * Get the number of dates omitted from an event card.
+     */
+    public function remainingCardDateCount(): int
+    {
+        return max(0, count($this->dates) - count($this->cardDates()));
+    }
+
+    /**
+     * Get the filtered card date limit.
+     */
+    private function cardDateLimit(): int
+    {
+        $limit = apply_filters(
+            'dizzy_events_card_date_limit',
+            self::DEFAULT_CARD_DATE_LIMIT,
+            $this->id
+        );
+
+        return min(
+            max(1, absint($limit)),
+            self::MAX_CARD_DATE_LIMIT
         );
     }
 
