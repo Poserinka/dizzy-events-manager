@@ -152,7 +152,17 @@ readonly class EventViewData
      */
     private static function permalink(int $eventId): string
     {
-        $permalink = get_permalink($eventId);
+        try {
+            $permalink = get_permalink($eventId);
+        } catch (Throwable $exception) {
+            self::logPresentationFailure(
+                'permalink generation',
+                $eventId,
+                $exception
+            );
+
+            return '';
+        }
 
         return is_string($permalink) ? $permalink : '';
     }
@@ -162,7 +172,17 @@ readonly class EventViewData
      */
     private static function featuredImage(int $eventId): string
     {
-        $image = get_the_post_thumbnail_url($eventId, 'large');
+        try {
+            $image = get_the_post_thumbnail_url($eventId, 'large');
+        } catch (Throwable $exception) {
+            self::logPresentationFailure(
+                'featured image generation',
+                $eventId,
+                $exception
+            );
+
+            return '';
+        }
 
         return is_string($image) ? $image : '';
     }
@@ -182,12 +202,10 @@ readonly class EventViewData
                     return $excerpt;
                 }
             } catch (Throwable $exception) {
-                error_log(
-                    sprintf(
-                        'Dizzy Events excerpt filtering failed for event %d: %s',
-                        $event->id,
-                        $exception->getMessage()
-                    )
+                self::logPresentationFailure(
+                    'excerpt filtering',
+                    $event->id,
+                    $exception
                 );
             }
 
@@ -201,6 +219,24 @@ readonly class EventViewData
         return wp_trim_words(
             wp_strip_all_tags(strip_shortcodes($event->content)),
             35
+        );
+    }
+
+    /**
+     * Log an isolated event presentation failure.
+     */
+    private static function logPresentationFailure(
+        string $operation,
+        int $eventId,
+        Throwable $exception
+    ): void {
+        error_log(
+            sprintf(
+                'Dizzy Events %s failed for event %d: %s',
+                $operation,
+                $eventId,
+                $exception->getMessage()
+            )
         );
     }
 }
