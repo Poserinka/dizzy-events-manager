@@ -59,7 +59,7 @@ final class OccurrenceRepository
     }
 
     /**
-     * Find upcoming published occurrences grouped by event ID.
+     * Find current and upcoming published occurrences grouped by event ID.
      *
      * @param array<int> $eventIds Event IDs.
      *
@@ -91,7 +91,7 @@ final class OccurrenceRepository
             FROM {$this->table}
             WHERE event_id IN ({$placeholders})
                 AND status = %s
-                AND start_datetime >= %s
+                AND COALESCE(end_datetime, start_datetime) >= %s
             ORDER BY event_id ASC, start_datetime ASC, sort_order ASC
             ",
             [
@@ -118,7 +118,7 @@ final class OccurrenceRepository
     }
 
     /**
-     * Find event IDs with upcoming published occurrences.
+     * Find event IDs with current or upcoming published occurrences.
      *
      * IDs are ordered by their next occurrence date.
      *
@@ -134,7 +134,7 @@ final class OccurrenceRepository
             SELECT event_id
             FROM {$this->table}
             WHERE status = %s
-                AND start_datetime >= %s
+                AND COALESCE(end_datetime, start_datetime) >= %s
             GROUP BY event_id
             ORDER BY MIN(start_datetime) ASC
             LIMIT %d
