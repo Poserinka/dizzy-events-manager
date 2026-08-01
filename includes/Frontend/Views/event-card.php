@@ -14,6 +14,7 @@ $datePresentation = $event->cardDatePresentation();
 $visibleDates     = $datePresentation['visible'];
 $remainingDates   = $datePresentation['remaining'];
 $eventUrl         = trim($event->url);
+$imageUrl         = esc_url(trim($event->image));
 $mapsUrl          = $event->mapsUrl !== null
     ? trim($event->mapsUrl)
     : '';
@@ -29,17 +30,17 @@ $hasEventUrl      = $eventUrl !== '';
         </span>
     <?php endif; ?>
 
-    <?php if ($event->image !== '') : ?>
+    <?php if ($imageUrl !== '') : ?>
         <?php if ($hasEventUrl) : ?>
             <a href="<?php echo esc_url($eventUrl); ?>">
                 <img
-                    src="<?php echo esc_url($event->image); ?>"
+                    src="<?php echo $imageUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
                     alt="<?php echo esc_attr($event->title); ?>"
                 >
             </a>
         <?php else : ?>
             <img
-                src="<?php echo esc_url($event->image); ?>"
+                src="<?php echo $imageUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
                 alt="<?php echo esc_attr($event->title); ?>"
             >
         <?php endif; ?>
