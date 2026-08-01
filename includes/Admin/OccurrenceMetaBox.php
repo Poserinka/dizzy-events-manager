@@ -21,6 +21,8 @@ final class OccurrenceMetaBox
 {
     private const ERROR_QUERY_ARG = 'dizzy_occurrence_error';
 
+    private const VALIDATION_QUERY_ARG = 'dizzy_occurrence_validation';
+
     public function __construct(
         private OccurrenceRepository $repository,
         private OccurrenceService $service
@@ -31,10 +33,7 @@ final class OccurrenceMetaBox
     {
         add_action('add_meta_boxes_event', [$this, 'add']);
         add_action('save_post_event', [$this, 'save']);
-        add_action(
-            'admin_notices',
-            [$this, 'renderPersistenceErrorNotice']
-        );
+        add_action('admin_notices', [$this, 'renderAdminNotices']);
     }
 
     public function add(): void
@@ -264,7 +263,26 @@ final class OccurrenceMetaBox
         }
 
         try {
-            $this->service->replaceForEvent($postId, $data);
+            $errors = $this->service->replaceForEvent($postId, $data);
+
+            if ($errors !== []) {
+                set_transient(
+                    $this->validationTransientKey($postId),
+                    $errors,
+                    5 * MINUTE_IN_SECONDS
+                );
+
+                add_filter(
+                    'redirect_post_location',
+                    static function (string $location): string {
+                        return add_query_arg(
+                            self::VALIDATION_QUERY_ARG,
+                            '1',
+                            $location
+                        );
+                    }
+                );
+            }
         } catch (Throwable $exception) {
             error_log(
                 sprintf(
@@ -287,16 +305,19 @@ final class OccurrenceMetaBox
         }
     }
 
-    public function renderPersistenceErrorNotice(): void
+    public function renderAdminNotices(): void
     {
-        if (
-            ! isset($_GET[self::ERROR_QUERY_ARG])
-            || sanitize_text_field(
-                wp_unslash($_GET[self::ERROR_QUERY_ARG])
-            ) !== '1'
-        ) {
-            return;
+        if ($this->queryFlagIsSet(self::ERROR_QUERY_ARG)) {
+            $this->renderPersistenceErrorNotice();
         }
+
+        if ($this->queryFlagIsSet(self::VALIDATION_QUERY_ARG)) {
+            $this->renderValidationNotice();
+        }
+    }
+
+    private function renderPersistenceErrorNotice(): void
+    {
         ?>
         <div class="notice notice-error is-dismissible">
             <p>
@@ -309,6 +330,104 @@ final class OccurrenceMetaBox
             </p>
         </div>
         <?php
+    }
+
+    private function renderValidationNotice(): void
+    {
+        $postId = isset($_GET['post'])
+            ? absint($_GET['post'])
+            : 0;
+
+        if ($postId <= 0) {
+            return;
+        }
+
+        $key    = $this->validationTransientKey($postId);
+        $errors = get_transient($key);
+
+        delete_transient($key);
+
+        if (! is_array($errors) || $errors === []) {
+            return;
+        }
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p>
+                <strong>
+                    <?php
+                    esc_html_e(
+                        'Event dates were not updated. Please correct the following:',
+                        'dizzy-events-manager'
+                    );
+                    ?>
+                </strong>
+            </p>
+            <ul>
+                <?php foreach ($errors as $error) : ?>
+                    <?php
+                    if (
+                        ! is_array($error)
+                        || ! isset($error['row'], $error['code'])
+                    ) {
+                        continue;
+                    }
+                    ?>
+                    <li>
+                        <?php
+                        echo esc_html(
+                            $this->validationMessage(
+                                absint($error['row']),
+                                sanitize_key((string) $error['code'])
+                            )
+                        );
+                        ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php
+    }
+
+    private function validationMessage(int $row, string $code): string
+    {
+        $messages = [
+            'invalid_event'       => __('The event identifier is invalid.', 'dizzy-events-manager'),
+            'start_date_required' => __('A start date is required.', 'dizzy-events-manager'),
+            'start_time_required' => __('A start time is required.', 'dizzy-events-manager'),
+            'invalid_start'       => __('The start date or time is invalid.', 'dizzy-events-manager'),
+            'incomplete_end'      => __('The end date and end time must be entered together.', 'dizzy-events-manager'),
+            'invalid_end'         => __('The end date or time is invalid.', 'dizzy-events-manager'),
+            'end_before_start'    => __('The end time must not be earlier than the start time.', 'dizzy-events-manager'),
+        ];
+
+        $message = $messages[$code]
+            ?? __('The occurrence contains invalid data.', 'dizzy-events-manager');
+
+        if ($row <= 0) {
+            return $message;
+        }
+
+        return sprintf(
+            /* translators: 1: occurrence row number, 2: validation message. */
+            __('Row %1$d: %2$s', 'dizzy-events-manager'),
+            $row,
+            $message
+        );
+    }
+
+    private function validationTransientKey(int $postId): string
+    {
+        return sprintf(
+            'dizzy_occurrence_errors_%d_%d',
+            get_current_user_id(),
+            $postId
+        );
+    }
+
+    private function queryFlagIsSet(string $key): bool
+    {
+        return isset($_GET[$key])
+            && sanitize_text_field(wp_unslash($_GET[$key])) === '1';
     }
 
     private function canSave(int $postId): bool
