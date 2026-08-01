@@ -23,7 +23,9 @@ final class Database
     /**
      * Database schema version.
      */
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.1.0';
+
+
 
     /**
      * Table registry.
@@ -51,15 +53,22 @@ final class Database
         ];
     }
 
+
+
     /**
      * Returns one table name.
      */
-    public static function table(string $key): string
-    {
+    public static function table(
+        string $key
+    ): string {
+
         $tables = self::tables();
 
         return $tables[$key] ?? '';
+
     }
+
+
 
     /**
      * Install or upgrade database.
@@ -70,17 +79,24 @@ final class Database
             Config::OPTION_DB_VERSION
         );
 
-        if ($installed === self::VERSION) {
+
+        if (
+            $installed === self::VERSION
+        ) {
             return;
         }
 
+
         self::createTables();
+
 
         update_option(
             Config::OPTION_DB_VERSION,
             self::VERSION
         );
     }
+
+
 
     /**
      * Creates plugin tables.
@@ -89,25 +105,39 @@ final class Database
     {
         global $wpdb;
 
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-        $charset = $wpdb->get_charset_collate();
 
-        $occurrences = self::table(
-            Config::TABLE_OCCURRENCES
-        );
+        $charset =
+            $wpdb->get_charset_collate();
 
-        $artists = self::table(
-            Config::TABLE_ARTISTS
-        );
 
-        $relations = self::table(
-            Config::TABLE_EVENT_ARTIST
-        );
 
-        $logs = self::table(
-            Config::TABLE_LOGS
-        );
+        $occurrences =
+            self::table(
+                Config::TABLE_OCCURRENCES
+            );
+
+
+        $artists =
+            self::table(
+                Config::TABLE_ARTISTS
+            );
+
+
+        $relations =
+            self::table(
+                Config::TABLE_EVENT_ARTIST
+            );
+
+
+        $logs =
+            self::table(
+                Config::TABLE_LOGS
+            );
+
+
 
         dbDelta(
 "
@@ -127,6 +157,8 @@ timezone VARCHAR(100) NULL,
 
 status VARCHAR(20) DEFAULT 'publish',
 
+sort_order INT NOT NULL DEFAULT 0,
+
 created_at DATETIME NOT NULL,
 
 updated_at DATETIME NOT NULL,
@@ -135,11 +167,15 @@ PRIMARY KEY (id),
 
 KEY event_id (event_id),
 
-KEY start_datetime (start_datetime)
+KEY start_datetime (start_datetime),
+
+KEY sort_order (sort_order)
 
 ) {$charset};
 "
 );
+
+
 
         dbDelta(
 "
@@ -173,6 +209,8 @@ UNIQUE KEY slug(slug)
 "
 );
 
+
+
         dbDelta(
 "
 CREATE TABLE {$relations} (
@@ -190,6 +228,8 @@ KEY artist_id(artist_id)
 ) {$charset};
 "
 );
+
+
 
         dbDelta(
 "
