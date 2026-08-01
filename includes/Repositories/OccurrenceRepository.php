@@ -19,6 +19,12 @@ defined('ABSPATH') || exit;
  */
 final class OccurrenceRepository
 {
+    private const OCCURRENCE_STATUS = 'publish';
+
+    private const EVENT_POST_TYPE = 'event';
+
+    private const EVENT_POST_STATUS = 'publish';
+
     /**
      * Occurrence repository constructor.
      */
@@ -86,16 +92,7 @@ final class OccurrenceRepository
             INNER JOIN {$this->postsTable} AS events
                 ON events.ID = occurrences.event_id
             WHERE occurrences.event_id IN ({$placeholders})
-                AND occurrences.status = %s
-                AND events.post_type = %s
-                AND events.post_status = %s
-                AND (
-                    occurrences.end_datetime >= %s
-                    OR (
-                        occurrences.end_datetime IS NULL
-                        AND occurrences.start_datetime >= %s
-                    )
-                )
+                AND {$this->publishedUpcomingConditions()}
             ORDER BY
                 occurrences.event_id ASC,
                 occurrences.start_datetime ASC,
@@ -103,11 +100,7 @@ final class OccurrenceRepository
             ",
             [
                 ...$eventIds,
-                'publish',
-                'event',
-                'publish',
-                $now,
-                $now,
+                ...$this->publishedUpcomingArguments($now),
             ]
         );
 
@@ -148,26 +141,13 @@ final class OccurrenceRepository
             FROM {$this->table} AS occurrences
             INNER JOIN {$this->postsTable} AS events
                 ON events.ID = occurrences.event_id
-            WHERE occurrences.status = %s
-                AND events.post_type = %s
-                AND events.post_status = %s
-                AND (
-                    occurrences.end_datetime >= %s
-                    OR (
-                        occurrences.end_datetime IS NULL
-                        AND occurrences.start_datetime >= %s
-                    )
-                )
+            WHERE {$this->publishedUpcomingConditions()}
             GROUP BY occurrences.event_id
             ORDER BY MIN(occurrences.start_datetime) ASC
             LIMIT %d
             ",
             [
-                'publish',
-                'event',
-                'publish',
-                $now,
-                $now,
+                ...$this->publishedUpcomingArguments($now),
                 $limit,
             ]
         );
@@ -197,25 +177,12 @@ final class OccurrenceRepository
             INNER JOIN {$this->postsTable} AS events
                 ON events.ID = occurrences.event_id
             WHERE occurrences.event_id = %d
-                AND occurrences.status = %s
-                AND events.post_type = %s
-                AND events.post_status = %s
-                AND (
-                    occurrences.end_datetime >= %s
-                    OR (
-                        occurrences.end_datetime IS NULL
-                        AND occurrences.start_datetime >= %s
-                    )
-                )
+                AND {$this->publishedUpcomingConditions()}
             LIMIT 1
             ",
             [
                 $eventId,
-                'publish',
-                'event',
-                'publish',
-                $now,
-                $now,
+                ...$this->publishedUpcomingArguments($now),
             ]
         );
     }
@@ -338,6 +305,41 @@ final class OccurrenceRepository
                 )
             );
         }
+    }
+
+    /**
+     * Get the common SQL conditions for public upcoming occurrences.
+     */
+    private function publishedUpcomingConditions(): string
+    {
+        return "
+            occurrences.status = %s
+            AND events.post_type = %s
+            AND events.post_status = %s
+            AND (
+                occurrences.end_datetime >= %s
+                OR (
+                    occurrences.end_datetime IS NULL
+                    AND occurrences.start_datetime >= %s
+                )
+            )
+        ";
+    }
+
+    /**
+     * Get arguments for the common public upcoming occurrence conditions.
+     *
+     * @return array<int, string>
+     */
+    private function publishedUpcomingArguments(string $now): array
+    {
+        return [
+            self::OCCURRENCE_STATUS,
+            self::EVENT_POST_TYPE,
+            self::EVENT_POST_STATUS,
+            $now,
+            $now,
+        ];
     }
 
     /**
