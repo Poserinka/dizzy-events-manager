@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Dizzy\Events\Frontend\ViewModels;
 
 use Dizzy\Events\Models\Event;
+use Dizzy\Events\Models\EventDetails;
+use Dizzy\Events\Repositories\OccurrenceRepository;
 
 defined('ABSPATH') || exit;
 
@@ -39,6 +41,11 @@ readonly class EventViewData
 
         public bool $featured,
 
+        /**
+         * @var array<OccurrenceViewData>
+         */
+        public array $dates,
+
     ) {
     }
 
@@ -47,7 +54,8 @@ readonly class EventViewData
      * Create view data.
      */
     public static function from(
-        Event $event
+        Event $event,
+        OccurrenceRepository $occurrenceRepository
     ): self {
 
 
@@ -57,6 +65,25 @@ readonly class EventViewData
                     $event->id
                 )
             );
+
+
+        $occurrences =
+            $occurrenceRepository
+                ->findByEventId(
+                    $event->id
+                );
+
+
+        $dates = [];
+
+
+        foreach ($occurrences as $occurrence) {
+
+            $dates[] =
+                OccurrenceViewData::from(
+                    $occurrence
+                );
+        }
 
 
         return new self(
@@ -108,6 +135,10 @@ readonly class EventViewData
 
             featured:
                 $details->featured,
+
+
+            dates:
+                $dates,
 
         );
     }
