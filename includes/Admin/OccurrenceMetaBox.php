@@ -8,6 +8,7 @@ use Dizzy\Events\Repositories\OccurrenceRepository;
 
 defined('ABSPATH') || exit;
 
+
 /**
  * Occurrence administration meta box.
  *
@@ -21,9 +22,7 @@ final class OccurrenceMetaBox
     }
 
 
-    /**
-     * Register hooks.
-     */
+
     public function register(): void
     {
         add_action(
@@ -46,9 +45,6 @@ final class OccurrenceMetaBox
 
 
 
-    /**
-     * Add meta box.
-     */
     public function addMetaBox(): void
     {
         add_meta_box(
@@ -66,9 +62,6 @@ final class OccurrenceMetaBox
 
 
 
-    /**
-     * Render fields.
-     */
     public function render(
         \WP_Post $post
     ): void {
@@ -86,7 +79,6 @@ final class OccurrenceMetaBox
                     $post->ID
                 );
 
-
         ?>
 
         <div class="dizzy-occurrences-list">
@@ -95,7 +87,13 @@ final class OccurrenceMetaBox
         <?php foreach ($occurrences as $occurrence): ?>
 
 
-            <?php $this->renderRow($occurrence); ?>
+            <?php
+
+            $this->renderRow(
+                $occurrence
+            );
+
+            ?>
 
 
         <?php endforeach; ?>
@@ -105,45 +103,44 @@ final class OccurrenceMetaBox
 
 
 
-        <button
-            type="button"
-            class="button dizzy-add-occurrence"
-        >
+        <p>
 
-            <?php esc_html_e(
-                'Add Date',
-                'dizzy-events-manager'
-            ); ?>
+            <button
+                type="button"
+                class="button dizzy-add-occurrence"
+            >
 
-        </button>
+                <?php esc_html_e(
+                    'Add Date',
+                    'dizzy-events-manager'
+                ); ?>
+
+            </button>
+
+        </p>
 
 
 
         <script type="text/html" id="dizzy-occurrence-template">
 
-
             <?php
-
             $this->renderEmptyRow();
-
             ?>
 
-
         </script>
-
 
         <?php
     }
 
 
 
-    /**
-     * Render existing row.
-     */
+
+
     private function renderRow(
         object $occurrence
     ): void {
 
+
         ?>
 
         <div class="dizzy-occurrence-row">
@@ -153,20 +150,21 @@ final class OccurrenceMetaBox
 
                 <label>
                     <?php esc_html_e(
-                        'Start',
+                        'Start Date',
                         'dizzy-events-manager'
                     ); ?>
                 </label>
 
 
                 <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[start][]"
+                    type="text"
+                    class="dizzy-occurrence-date"
+                    name="dizzy_occurrences[start_date][]"
                     value="<?php echo esc_attr(
                         $occurrence
                             ->startDateTime
                             ->format(
-                                'Y-m-d\TH:i'
+                                'Y-m-d'
                             )
                     ); ?>"
                 >
@@ -179,20 +177,73 @@ final class OccurrenceMetaBox
 
                 <label>
                     <?php esc_html_e(
-                        'End',
+                        'Start Time',
                         'dizzy-events-manager'
                     ); ?>
                 </label>
 
 
                 <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[end][]"
+                    type="time"
+                    name="dizzy_occurrences[start_time][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->startDateTime
+                            ->format(
+                                'H:i'
+                            )
+                    ); ?>"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End Date',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="text"
+                    class="dizzy-occurrence-date"
+                    name="dizzy_occurrences[end_date][]"
                     value="<?php echo esc_attr(
                         $occurrence
                             ->endDateTime
-                            ->format(
-                                'Y-m-d\TH:i'
+                            ?->format(
+                                'Y-m-d'
+                            )
+                    ); ?>"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End Time',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="time"
+                    name="dizzy_occurrences[end_time][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->endDateTime
+                            ?->format(
+                                'H:i'
                             )
                     ); ?>"
                 >
@@ -222,11 +273,9 @@ final class OccurrenceMetaBox
 
 
 
-    /**
-     * Empty template row.
-     */
     private function renderEmptyRow(): void
     {
+
         ?>
 
         <div class="dizzy-occurrence-row">
@@ -236,15 +285,16 @@ final class OccurrenceMetaBox
 
                 <label>
                     <?php esc_html_e(
-                        'Start',
+                        'Start Date',
                         'dizzy-events-manager'
                     ); ?>
                 </label>
 
 
                 <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[start][]"
+                    type="text"
+                    class="dizzy-occurrence-date"
+                    name="dizzy_occurrences[start_date][]"
                 >
 
             </p>
@@ -255,15 +305,54 @@ final class OccurrenceMetaBox
 
                 <label>
                     <?php esc_html_e(
-                        'End',
+                        'Start Time',
                         'dizzy-events-manager'
                     ); ?>
                 </label>
 
 
                 <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[end][]"
+                    type="time"
+                    name="dizzy_occurrences[start_time][]"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End Date',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="text"
+                    class="dizzy-occurrence-date"
+                    name="dizzy_occurrences[end_date][]"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End Time',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="time"
+                    name="dizzy_occurrences[end_time][]"
                 >
 
             </p>
@@ -291,9 +380,6 @@ final class OccurrenceMetaBox
 
 
 
-    /**
-     * Save occurrences.
-     */
     public function save(
         int $postId
     ): void {
@@ -337,8 +423,27 @@ final class OccurrenceMetaBox
         }
 
 
-        // Saving logic will be moved
-        // to repository handler next.
+
+        $data =
+            isset(
+                $_POST['dizzy_occurrences']
+            )
+            &&
+            is_array(
+                $_POST['dizzy_occurrences']
+            )
+                ? wp_unslash(
+                    $_POST['dizzy_occurrences']
+                )
+                : [];
+
+
+
+        $this->repository
+            ->replaceForEvent(
+                $postId,
+                $data
+            );
 
     }
 }
