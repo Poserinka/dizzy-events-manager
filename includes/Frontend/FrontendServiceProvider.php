@@ -6,6 +6,7 @@ namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Services\EventService;
+use Dizzy\Events\Repositories\OccurrenceRepository;
 
 defined('ABSPATH') || exit;
 
@@ -23,14 +24,22 @@ final class FrontendServiceProvider
         Container $container
     ): void {
 
+
         $container->singleton(
             EventShortcode::class,
             static function () use ($container): EventShortcode {
 
                 return new EventShortcode(
+
                     $container->get(
                         EventService::class
+                    ),
+
+
+                    $container->get(
+                        OccurrenceRepository::class
                     )
+
                 );
             }
         );
@@ -41,9 +50,11 @@ final class FrontendServiceProvider
             static function () use ($container): SingleEvent {
 
                 return new SingleEvent(
+
                     $container->get(
                         EventService::class
                     )
+
                 );
             }
         );
