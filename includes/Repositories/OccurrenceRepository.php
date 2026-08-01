@@ -4,48 +4,20 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
-use Dizzy\Events\Enums\OccurrenceStatus;
 use Dizzy\Events\Models\Occurrence;
 
 defined('ABSPATH') || exit;
 
 /**
- * Repository for event occurrences.
+ * Handles event occurrences persistence.
  *
  * @package Dizzy\Events\Repositories
  */
-final class OccurrenceRepository extends AbstractRepository
+final class OccurrenceRepository
 {
-    protected string $table = 'dizzy_event_occurrences';
-
-
-    /**
-     * Model handled by repository.
-     */
-    protected function modelClass(): string
-    {
-        return Occurrence::class;
-    }
-
-
-    /**
-     * Find occurrence by ID.
-     */
-    public function findById(
-        int $id
-    ): ?Occurrence {
-
-        return $this->findOne(
-            "
-            SELECT *
-            FROM {$this->table()}
-            WHERE id = %d
-            LIMIT 1
-            ",
-            [
-                $id,
-            ]
-        );
+    public function __construct(
+        private string $table
+    ) {
     }
 
 
@@ -58,60 +30,128 @@ final class OccurrenceRepository extends AbstractRepository
         int $eventId
     ): array {
 
-        return $this->findMany(
-            "
-            SELECT *
-            FROM {$this->table()}
-            WHERE event_id = %d
-            ORDER BY start_datetime ASC
-            ",
-            [
-                $eventId,
-            ]
+        global $wpdb;
+
+
+        $rows =
+            $wpdb->get_results(
+                $wpdb->prepare(
+                    "
+                    SELECT *
+                    FROM {$this->table}
+                    WHERE event_id = %d
+                    ORDER BY start_datetime ASC
+                    ",
+                    $eventId
+                )
+            );
+
+
+        return array_map(
+            static function ($row): Occurrence {
+
+                return Occurrence::hydrateFromRow(
+                    $row
+                );
+
+            },
+            $rows
         );
     }
 
 
+
     /**
-     * Create occurrence.
+     * Replace all occurrences.
      *
      * @param array<string,mixed> $data
      */
-    public function create(
+    public function replaceForEvent(
+        int $eventId,
         array $data
-    ): int {
-
-        return $this->insert(
-            $data
-        );
-    }
+    ): void {
 
 
-    /**
-     * Find upcoming occurrences.
-     *
-     * @return array<Occurrence>
-     */
-    public function findUpcoming(
-        int $limit = 20
-    ): array {
+        global $wpdb;
 
-        return $this->findMany(
-            "
-            SELECT *
-            FROM {$this->table()}
-            WHERE start_datetime >= %s
-            AND status = %s
-            ORDER BY start_datetime ASC
-            LIMIT %d
-            ",
+
+        $wpdb->delete(
+            $this->table,
             [
-                current_time('mysql'),
-
-                OccurrenceStatus::PUBLISHED->value,
-
-                $limit,
+                'event_id' => $eventId,
+            ],
+            [
+                '%d',
             ]
         );
+
+
+
+        if (
+            empty($data['start'])
+            ||
+            ! is_array($data['start'])
+        ) {
+            return;
+        }
+
+
+
+        foreach ($data['start'] as $index => $start) {
+
+
+            if (
+                empty($start)
+            ) {
+                continue;
+            }
+
+
+            $end =
+                $data['end'][$index]
+                ??
+                null;
+
+
+
+            $wpdb->insert(
+
+                $this->table,
+
+                [
+
+                    'event_id' =>
+                        $eventId,
+
+
+                    'start_datetime' =>
+                        sanitize_text_field(
+                            $start
+                        ),
+
+
+                    'end_datetime' =>
+                        $end
+                        ? sanitize_text_field(
+                            $end
+                        )
+                        : null,
+
+                ],
+
+
+                [
+
+                    '%d',
+                    '%s',
+                    '%s',
+
+                ]
+
+            );
+
+        }
+
     }
+
 }
