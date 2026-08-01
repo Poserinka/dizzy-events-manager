@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend\ViewModels;
 
-use Dizzy\Events\Models\Event;
-use Dizzy\Events\Models\EventDetails;
-use Dizzy\Events\Models\Occurrence;
-use Throwable;
-use WP_Post;
-
 defined('ABSPATH') || exit;
 
 /**
@@ -24,9 +18,7 @@ readonly class EventViewData
     private const MAX_CARD_DATE_LIMIT = 10;
 
     /**
-     * Create event view data.
-     *
-     * @param array<OccurrenceViewData> $dates Event occurrence view data.
+     * @param array<OccurrenceViewData> $dates
      */
     public function __construct(
         public int $id,
@@ -47,74 +39,19 @@ readonly class EventViewData
     }
 
     /**
-     * Create view data from application data.
-     *
-     * @param array<Occurrence> $occurrences Event occurrences.
-     */
-    public static function from(
-        Event $event,
-        EventDetails $details,
-        array $occurrences
-    ): self {
-        $dates = [];
-
-        foreach ($occurrences as $occurrence) {
-            if (! $occurrence instanceof Occurrence) {
-                continue;
-            }
-
-            try {
-                $dates[] = OccurrenceViewData::from($occurrence);
-            } catch (Throwable $exception) {
-                error_log(
-                    sprintf(
-                        'Dizzy Events skipped occurrence view data %d: %s',
-                        $occurrence->id,
-                        $exception->getMessage()
-                    )
-                );
-            }
-        }
-
-        return new self(
-            id: $event->id,
-            title: $event->title,
-            url: self::permalink($event->id),
-            image: self::featuredImage($event->id),
-            excerpt: self::excerpt($event),
-            artist: $details->artist,
-            genre: $details->genre,
-            venue: $details->venue,
-            address: $details->address,
-            mapsUrl: $details->mapsUrl,
-            ticketUrl: $details->ticketUrl,
-            ticketPrice: $details->ticketPrice,
-            featured: $details->featured,
-            dates: $dates,
-        );
-    }
-
-    /**
-     * Get event-card date presentation data.
-     *
-     * @return array{
-     *     visible: array<OccurrenceViewData>,
-     *     remaining: int
-     * }
+     * @return array{visible: array<OccurrenceViewData>, remaining: int}
      */
     public function cardDatePresentation(): array
     {
         $visible = array_slice($this->dates, 0, $this->cardDateLimit());
 
         return [
-            'visible'   => $visible,
+            'visible' => $visible,
             'remaining' => max(0, count($this->dates) - count($visible)),
         ];
     }
 
     /**
-     * Get dates displayed on an event card.
-     *
      * @return array<OccurrenceViewData>
      */
     public function cardDates(): array
@@ -122,17 +59,11 @@ readonly class EventViewData
         return $this->cardDatePresentation()['visible'];
     }
 
-    /**
-     * Get the number of dates omitted from an event card.
-     */
     public function remainingCardDateCount(): int
     {
         return $this->cardDatePresentation()['remaining'];
     }
 
-    /**
-     * Get the filtered card date limit.
-     */
     private function cardDateLimit(): int
     {
         $limit = apply_filters(
@@ -141,102 +72,6 @@ readonly class EventViewData
             $this->id
         );
 
-        return min(
-            max(1, absint($limit)),
-            self::MAX_CARD_DATE_LIMIT
-        );
-    }
-
-    /**
-     * Get a safe event permalink.
-     */
-    private static function permalink(int $eventId): string
-    {
-        try {
-            $permalink = get_permalink($eventId);
-        } catch (Throwable $exception) {
-            self::logPresentationFailure(
-                'permalink generation',
-                $eventId,
-                $exception
-            );
-
-            return '';
-        }
-
-        return is_string($permalink) ? $permalink : '';
-    }
-
-    /**
-     * Get a safe featured image URL.
-     */
-    private static function featuredImage(int $eventId): string
-    {
-        try {
-            $image = get_the_post_thumbnail_url($eventId, 'large');
-        } catch (Throwable $exception) {
-            self::logPresentationFailure(
-                'featured image generation',
-                $eventId,
-                $exception
-            );
-
-            return '';
-        }
-
-        return is_string($image) ? $image : '';
-    }
-
-    /**
-     * Build the event card excerpt with an explicit post context.
-     */
-    private static function excerpt(Event $event): string
-    {
-        $post = get_post($event->id);
-
-        if ($post instanceof WP_Post) {
-            try {
-                $excerpt = get_the_excerpt($post);
-
-                if (is_string($excerpt) && trim($excerpt) !== '') {
-                    return $excerpt;
-                }
-            } catch (Throwable $exception) {
-                self::logPresentationFailure(
-                    'excerpt filtering',
-                    $event->id,
-                    $exception
-                );
-            }
-
-            $manualExcerpt = trim($post->post_excerpt);
-
-            if ($manualExcerpt !== '') {
-                return $manualExcerpt;
-            }
-        }
-
-        return wp_trim_words(
-            wp_strip_all_tags(strip_shortcodes($event->content)),
-            35
-        );
-    }
-
-    /**
-     * Log an isolated event presentation failure.
-     */
-    private static function logPresentationFailure(
-        string $operation,
-        int $eventId,
-        Throwable $exception
-    ): void {
-        error_log(
-            sprintf(
-                'Dizzy Events %s failed for event %d: %s',
-                $operation,
-                $eventId,
-                $exception->getMessage()
-            )
-        );
+        return min(max(1, absint($limit)), self::MAX_CARD_DATE_LIMIT);
     }
 }
