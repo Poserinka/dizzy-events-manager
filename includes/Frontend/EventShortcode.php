@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend;
 
+use Dizzy\Events\Frontend\ViewModels\EventViewData;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -45,9 +46,7 @@ final class EventShortcode
 
         $events =
             $this->service
-                ->getUpcomingEvents(
-                    10
-                );
+                ->getUpcomingEvents(10);
 
 
         if (empty($events)) {
@@ -70,32 +69,25 @@ final class EventShortcode
 
             <?php foreach ($events as $event): ?>
 
-                <article class="dizzy-event">
+                <?php
 
-                    <h3>
-                        <?php echo esc_html(
-                            $event->title
-                        ); ?>
-                    </h3>
+                $viewData =
+                    EventViewData::from(
+                        $event
+                    );
 
 
-                    <?php if ($event->excerpt): ?>
+                include DIZZY_EVENTS_PATH .
+                    'includes/Frontend/Views/event-card.php';
 
-                        <div>
-                            <?php echo wp_kses_post(
-                                $event->excerpt
-                            ); ?>
-                        </div>
-
-                    <?php endif; ?>
-
-                </article>
+                ?>
 
             <?php endforeach; ?>
 
         </div>
 
         <?php
+
 
         return (string) ob_get_clean();
     }
