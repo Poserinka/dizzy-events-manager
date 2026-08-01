@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Frontend\ViewModels\EventViewData;
+use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -17,7 +18,11 @@ defined('ABSPATH') || exit;
 final class EventShortcode
 {
     public function __construct(
-        private EventService $service
+
+        private EventService $service,
+
+        private OccurrenceRepository $occurrenceRepository,
+
     ) {
     }
 
@@ -44,9 +49,12 @@ final class EventShortcode
         array $atts = []
     ): string {
 
+
         $events =
             $this->service
-                ->getUpcomingEvents(10);
+                ->getUpcomingEvents(
+                    10
+                );
 
 
         if (empty($events)) {
@@ -67,22 +75,26 @@ final class EventShortcode
 
         <div class="dizzy-events">
 
+
             <?php foreach ($events as $event): ?>
+
 
                 <?php
 
                 $viewData =
                     EventViewData::from(
-                        $event
+                        $event,
+                        $this->occurrenceRepository
                     );
-
 
                 include DIZZY_EVENTS_PATH .
                     'includes/Frontend/Views/event-card.php';
 
                 ?>
 
+
             <?php endforeach; ?>
+
 
         </div>
 
