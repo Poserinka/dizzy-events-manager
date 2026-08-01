@@ -6,6 +6,7 @@ namespace Dizzy\Events\Core;
 
 use Dizzy\Events\Admin\AdminServiceProvider;
 use Dizzy\Events\Providers\EventServiceProvider;
+use Dizzy\Events\Providers\PostTypeServiceProvider;
 
 defined('ABSPATH') || exit;
 
@@ -40,7 +41,7 @@ final class Application
     }
 
     /**
-     * Get container.
+     * Get container instance.
      */
     public function container(): Container
     {
@@ -48,13 +49,14 @@ final class Application
     }
 
     /**
-     * Register providers.
+     * Register application providers.
      */
     private function registerProviders(): void
     {
         $providers = [
             EventServiceProvider::class,
             AdminServiceProvider::class,
+            PostTypeServiceProvider::class,
         ];
 
         foreach ($providers as $provider) {
