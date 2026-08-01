@@ -40,6 +40,9 @@ $autoload = DIZZY_EVENTS_PATH . 'vendor/autoload.php';
 
 if (file_exists($autoload)) {
     require_once $autoload;
+} else {
+    require_once DIZZY_EVENTS_PATH . 'includes/Core/Autoloader.php';
+    \Dizzy\Events\Core\Autoloader::register();
 }
 
 /**
