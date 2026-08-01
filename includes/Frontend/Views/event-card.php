@@ -9,7 +9,6 @@ declare(strict_types=1);
  */
 
 defined('ABSPATH') || exit;
-
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
@@ -86,7 +85,11 @@ defined('ABSPATH') || exit;
 
     <?php if ($event->ticketPrice !== null) : ?>
         <p class="dizzy-event-price">
-            <?php echo esc_html(number_format($event->ticketPrice, 2)); ?> €
+            <?php
+            echo esc_html(
+                number_format_i18n($event->ticketPrice, 2)
+            );
+            ?> €
         </p>
     <?php endif; ?>
 
