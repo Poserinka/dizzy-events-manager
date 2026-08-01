@@ -15,90 +15,101 @@ defined('ABSPATH') || exit;
  */
 readonly class EventDetails
 {
+    /**
+     * Create event details.
+     */
     public function __construct(
-
         public ?string $artist,
-
         public ?string $genre,
-
         public ?string $venue,
-
         public ?string $ticketUrl,
-
         public ?float $ticketPrice,
-
         public bool $featured,
-
     ) {
     }
 
-
     /**
-     * Create from metadata.
+     * Create from WordPress metadata.
      *
-     * @param array<string,mixed> $meta
+     * Supports both normalized keys and raw get_post_meta() output.
+     *
+     * @param array<string, mixed> $meta Event metadata.
      */
-    public static function fromMeta(
-        array $meta
-    ): self {
-
+    public static function fromMeta(array $meta): self
+    {
         return new self(
-
-            artist:
-                self::stringValue(
-                    $meta['artist'] ?? null
-                ),
-
-
-            genre:
-                self::stringValue(
-                    $meta['genre'] ?? null
-                ),
-
-
-            venue:
-                self::stringValue(
-                    $meta['venue'] ?? null
-                ),
-
-
-            ticketUrl:
-                self::stringValue(
-                    $meta['ticket_url'] ?? null
-                ),
-
-
-            ticketPrice:
-                isset($meta['ticket_price'])
-                    ? (float) $meta['ticket_price']
-                    : null,
-
-
-            featured:
-                ! empty(
-                    $meta['featured']
-                ),
-
+            artist: self::stringValue(
+                self::metaValue($meta, 'artist')
+            ),
+            genre: self::stringValue(
+                self::metaValue($meta, 'genre')
+            ),
+            venue: self::stringValue(
+                self::metaValue($meta, 'venue')
+            ),
+            ticketUrl: self::stringValue(
+                self::metaValue($meta, 'ticket_url')
+            ),
+            ticketPrice: self::floatValue(
+                self::metaValue($meta, 'ticket_price')
+            ),
+            featured: self::boolValue(
+                self::metaValue($meta, 'featured')
+            ),
         );
     }
 
+    /**
+     * Get a normalized metadata value.
+     *
+     * @param array<string, mixed> $meta Metadata values.
+     */
+    private static function metaValue(array $meta, string $key): mixed
+    {
+        $value = $meta[$key] ?? $meta['_dizzy_' . $key] ?? null;
+
+        if (is_array($value)) {
+            return $value[0] ?? null;
+        }
+
+        return $value;
+    }
 
     /**
-     * Normalize string values.
+     * Normalize a string value.
      */
-    private static function stringValue(
-        mixed $value
-    ): ?string {
-
-        if (
-            ! is_string($value)
-            ||
-            trim($value) === ''
-        ) {
+    private static function stringValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
             return null;
         }
 
+        $value = trim((string) $value);
 
-        return trim($value);
+        return $value === '' ? null : $value;
+    }
+
+    /**
+     * Normalize a float value.
+     */
+    private static function floatValue(mixed $value): ?float
+    {
+        if (! is_scalar($value) || $value === '') {
+            return null;
+        }
+
+        return is_numeric($value) ? (float) $value : null;
+    }
+
+    /**
+     * Normalize a boolean value.
+     */
+    private static function boolValue(mixed $value): bool
+    {
+        return in_array(
+            $value,
+            [true, 1, '1', 'true', 'yes', 'on'],
+            true
+        );
     }
 }
