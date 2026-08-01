@@ -6,6 +6,7 @@ namespace Dizzy\Events\Repositories;
 
 use Dizzy\Events\Core\DB;
 use Dizzy\Events\Models\Occurrence;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -75,6 +76,12 @@ final class OccurrenceRepository
         int $eventId,
         array $occurrences
     ): void {
+        if ($eventId <= 0) {
+            throw new InvalidArgumentException(
+                'A valid event ID is required to replace occurrences.'
+            );
+        }
+
         $database = DB::instance();
 
         if ($database->query('START TRANSACTION') === false) {
@@ -102,6 +109,8 @@ final class OccurrenceRepository
                 );
             }
 
+            $timestamp = current_time('mysql', true);
+
             foreach ($occurrences as $occurrence) {
                 $inserted = $database->insert(
                     $this->table,
@@ -113,8 +122,8 @@ final class OccurrenceRepository
                         'timezone'       => $occurrence['timezone'],
                         'sort_order'     => $occurrence['sort_order'],
                         'status'         => $occurrence['status'],
-                        'created_at'     => current_time('mysql', true),
-                        'updated_at'     => current_time('mysql', true),
+                        'created_at'     => $timestamp,
+                        'updated_at'     => $timestamp,
                     ],
                     [
                         '%d',
