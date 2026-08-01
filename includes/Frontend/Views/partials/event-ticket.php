@@ -11,6 +11,10 @@ $details = $args['details'] ?? null;
 if (! $details instanceof EventDetails) {
     return;
 }
+
+$ticketUrl = $details->ticketUrl !== null
+    ? trim($details->ticketUrl)
+    : '';
 ?>
 <?php if ($details->ticketPrice !== null) : ?>
     <p class="dizzy-event-price">
@@ -25,10 +29,10 @@ if (! $details instanceof EventDetails) {
     </p>
 <?php endif; ?>
 
-<?php if ($details->ticketUrl !== null) : ?>
+<?php if ($ticketUrl !== '') : ?>
     <a
         class="dizzy-event-ticket"
-        href="<?php echo esc_url($details->ticketUrl); ?>"
+        href="<?php echo esc_url($ticketUrl); ?>"
         target="_blank"
         rel="noopener noreferrer"
     >
