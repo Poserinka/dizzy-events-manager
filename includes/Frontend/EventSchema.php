@@ -76,6 +76,7 @@ final class EventSchema
         }
 
         $firstOccurrence = $occurrences[0];
+        $eventUrl        = get_permalink($event->id);
         $image           = get_the_post_thumbnail_url($event->id, 'large');
 
         $schema = [
@@ -83,15 +84,26 @@ final class EventSchema
             '@type'               => 'MusicEvent',
             'name'                => $event->title,
             'description'         => wp_strip_all_tags($event->content),
-            'url'                 => get_permalink($event->id),
             'eventStatus'         => 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
             'startDate'           => $firstOccurrence->startDateTime->format(DATE_ATOM),
             'location'            => [
-                '@type' => 'Place',
-                'name'  => $details->venue ?? get_bloginfo('name'),
+                '@type'   => 'Place',
+                'name'    => $details->venue,
+                'url'     => $details->mapsUrl,
+                'address' => [
+                    '@type'         => 'PostalAddress',
+                    'streetAddress' => $details->address,
+                    'addressLocality' => 'Rotterdam',
+                    'postalCode'    => '3021 EK',
+                    'addressCountry' => 'NL',
+                ],
             ],
         ];
+
+        if (is_string($eventUrl) && $eventUrl !== '') {
+            $schema['url'] = $eventUrl;
+        }
 
         if (is_string($image) && $image !== '') {
             $schema['image'] = $image;
