@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Repositories;
 
 use Dizzy\Events\Models\Event;
+use Throwable;
 use WP_Post;
 use WP_Query;
 
@@ -58,7 +59,7 @@ final class EventRepository extends AbstractRepository
             return null;
         }
 
-        return $this->hydrate($this->convertPost($post));
+        return $this->hydratePost($post);
     }
 
     /**
@@ -135,12 +136,36 @@ final class EventRepository extends AbstractRepository
                 continue;
             }
 
-            $events[] = $this->hydrate(
-                $this->convertPost($post)
-            );
+            $event = $this->hydratePost($post);
+
+            if ($event !== null) {
+                $events[] = $event;
+            }
         }
 
         return $events;
+    }
+
+    /**
+     * Hydrate one WordPress event while isolating malformed records.
+     */
+    private function hydratePost(WP_Post $post): ?Event
+    {
+        try {
+            return $this->hydrate(
+                $this->convertPost($post)
+            );
+        } catch (Throwable $exception) {
+            error_log(
+                sprintf(
+                    'Dizzy Events skipped malformed event %d: %s',
+                    (int) $post->ID,
+                    $exception->getMessage()
+                )
+            );
+
+            return null;
+        }
     }
 
     /**
