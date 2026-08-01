@@ -2,14 +2,14 @@
 /**
  * PSR-4 Autoloader.
  *
- * @package DizzyEventsManager
+ * @package Dizzy\Events
  */
 
 declare(strict_types=1);
 
-namespace DizzyEvents\Core;
+namespace Dizzy\Events\Core;
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
  * Plugin autoloader.
@@ -19,7 +19,7 @@ final class Autoloader {
 	/**
 	 * Root namespace.
 	 */
-	private const NAMESPACE = 'DizzyEvents\\';
+	private const NAMESPACE = 'Dizzy\\Events\\';
 
 	/**
 	 * Plugin includes directory.
@@ -49,24 +49,19 @@ final class Autoloader {
 	 *
 	 * @return void
 	 */
-	private static function load( string $class ): void {
+	private static function load(string $class): void {
 
-		// Ignore external namespaces.
-		if ( strncmp( $class, self::NAMESPACE, strlen( self::NAMESPACE ) ) !== 0 ) {
+		if (strncmp($class, self::NAMESPACE, strlen(self::NAMESPACE)) !== 0) {
 			return;
 		}
 
-		$relative = substr( $class, strlen( self::NAMESPACE ) );
+		$relative = substr($class, strlen(self::NAMESPACE));
 
-		$file = self::BASE_DIRECTORY .
-			str_replace(
-				'\\',
-				DIRECTORY_SEPARATOR,
-				$relative
-			) .
-			'.php';
+		$file = self::BASE_DIRECTORY
+			. str_replace('\\', DIRECTORY_SEPARATOR, $relative)
+			. '.php';
 
-		if ( is_readable( $file ) ) {
+		if (is_readable($file)) {
 			require_once $file;
 		}
 
