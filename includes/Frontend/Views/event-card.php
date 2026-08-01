@@ -13,14 +13,18 @@ defined('ABSPATH') || exit;
 $datePresentation = $event->cardDatePresentation();
 $visibleDates     = $datePresentation['visible'];
 $remainingDates   = $datePresentation['remaining'];
-$eventUrl         = trim($event->url);
+$eventUrl         = esc_url(trim($event->url));
 $imageUrl         = esc_url(trim($event->image));
-$mapsUrl          = $event->mapsUrl !== null
-    ? trim($event->mapsUrl)
-    : '';
-$ticketUrl        = $event->ticketUrl !== null
-    ? trim($event->ticketUrl)
-    : '';
+$mapsUrl          = esc_url(
+    $event->mapsUrl !== null
+        ? trim($event->mapsUrl)
+        : ''
+);
+$ticketUrl        = esc_url(
+    $event->ticketUrl !== null
+        ? trim($event->ticketUrl)
+        : ''
+);
 $hasEventUrl      = $eventUrl !== '';
 ?>
 <article class="dizzy-event-card">
@@ -32,7 +36,7 @@ $hasEventUrl      = $eventUrl !== '';
 
     <?php if ($imageUrl !== '') : ?>
         <?php if ($hasEventUrl) : ?>
-            <a href="<?php echo esc_url($eventUrl); ?>">
+            <a href="<?php echo $eventUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>">
                 <img
                     src="<?php echo $imageUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
                     alt="<?php echo esc_attr($event->title); ?>"
@@ -48,7 +52,7 @@ $hasEventUrl      = $eventUrl !== '';
 
     <h3 class="dizzy-event-title">
         <?php if ($hasEventUrl) : ?>
-            <a href="<?php echo esc_url($eventUrl); ?>">
+            <a href="<?php echo $eventUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>">
                 <?php echo esc_html($event->title); ?>
             </a>
         <?php else : ?>
@@ -78,7 +82,7 @@ $hasEventUrl      = $eventUrl !== '';
         <p class="dizzy-event-address">
             <?php if ($mapsUrl !== '') : ?>
                 <a
-                    href="<?php echo esc_url($mapsUrl); ?>"
+                    href="<?php echo $mapsUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
@@ -120,7 +124,7 @@ $hasEventUrl      = $eventUrl !== '';
                     );
                     ?>
                     <?php if ($hasEventUrl) : ?>
-                        <a href="<?php echo esc_url($eventUrl); ?>">
+                        <a href="<?php echo $eventUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>">
                             <?php echo esc_html($moreDatesLabel); ?>
                         </a>
                     <?php else : ?>
@@ -150,7 +154,7 @@ $hasEventUrl      = $eventUrl !== '';
     <?php if ($ticketUrl !== '') : ?>
         <a
             class="dizzy-event-ticket"
-            href="<?php echo esc_url($ticketUrl); ?>"
+            href="<?php echo $ticketUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
             target="_blank"
             rel="noopener noreferrer"
         >
@@ -161,7 +165,7 @@ $hasEventUrl      = $eventUrl !== '';
     <?php if ($hasEventUrl) : ?>
         <a
             class="dizzy-event-link"
-            href="<?php echo esc_url($eventUrl); ?>"
+            href="<?php echo $eventUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
         >
             <?php esc_html_e('Read more', 'dizzy-events-manager'); ?>
         </a>
