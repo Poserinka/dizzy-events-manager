@@ -6,6 +6,7 @@
      */
     const DizzyOccurrences = {
         init: function () {
+            this.prepareRows();
             this.bindEvents();
             this.enableSorting();
             this.refreshOrder();
@@ -23,6 +24,24 @@
                 '.dizzy-remove-occurrence',
                 this.removeRow.bind(this)
             );
+        },
+
+        /**
+         * Prepare server-rendered rows for sorting.
+         */
+        prepareRows: function () {
+            const manager = this;
+
+            $('.dizzy-occurrence-row').each(function () {
+                const actions = $(this)
+                    .children('td')
+                    .last()
+                    .addClass('dizzy-occurrence-actions');
+
+                if (! actions.find('.dizzy-sort-handle').length) {
+                    actions.prepend(manager.createSortHandle());
+                }
+            });
         },
 
         /**
