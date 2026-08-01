@@ -76,21 +76,26 @@ final class EventSchema
         }
 
         $firstOccurrence = $occurrences[0];
+        $image           = get_the_post_thumbnail_url($event->id, 'large');
 
         $schema = [
             '@context'            => 'https://schema.org',
             '@type'               => 'MusicEvent',
             'name'                => $event->title,
             'description'         => wp_strip_all_tags($event->content),
+            'url'                 => get_permalink($event->id),
             'eventStatus'         => 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
-            'image'               => get_the_post_thumbnail_url($event->id, 'large'),
             'startDate'           => $firstOccurrence->startDateTime->format(DATE_ATOM),
             'location'            => [
                 '@type' => 'Place',
                 'name'  => $details->venue ?? get_bloginfo('name'),
             ],
         ];
+
+        if (is_string($image) && $image !== '') {
+            $schema['image'] = $image;
+        }
 
         if ($firstOccurrence->endDateTime !== null) {
             $schema['endDate'] = $firstOccurrence->endDateTime->format(DATE_ATOM);
@@ -122,13 +127,18 @@ final class EventSchema
         }
 
         if ($details->ticketUrl !== null) {
-            $schema['offers'] = [
-                '@type'         => 'Offer',
-                'url'           => $details->ticketUrl,
-                'price'         => $details->ticketPrice ?? 0,
-                'priceCurrency' => 'EUR',
-                'availability'  => 'https://schema.org/InStock',
+            $offer = [
+                '@type'        => 'Offer',
+                'url'          => $details->ticketUrl,
+                'availability' => 'https://schema.org/InStock',
             ];
+
+            if ($details->ticketPrice !== null) {
+                $offer['price']         = $details->ticketPrice;
+                $offer['priceCurrency'] = 'EUR';
+            }
+
+            $schema['offers'] = $offer;
         }
 
         echo '<script type="application/ld+json">';
