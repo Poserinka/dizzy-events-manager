@@ -40,4 +40,27 @@ final class Schema
         KEY status_end_event (status, end_datetime, event_id)
         ";
     }
+
+    /**
+     * Reservation table schema.
+     */
+    public static function reservations(): string
+    {
+        return "
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        event_id bigint(20) unsigned NOT NULL,
+        name varchar(190) NOT NULL,
+        email varchar(190) NOT NULL,
+        phone varchar(64) NULL,
+        guests int(11) NOT NULL DEFAULT 1,
+        status varchar(32) NOT NULL DEFAULT 'pending',
+        notes text NULL,
+        created_at datetime NOT NULL,
+        updated_at datetime NOT NULL,
+        PRIMARY KEY (id),
+        KEY event_id (event_id),
+        KEY status (status),
+        KEY email (email)
+        ";
+    }
 }
