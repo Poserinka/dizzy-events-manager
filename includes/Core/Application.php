@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Core;
 
 use Dizzy\Events\Admin\AdminServiceProvider;
+use Dizzy\Events\Frontend\FrontendServiceProvider;
 use Dizzy\Events\Providers\EventServiceProvider;
 use Dizzy\Events\Providers\PostTypeServiceProvider;
 
@@ -24,6 +25,7 @@ final class Application
      */
     private Container $container;
 
+
     /**
      * Constructor.
      */
@@ -31,6 +33,7 @@ final class Application
     {
         $this->container = new Container();
     }
+
 
     /**
      * Boot application.
@@ -40,6 +43,7 @@ final class Application
         $this->registerProviders();
     }
 
+
     /**
      * Get container instance.
      */
@@ -48,21 +52,32 @@ final class Application
         return $this->container;
     }
 
+
     /**
-     * Register application providers.
+     * Register providers.
      */
     private function registerProviders(): void
     {
         $providers = [
+
             EventServiceProvider::class,
+
             AdminServiceProvider::class,
+
             PostTypeServiceProvider::class,
+
+            FrontendServiceProvider::class,
+
         ];
+
 
         foreach ($providers as $provider) {
 
             (new $provider())
-                ->register($this->container);
+                ->register(
+                    $this->container
+                );
+
         }
     }
 }
