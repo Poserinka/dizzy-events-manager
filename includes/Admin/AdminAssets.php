@@ -60,6 +60,11 @@ final class AdminAssets
                     'Remove',
                     'dizzy-events-manager'
                 ),
+                'selectTimeLabel' => esc_html__(
+                    'Select time',
+                    'dizzy-events-manager'
+                ),
+                'timeOptions' => OccurrenceMetaBox::timeOptions(),
             ]
         );
 
