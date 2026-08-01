@@ -50,12 +50,7 @@ final class OccurrenceRepository
             ]
         );
 
-        return array_map(
-            static function (object $row): Occurrence {
-                return Occurrence::hydrateFromRow($row);
-            },
-            $rows
-        );
+        return $this->hydrateRows($rows);
     }
 
     /**
@@ -103,15 +98,12 @@ final class OccurrenceRepository
 
         $grouped = array_fill_keys($eventIds, []);
 
-        foreach ($rows as $row) {
-            $occurrence = Occurrence::hydrateFromRow($row);
-            $eventId    = (int) $row->event_id;
-
-            if (! isset($grouped[$eventId])) {
+        foreach ($this->hydrateRows($rows) as $occurrence) {
+            if (! isset($grouped[$occurrence->eventId])) {
                 continue;
             }
 
-            $grouped[$eventId][] = $occurrence;
+            $grouped[$occurrence->eventId][] = $occurrence;
         }
 
         return $grouped;
@@ -253,6 +245,34 @@ final class OccurrenceRepository
 
             throw $exception;
         }
+    }
+
+    /**
+     * Hydrate database rows while isolating malformed records.
+     *
+     * @param array<object> $rows Database rows.
+     *
+     * @return array<Occurrence>
+     */
+    private function hydrateRows(array $rows): array
+    {
+        $occurrences = [];
+
+        foreach ($rows as $row) {
+            try {
+                $occurrences[] = Occurrence::hydrateFromRow($row);
+            } catch (Throwable $exception) {
+                error_log(
+                    sprintf(
+                        'Dizzy Events skipped malformed occurrence row %d: %s',
+                        isset($row->id) ? (int) $row->id : 0,
+                        $exception->getMessage()
+                    )
+                );
+            }
+        }
+
+        return $occurrences;
     }
 
     /**
