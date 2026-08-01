@@ -24,50 +24,91 @@ final class AdminServiceProvider
     ): void {
 
 
+        /**
+         * Event meta box.
+         */
         $container->singleton(
             EventMetaBox::class,
             static function (): EventMetaBox {
 
                 return new EventMetaBox();
+
             }
         );
 
 
+
+        /**
+         * Occurrence meta box.
+         */
         $container->singleton(
             OccurrenceMetaBox::class,
             static function () use ($container): OccurrenceMetaBox {
 
                 return new OccurrenceMetaBox(
+
                     $container->get(
                         OccurrenceRepository::class
                     )
+
                 );
+
             }
         );
 
 
+
+        /**
+         * Occurrence table.
+         */
         $container->singleton(
             OccurrenceTable::class,
             static function () use ($container): OccurrenceTable {
 
                 return new OccurrenceTable(
+
                     $container->get(
                         OccurrenceRepository::class
                     )
+
                 );
+
             }
         );
 
 
+
+        /**
+         * Event details meta box.
+         */
         $container->singleton(
             EventDetailsMetaBox::class,
             static function (): EventDetailsMetaBox {
 
                 return new EventDetailsMetaBox();
+
             }
         );
 
 
+
+        /**
+         * Admin assets.
+         */
+        $container->singleton(
+            AdminAssets::class,
+            static function (): AdminAssets {
+
+                return new AdminAssets();
+
+            }
+        );
+
+
+
+        /**
+         * Register admin hooks.
+         */
         add_action(
             'admin_init',
             static function () use ($container): void {
@@ -78,9 +119,11 @@ final class AdminServiceProvider
                     ->register();
 
 
+
                 $container
                     ->get(OccurrenceMetaBox::class)
                     ->register();
+
 
 
                 $container
@@ -88,11 +131,20 @@ final class AdminServiceProvider
                     ->register();
 
 
+
                 $container
                     ->get(EventDetailsMetaBox::class)
                     ->register();
 
+
+
+                $container
+                    ->get(AdminAssets::class)
+                    ->register();
+
+
             }
         );
+
     }
 }
