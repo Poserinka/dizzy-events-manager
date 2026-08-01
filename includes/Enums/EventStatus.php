@@ -19,9 +19,29 @@ enum EventStatus: string
     case DRAFT = 'draft';
 
     /**
+     * Event is awaiting editorial review.
+     */
+    case PENDING = 'pending';
+
+    /**
+     * Event is scheduled for future publication.
+     */
+    case SCHEDULED = 'future';
+
+    /**
+     * Event is privately visible.
+     */
+    case PRIVATE = 'private';
+
+    /**
      * Event is publicly visible.
      */
     case PUBLISHED = 'publish';
+
+    /**
+     * Event is in the WordPress trash.
+     */
+    case TRASHED = 'trash';
 
     /**
      * Event has been cancelled.
