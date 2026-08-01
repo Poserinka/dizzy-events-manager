@@ -181,19 +181,11 @@ final class EventService
     }
 
     /**
-     * Check whether event has future occurrences.
+     * Check whether event has a current or upcoming published occurrence.
      */
     public function hasUpcomingOccurrences(int $eventId): bool
     {
-        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
-
-        foreach ($occurrences as $occurrence) {
-            if ($occurrence->isUpcoming()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->occurrenceRepository->hasUpcomingForEvent($eventId);
     }
 
     /**
