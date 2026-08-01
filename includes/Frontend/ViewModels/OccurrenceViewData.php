@@ -15,40 +15,34 @@ defined('ABSPATH') || exit;
  */
 readonly class OccurrenceViewData
 {
+    /**
+     * Create occurrence view data.
+     */
     public function __construct(
-
         public string $date,
-
         public string $time,
-
     ) {
     }
-
 
     /**
      * Create from occurrence model.
      */
-    public static function from(
-        Occurrence $occurrence
-    ): self {
+    public static function from(Occurrence $occurrence): self
+    {
+        $timestamp = $occurrence->startDateTime->getTimestamp();
+        $timezone  = $occurrence->startDateTime->getTimezone();
 
         return new self(
-
-            date:
-                $occurrence
-                    ->startDateTime
-                    ->format(
-                        'd F Y'
-                    ),
-
-
-            time:
-                $occurrence
-                    ->startDateTime
-                    ->format(
-                        'H:i'
-                    ),
-
+            date: wp_date(
+                (string) get_option('date_format'),
+                $timestamp,
+                $timezone
+            ),
+            time: wp_date(
+                (string) get_option('time_format'),
+                $timestamp,
+                $timezone
+            ),
         );
     }
 }
