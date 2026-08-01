@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Core\Container;
+use Dizzy\Events\Repositories\OccurrenceRepository;
 
 defined('ABSPATH') || exit;
 
@@ -30,12 +31,31 @@ final class AdminServiceProvider
             }
         );
 
+
+        $container->singleton(
+            OccurrenceMetaBox::class,
+            static function () use ($container): OccurrenceMetaBox {
+
+                return new OccurrenceMetaBox(
+                    $container->get(
+                        OccurrenceRepository::class
+                    )
+                );
+            }
+        );
+
+
         add_action(
             'admin_init',
             static function () use ($container): void {
 
                 $container
                     ->get(EventMetaBox::class)
+                    ->register();
+
+
+                $container
+                    ->get(OccurrenceMetaBox::class)
                     ->register();
 
             }
