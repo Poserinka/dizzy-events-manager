@@ -46,19 +46,32 @@ if (file_exists($autoload)) {
 
 
 /**
+ * Database migrations.
+ */
+register_activation_hook(
+    __FILE__,
+    static function (): void {
+
+        \Dizzy\Events\Database\Migrations::run();
+
+    }
+);
+
+
+/**
  * Bootstrap application.
  */
 add_action(
     'plugins_loaded',
     static function (): void {
 
-        $application = new \Dizzy\Events\Core\Application();
+        $application =
+            new \Dizzy\Events\Core\Application();
 
         $application->boot();
 
-        /**
-         * Store application instance.
-         */
-        $GLOBALS['dizzy_events_application'] = $application;
+        $GLOBALS['dizzy_events_application'] =
+            $application;
+
     }
 );
