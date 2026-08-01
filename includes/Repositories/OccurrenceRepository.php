@@ -59,6 +59,42 @@ final class OccurrenceRepository
     }
 
     /**
+     * Find event IDs with upcoming published occurrences.
+     *
+     * IDs are ordered by their next occurrence date.
+     *
+     * @return array<int>
+     */
+    public function findUpcomingEventIds(int $limit = 20): array
+    {
+        $limit = max(1, $limit);
+        $now   = current_time('mysql', true);
+
+        $eventIds = DB::getColumn(
+            "
+            SELECT event_id
+            FROM {$this->table}
+            WHERE status = %s
+                AND start_datetime >= %s
+            GROUP BY event_id
+            ORDER BY MIN(start_datetime) ASC
+            LIMIT %d
+            ",
+            [
+                'publish',
+                $now,
+                $limit,
+            ]
+        );
+
+        return array_values(
+            array_filter(
+                array_map('absint', $eventIds)
+            )
+        );
+    }
+
+    /**
      * Replace all occurrences belonging to an event.
      *
      * The occurrence data must already be validated and normalized.
@@ -83,6 +119,7 @@ final class OccurrenceRepository
         }
 
         $database = DB::instance();
+        $timestamp = current_time('mysql', true);
 
         if ($database->query('START TRANSACTION') === false) {
             throw new RuntimeException(
@@ -108,8 +145,6 @@ final class OccurrenceRepository
                     )
                 );
             }
-
-            $timestamp = current_time('mysql', true);
 
             foreach ($occurrences as $occurrence) {
                 $inserted = $database->insert(
