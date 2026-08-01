@@ -7,6 +7,7 @@ namespace Dizzy\Events\Frontend\ViewModels;
 use Dizzy\Events\Models\Event;
 use Dizzy\Events\Models\EventDetails;
 use Dizzy\Events\Models\Occurrence;
+use Throwable;
 
 defined('ABSPATH') || exit;
 
@@ -61,7 +62,17 @@ readonly class EventViewData
                 continue;
             }
 
-            $dates[] = OccurrenceViewData::from($occurrence);
+            try {
+                $dates[] = OccurrenceViewData::from($occurrence);
+            } catch (Throwable $exception) {
+                error_log(
+                    sprintf(
+                        'Dizzy Events skipped occurrence view data %d: %s',
+                        $occurrence->id,
+                        $exception->getMessage()
+                    )
+                );
+            }
         }
 
         return new self(
