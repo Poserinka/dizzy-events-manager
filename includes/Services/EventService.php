@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Services;
 
 use Dizzy\Events\Models\Event;
+use Dizzy\Events\Models\EventDetails;
 use Dizzy\Events\Models\Occurrence;
 use Dizzy\Events\Repositories\EventRepository;
 use Dizzy\Events\Repositories\OccurrenceRepository;
@@ -26,34 +27,162 @@ final class EventService
     ) {
     }
 
+
+
     /**
-     * Get event with occurrences.
+     * Get event with occurrences and details.
      *
      * @return array{
      *     event: Event,
-     *     occurrences: array<Occurrence>
+     *     occurrences: array<Occurrence>,
+     *     details: EventDetails
      * }|null
      */
     public function getEvent(
         int $eventId
     ): ?array {
 
-        $event = $this->eventRepository->findById(
-            $eventId
-        );
 
-        if ($event === null) {
+        $event =
+            $this->eventRepository
+                ->findById(
+                    $eventId
+                );
+
+
+        if (
+            $event === null
+        ) {
             return null;
         }
 
+
+
         return [
-            'event' => $event,
+
+            'event' =>
+                $event,
+
 
             'occurrences' =>
                 $this->occurrenceRepository
-                    ->findByEventId($eventId),
+                    ->findByEventId(
+                        $eventId
+                    ),
+
+
+            'details' =>
+                $this->getEventDetails(
+                    $eventId
+                ),
+
         ];
     }
+
+
+
+
+
+    /**
+     * Get event details.
+     */
+    public function getEventDetails(
+        int $eventId
+    ): EventDetails {
+
+
+        return EventDetails::fromMeta(
+
+            get_post_meta(
+                $eventId
+            )
+
+        );
+    }
+
+
+
+
+
+    /**
+     * Get upcoming occurrences.
+     *
+     * @return array<Occurrence>
+     */
+    public function getUpcomingOccurrences(
+        int $eventId
+    ): array {
+
+
+        $occurrences =
+            $this->occurrenceRepository
+                ->findByEventId(
+                    $eventId
+                );
+
+
+        return array_values(
+
+            array_filter(
+
+                $occurrences,
+
+                static function (
+                    Occurrence $occurrence
+                ): bool {
+
+                    return $occurrence->isUpcoming();
+
+                }
+
+            )
+
+        );
+    }
+
+
+
+
+
+    /**
+     * Get past occurrences.
+     *
+     * @return array<Occurrence>
+     */
+    public function getPastOccurrences(
+        int $eventId
+    ): array {
+
+
+        $occurrences =
+            $this->occurrenceRepository
+                ->findByEventId(
+                    $eventId
+                );
+
+
+        return array_values(
+
+            array_filter(
+
+                $occurrences,
+
+                static function (
+                    Occurrence $occurrence
+                ): bool {
+
+                    return ! $occurrence->isUpcoming();
+
+                }
+
+            )
+
+        );
+    }
+
+
+
+
 
     /**
      * Get upcoming published events.
@@ -64,9 +193,16 @@ final class EventService
         int $limit = 20
     ): array {
 
+
         return $this->eventRepository
-            ->findPublished($limit);
+            ->findPublished(
+                $limit
+            );
     }
+
+
+
+
 
     /**
      * Check whether event has future occurrences.
@@ -75,16 +211,26 @@ final class EventService
         int $eventId
     ): bool {
 
+
         $occurrences =
             $this->occurrenceRepository
-                ->findByEventId($eventId);
+                ->findByEventId(
+                    $eventId
+                );
 
-        foreach ($occurrences as $occurrence) {
 
-            if ($occurrence->isUpcoming()) {
+        foreach (
+            $occurrences as $occurrence
+        ) {
+
+            if (
+                $occurrence->isUpcoming()
+            ) {
                 return true;
             }
+
         }
+
 
         return false;
     }
