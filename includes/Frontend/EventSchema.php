@@ -38,6 +38,8 @@ final class EventSchema
 
 
 
+
+
     /**
      * Output JSON-LD.
      */
@@ -50,11 +52,13 @@ final class EventSchema
         }
 
 
+
         global $post;
 
 
+
         if (
-            ! $post
+            ! $post instanceof \WP_Post
         ) {
             return;
         }
@@ -123,19 +127,22 @@ final class EventSchema
                 ),
 
 
-            'image' =>
-                get_the_post_thumbnail_url(
-                    $event->id,
-                    'large'
-                ),
-
 
             'eventStatus' =>
                 'https://schema.org/EventScheduled',
 
 
+
             'eventAttendanceMode' =>
                 'https://schema.org/OfflineEventAttendanceMode',
+
+
+
+            'image' =>
+                get_the_post_thumbnail_url(
+                    $event->id,
+                    'large'
+                ),
 
 
 
@@ -167,6 +174,8 @@ final class EventSchema
 
 
 
+
+
         if (
             $firstOccurrence->endDateTime
         ) {
@@ -182,9 +191,14 @@ final class EventSchema
 
 
 
+
+
+
+
         if (
             $details->artist
         ) {
+
 
             $schema['performer'] = [
 
@@ -198,6 +212,73 @@ final class EventSchema
             ];
 
         }
+
+
+
+
+
+
+
+        if (
+            count($occurrences) > 1
+        ) {
+
+
+            $schema['subEvent'] = [];
+
+
+
+            foreach (
+                $occurrences as $occurrence
+            ) {
+
+
+                $subEvent = [
+
+                    '@type' =>
+                        'MusicEvent',
+
+
+                    'name' =>
+                        $event->title,
+
+
+                    'startDate' =>
+                        $occurrence
+                            ->startDateTime
+                            ->format(
+                                DATE_ATOM
+                            ),
+
+                ];
+
+
+
+                if (
+                    $occurrence->endDateTime
+                ) {
+
+                    $subEvent['endDate'] =
+                        $occurrence
+                            ->endDateTime
+                            ->format(
+                                DATE_ATOM
+                            );
+
+                }
+
+
+
+                $schema['subEvent'][] =
+                    $subEvent;
+
+            }
+
+        }
+
+
+
+
 
 
 
@@ -232,6 +313,10 @@ final class EventSchema
             ];
 
         }
+
+
+
+
 
 
 
