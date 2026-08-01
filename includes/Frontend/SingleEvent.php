@@ -53,17 +53,18 @@ final class SingleEvent
             return $template;
         }
 
-        $eventId = (int) $post->ID;
-        $data    = $this->service->getEvent($eventId);
+        $data = $this->service->getEvent((int) $post->ID);
 
         if ($data === null) {
             return $template;
         }
 
-        $data['upcomingOccurrences'] = $this->service
-            ->getUpcomingOccurrences($eventId);
-        $data['pastOccurrences'] = $this->service
-            ->getPastOccurrences($eventId);
+        $occurrenceGroups = $this->service->groupOccurrences(
+            $data['occurrences']
+        );
+
+        $data['upcomingOccurrences'] = $occurrenceGroups['upcoming'];
+        $data['pastOccurrences']     = $occurrenceGroups['past'];
 
         set_query_var('dizzy_event_data', $data);
 
