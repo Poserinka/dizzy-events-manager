@@ -1,129 +1,69 @@
-.dizzy-occurrences-list {
-    margin-bottom: 20px;
+.dizzy-occurrences-wrapper {
+    overflow-x: auto;
 }
 
-
+.dizzy-occurrences-table {
+    min-width: 760px;
+}
 
 .dizzy-occurrence-row {
-
     background: #ffffff;
-
-    border: 1px solid #dcdcde;
-
-    border-radius: 6px;
-
-    padding: 15px;
-
-    margin-bottom: 15px;
-
 }
 
+.dizzy-occurrence-row td {
+    vertical-align: middle;
+}
 
+.dizzy-occurrence-row input,
+.dizzy-occurrence-row select {
+    min-width: 135px;
+}
 
-.dizzy-occurrence-row p {
+.dizzy-occurrence-actions {
+    min-width: 145px;
+    white-space: nowrap;
+}
 
+.dizzy-sort-handle {
+    align-items: center;
+    color: #646970;
+    cursor: grab;
     display: inline-flex;
-
-    flex-direction: column;
-
-    margin-right: 15px;
-
-    margin-bottom: 10px;
-
+    height: 30px;
+    justify-content: center;
+    margin-right: 8px;
+    text-decoration: none;
+    vertical-align: middle;
+    width: 30px;
 }
 
-
-
-.dizzy-occurrence-row label {
-
-    font-weight: 600;
-
-    margin-bottom: 5px;
-
+.dizzy-sort-handle:active {
+    cursor: grabbing;
 }
 
-
-
-.dizzy-occurrence-row input {
-
-    min-width: 160px;
-
+.dizzy-sort-handle:focus {
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 2px solid transparent;
 }
 
-
+.dizzy-sort-placeholder td {
+    background: #f0f6fc;
+    border: 2px dashed #2271b1;
+    height: 48px;
+}
 
 .dizzy-remove-occurrence {
-
-    margin-top: 24px !important;
-
+    vertical-align: middle;
 }
-
-
 
 .dizzy-add-occurrence {
-
     margin-top: 10px;
-
 }
-
-
 
 #dizzy_event_occurrences {
-
     max-width: 100%;
-
 }
-
-
 
 #dizzy_event_occurrences .inside {
-
     padding: 15px;
-
-}
-
-.dizzy-sort-handle {
-    cursor: move;
-    font-size: 18px;
-    margin-right: 10px;
-}
-
-.dizzy-sort-placeholder {
-    height: 80px;
-    border: 2px dashed #999;
-    margin-bottom: 15px;
-}
-
-.dizzy-occurrence-row {
-    position: relative;
-}
-
-
-.dizzy-sort-handle {
-
-    cursor: move;
-
-    display: inline-block;
-
-    font-size: 18px;
-
-    margin-right: 12px;
-
-    color: #646970;
-
-    vertical-align: middle;
-
-}
-
-
-.dizzy-sort-placeholder {
-
-    height: 120px;
-
-    border: 2px dashed #2271b1;
-
-    background: #f6f7f7;
-
-    margin-bottom: 15px;
-
 }
