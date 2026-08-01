@@ -64,14 +64,17 @@ readonly class Occurrence
     }
 
     /**
-     * Check whether the occurrence starts in the future.
+     * Check whether the occurrence is current or upcoming.
      */
     public function isUpcoming(): bool
     {
-        return $this->startDateTime > new DateTimeImmutable(
+        $now = new DateTimeImmutable(
             'now',
             $this->startDateTime->getTimezone()
         );
+        $activeUntil = $this->endDateTime ?? $this->startDateTime;
+
+        return $activeUntil >= $now;
     }
 
     /**
