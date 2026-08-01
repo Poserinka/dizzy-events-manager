@@ -23,7 +23,8 @@ final class OccurrenceRepository
      * Occurrence repository constructor.
      */
     public function __construct(
-        private string $table
+        private string $table,
+        private string $postsTable
     ) {
     }
 
@@ -80,18 +81,30 @@ final class OccurrenceRepository
 
         $rows = DB::getResults(
             "
-            SELECT *
-            FROM {$this->table}
-            WHERE event_id IN ({$placeholders})
-                AND status = %s
+            SELECT occurrences.*
+            FROM {$this->table} AS occurrences
+            INNER JOIN {$this->postsTable} AS events
+                ON events.ID = occurrences.event_id
+            WHERE occurrences.event_id IN ({$placeholders})
+                AND occurrences.status = %s
+                AND events.post_type = %s
+                AND events.post_status = %s
                 AND (
-                    end_datetime >= %s
-                    OR (end_datetime IS NULL AND start_datetime >= %s)
+                    occurrences.end_datetime >= %s
+                    OR (
+                        occurrences.end_datetime IS NULL
+                        AND occurrences.start_datetime >= %s
+                    )
                 )
-            ORDER BY event_id ASC, start_datetime ASC, sort_order ASC
+            ORDER BY
+                occurrences.event_id ASC,
+                occurrences.start_datetime ASC,
+                occurrences.sort_order ASC
             ",
             [
                 ...$eventIds,
+                'publish',
+                'event',
                 'publish',
                 $now,
                 $now,
@@ -118,7 +131,7 @@ final class OccurrenceRepository
     }
 
     /**
-     * Find event IDs with current or upcoming published occurrences.
+     * Find published event IDs with current or upcoming occurrences.
      *
      * IDs are ordered by their next occurrence date.
      *
@@ -131,18 +144,27 @@ final class OccurrenceRepository
 
         $eventIds = DB::getColumn(
             "
-            SELECT event_id
-            FROM {$this->table}
-            WHERE status = %s
+            SELECT occurrences.event_id
+            FROM {$this->table} AS occurrences
+            INNER JOIN {$this->postsTable} AS events
+                ON events.ID = occurrences.event_id
+            WHERE occurrences.status = %s
+                AND events.post_type = %s
+                AND events.post_status = %s
                 AND (
-                    end_datetime >= %s
-                    OR (end_datetime IS NULL AND start_datetime >= %s)
+                    occurrences.end_datetime >= %s
+                    OR (
+                        occurrences.end_datetime IS NULL
+                        AND occurrences.start_datetime >= %s
+                    )
                 )
-            GROUP BY event_id
-            ORDER BY MIN(start_datetime) ASC
+            GROUP BY occurrences.event_id
+            ORDER BY MIN(occurrences.start_datetime) ASC
             LIMIT %d
             ",
             [
+                'publish',
+                'event',
                 'publish',
                 $now,
                 $now,
@@ -155,30 +177,6 @@ final class OccurrenceRepository
                 array_map('absint', $eventIds)
             )
         );
-    }
-
-    /**
-     * Delete all occurrences belonging to an event.
-     */
-    public function deleteForEvent(int $eventId): void
-    {
-        if ($eventId <= 0) {
-            return;
-        }
-
-        $deleted = DB::instance()->delete(
-            $this->table,
-            ['event_id' => $eventId],
-            ['%d']
-        );
-
-        if ($deleted === false) {
-            throw new RuntimeException(
-                $this->getDatabaseError(
-                    'Could not delete event occurrences.'
-                )
-            );
-        }
     }
 
     /**
@@ -274,6 +272,30 @@ final class OccurrenceRepository
             $database->query('ROLLBACK');
 
             throw $exception;
+        }
+    }
+
+    /**
+     * Delete all occurrences belonging to an event.
+     */
+    public function deleteForEvent(int $eventId): void
+    {
+        if ($eventId <= 0) {
+            return;
+        }
+
+        $deleted = DB::instance()->delete(
+            $this->table,
+            ['event_id' => $eventId],
+            ['%d']
+        );
+
+        if ($deleted === false) {
+            throw new RuntimeException(
+                $this->getDatabaseError(
+                    'Could not delete event occurrences.'
+                )
+            );
         }
     }
 
