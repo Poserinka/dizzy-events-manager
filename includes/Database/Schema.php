@@ -33,7 +33,11 @@ final class Schema
         KEY event_id (event_id),
         KEY start_datetime (start_datetime),
         KEY sort_order (sort_order),
-        KEY status (status)
+        KEY status (status),
+        KEY event_status_start (event_id, status, start_datetime),
+        KEY event_status_end (event_id, status, end_datetime),
+        KEY status_start_event (status, start_datetime, event_id),
+        KEY status_end_event (status, end_datetime, event_id)
         ";
     }
 }
