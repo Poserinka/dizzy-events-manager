@@ -106,40 +106,28 @@ final class EventService
     }
 
     /**
-     * Get upcoming occurrences.
+     * Get upcoming occurrences in chronological order.
      *
      * @return array<Occurrence>
      */
     public function getUpcomingOccurrences(int $eventId): array
     {
-        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
-
-        return array_values(
-            array_filter(
-                $occurrences,
-                static function (Occurrence $occurrence): bool {
-                    return $occurrence->isUpcoming();
-                }
-            )
+        return $this->filterAndSortOccurrences(
+            $this->occurrenceRepository->findByEventId($eventId),
+            true
         );
     }
 
     /**
-     * Get past occurrences.
+     * Get past occurrences in chronological order.
      *
      * @return array<Occurrence>
      */
     public function getPastOccurrences(int $eventId): array
     {
-        $occurrences = $this->occurrenceRepository->findByEventId($eventId);
-
-        return array_values(
-            array_filter(
-                $occurrences,
-                static function (Occurrence $occurrence): bool {
-                    return ! $occurrence->isUpcoming();
-                }
-            )
+        return $this->filterAndSortOccurrences(
+            $this->occurrenceRepository->findByEventId($eventId),
+            false
         );
     }
 
@@ -169,5 +157,42 @@ final class EventService
         }
 
         return false;
+    }
+
+    /**
+     * Filter occurrences by temporal state and sort them chronologically.
+     *
+     * @param array<Occurrence> $occurrences Occurrence records.
+     *
+     * @return array<Occurrence>
+     */
+    private function filterAndSortOccurrences(
+        array $occurrences,
+        bool $upcoming
+    ): array {
+        $filtered = array_values(
+            array_filter(
+                $occurrences,
+                static function (Occurrence $occurrence) use ($upcoming): bool {
+                    return $occurrence->isUpcoming() === $upcoming;
+                }
+            )
+        );
+
+        usort(
+            $filtered,
+            static function (
+                Occurrence $first,
+                Occurrence $second
+            ): int {
+                $comparison = $first->startDateTime <=> $second->startDateTime;
+
+                return $comparison !== 0
+                    ? $comparison
+                    : $first->id <=> $second->id;
+            }
+        );
+
+        return $filtered;
     }
 }
