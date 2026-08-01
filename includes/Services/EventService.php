@@ -101,13 +101,15 @@ final class EventService
     }
 
     /**
-     * Get upcoming published events.
+     * Get upcoming published events ordered by next occurrence.
      *
      * @return array<Event>
      */
     public function getUpcomingEvents(int $limit = 20): array
     {
-        return $this->eventRepository->findPublished($limit);
+        $eventIds = $this->occurrenceRepository->findUpcomingEventIds($limit);
+
+        return $this->eventRepository->findPublishedByIds($eventIds);
     }
 
     /**
