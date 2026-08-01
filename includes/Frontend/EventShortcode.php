@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Frontend\ViewModels\EventViewData;
-use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -17,15 +16,13 @@ defined('ABSPATH') || exit;
  */
 final class EventShortcode
 {
+    /**
+     * Create the event shortcode.
+     */
     public function __construct(
-
-        private EventService $service,
-
-        private OccurrenceRepository $occurrenceRepository,
-
+        private EventService $service
     ) {
     }
-
 
     /**
      * Register shortcode.
@@ -41,24 +38,16 @@ final class EventShortcode
         );
     }
 
-
     /**
      * Render events.
+     *
+     * @param array<string, mixed> $atts Shortcode attributes.
      */
-    public function render(
-        array $atts = []
-    ): string {
+    public function render(array $atts = []): string
+    {
+        $events = $this->service->getUpcomingEvents(10);
 
-
-        $events =
-            $this->service
-                ->getUpcomingEvents(
-                    10
-                );
-
-
-        if (empty($events)) {
-
+        if ($events === []) {
             return sprintf(
                 '<p>%s</p>',
                 esc_html__(
@@ -68,38 +57,22 @@ final class EventShortcode
             );
         }
 
-
         ob_start();
-
         ?>
-
         <div class="dizzy-events">
-
-
-            <?php foreach ($events as $event): ?>
-
-
+            <?php foreach ($events as $event) : ?>
                 <?php
+                $viewData = EventViewData::from(
+                    $event,
+                    $this->service->getEventDetails($event->id),
+                    $this->service->getUpcomingOccurrences($event->id)
+                );
 
-                $viewData =
-                    EventViewData::from(
-                        $event,
-                        $this->occurrenceRepository
-                    );
-
-                include DIZZY_EVENTS_PATH .
-                    'includes/Frontend/Views/event-card.php';
-
+                include DIZZY_EVENTS_PATH . 'includes/Frontend/Views/event-card.php';
                 ?>
-
-
             <?php endforeach; ?>
-
-
         </div>
-
         <?php
-
 
         return (string) ob_get_clean();
     }
