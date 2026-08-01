@@ -6,9 +6,8 @@ namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Repositories\OccurrenceRepository;
-use Dizzy\Events\Reservations\Admin\ReservationAdmin;
+use Dizzy\Events\Reservations\ReservationRepository;
 use Dizzy\Events\Services\OccurrenceService;
-
 
 defined('ABSPATH') || exit;
 
@@ -19,9 +18,6 @@ defined('ABSPATH') || exit;
  */
 final class AdminServiceProvider
 {
-    /**
-     * Register admin services.
-     */
     public function register(Container $container): void
     {
         $container->singleton(
@@ -50,29 +46,20 @@ final class AdminServiceProvider
 
         $container->singleton(
             ReservationAdmin::class,
-            static function (): ReservationAdmin {
-                return new ReservationAdmin();
+            static function () use ($container): ReservationAdmin {
+                return new ReservationAdmin(
+                    $container->get(ReservationRepository::class)
+                );
             }
         );
 
         add_action(
             'admin_init',
             static function () use ($container): void {
-                $container
-                    ->get(OccurrenceMetaBox::class)
-                    ->register();
-
-                $container
-                    ->get(EventDetailsMetaBox::class)
-                    ->register();
-
-                $container
-                    ->get(AdminAssets::class)
-                    ->register();
-
-                $container
-                    ->get(ReservationAdmin::class)
-                    ->register();
+                $container->get(OccurrenceMetaBox::class)->register();
+                $container->get(EventDetailsMetaBox::class)->register();
+                $container->get(AdminAssets::class)->register();
+                $container->get(ReservationAdmin::class)->register();
             }
         );
     }
