@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend;
 
-use Dizzy\Events\Models\EventDetails;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -22,6 +21,7 @@ final class EventSchema
     }
 
 
+
     /**
      * Register hooks.
      */
@@ -35,6 +35,7 @@ final class EventSchema
             ]
         );
     }
+
 
 
     /**
@@ -59,6 +60,7 @@ final class EventSchema
         }
 
 
+
         $data =
             $this->service
                 ->getEvent(
@@ -66,9 +68,13 @@ final class EventSchema
                 );
 
 
-        if (! $data) {
+
+        if (
+            ! $data
+        ) {
             return;
         }
+
 
 
         $event =
@@ -80,11 +86,21 @@ final class EventSchema
 
 
         $details =
-            EventDetails::fromMeta(
-                get_post_meta(
-                    $event->id
-                )
-            );
+            $data['details'];
+
+
+
+        if (
+            empty($occurrences)
+        ) {
+            return;
+        }
+
+
+
+        $firstOccurrence =
+            $occurrences[0];
+
 
 
         $schema = [
@@ -114,15 +130,36 @@ final class EventSchema
                 ),
 
 
+            'eventStatus' =>
+                'https://schema.org/EventScheduled',
+
+
+            'eventAttendanceMode' =>
+                'https://schema.org/OfflineEventAttendanceMode',
+
+
+
+            'startDate' =>
+                $firstOccurrence
+                    ->startDateTime
+                    ->format(
+                        DATE_ATOM
+                    ),
+
+
+
             'location' => [
 
                 '@type' =>
                     'Place',
 
+
                 'name' =>
                     $details->venue
                     ??
-                    get_bloginfo('name'),
+                    get_bloginfo(
+                        'name'
+                    ),
 
             ],
 
@@ -131,15 +168,35 @@ final class EventSchema
 
 
         if (
-            ! empty($occurrences)
+            $firstOccurrence->endDateTime
         ) {
 
-            $schema['startDate'] =
-                $occurrences[0]
-                    ->startDateTime
+            $schema['endDate'] =
+                $firstOccurrence
+                    ->endDateTime
                     ->format(
                         DATE_ATOM
                     );
+
+        }
+
+
+
+        if (
+            $details->artist
+        ) {
+
+            $schema['performer'] = [
+
+                '@type' =>
+                    'PerformingGroup',
+
+
+                'name' =>
+                    $details->artist,
+
+            ];
+
         }
 
 
@@ -148,33 +205,50 @@ final class EventSchema
             $details->ticketUrl
         ) {
 
+
             $schema['offers'] = [
 
                 '@type' =>
                     'Offer',
+
 
                 'url' =>
                     $details->ticketUrl,
 
 
                 'price' =>
-                    $details->ticketPrice,
+                    $details->ticketPrice
+                    ??
+                    0,
+
 
                 'priceCurrency' =>
                     'EUR',
 
+
+                'availability' =>
+                    'https://schema.org/InStock',
+
             ];
+
         }
+
 
 
         echo '<script type="application/ld+json">';
 
+
+
         echo wp_json_encode(
+
             $schema,
+
             JSON_UNESCAPED_SLASHES
+
         );
 
-        echo '</script>';
 
+
+        echo '</script>';
     }
 }
