@@ -13,7 +13,7 @@ if (! $details instanceof EventDetails) {
 }
 
 $ticketUrl = $details->ticketUrl !== null
-    ? trim($details->ticketUrl)
+    ? esc_url(trim($details->ticketUrl))
     : '';
 ?>
 <?php if ($details->ticketPrice !== null) : ?>
@@ -32,7 +32,7 @@ $ticketUrl = $details->ticketUrl !== null
 <?php if ($ticketUrl !== '') : ?>
     <a
         class="dizzy-event-ticket"
-        href="<?php echo esc_url($ticketUrl); ?>"
+        href="<?php echo $ticketUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
         target="_blank"
         rel="noopener noreferrer"
     >
