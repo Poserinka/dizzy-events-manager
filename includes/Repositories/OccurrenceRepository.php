@@ -45,9 +45,7 @@ final class OccurrenceRepository
             WHERE event_id = %d
             ORDER BY start_datetime ASC, sort_order ASC
             ",
-            [
-                $eventId,
-            ]
+            [$eventId]
         );
 
         return $this->hydrateRows($rows);
@@ -86,24 +84,34 @@ final class OccurrenceRepository
             FROM {$this->table}
             WHERE event_id IN ({$placeholders})
                 AND status = %s
-                AND COALESCE(end_datetime, start_datetime) >= %s
+                AND (
+                    end_datetime >= %s
+                    OR (end_datetime IS NULL AND start_datetime >= %s)
+                )
             ORDER BY event_id ASC, start_datetime ASC, sort_order ASC
             ",
             [
                 ...$eventIds,
                 'publish',
                 $now,
+                $now,
             ]
         );
 
         $grouped = array_fill_keys($eventIds, []);
 
-        foreach ($this->hydrateRows($rows) as $occurrence) {
-            if (! isset($grouped[$occurrence->eventId])) {
+        foreach ($rows as $row) {
+            $occurrence = $this->hydrateRow($row);
+
+            if ($occurrence === null) {
                 continue;
             }
 
-            $grouped[$occurrence->eventId][] = $occurrence;
+            $eventId = (int) ($row->event_id ?? 0);
+
+            if (isset($grouped[$eventId])) {
+                $grouped[$eventId][] = $occurrence;
+            }
         }
 
         return $grouped;
@@ -126,13 +134,17 @@ final class OccurrenceRepository
             SELECT event_id
             FROM {$this->table}
             WHERE status = %s
-                AND COALESCE(end_datetime, start_datetime) >= %s
+                AND (
+                    end_datetime >= %s
+                    OR (end_datetime IS NULL AND start_datetime >= %s)
+                )
             GROUP BY event_id
             ORDER BY MIN(start_datetime) ASC
             LIMIT %d
             ",
             [
                 'publish',
+                $now,
                 $now,
                 $limit,
             ]
@@ -159,10 +171,8 @@ final class OccurrenceRepository
      *     status: string
      * }> $occurrences Normalized occurrence records.
      */
-    public function replaceForEvent(
-        int $eventId,
-        array $occurrences
-    ): void {
+    public function replaceForEvent(int $eventId, array $occurrences): void
+    {
         if ($eventId <= 0) {
             throw new InvalidArgumentException(
                 'A valid event ID is required to replace occurrences.'
@@ -181,12 +191,8 @@ final class OccurrenceRepository
         try {
             $deleted = $database->delete(
                 $this->table,
-                [
-                    'event_id' => $eventId,
-                ],
-                [
-                    '%d',
-                ]
+                ['event_id' => $eventId],
+                ['%d']
             );
 
             if ($deleted === false) {
@@ -248,7 +254,7 @@ final class OccurrenceRepository
     }
 
     /**
-     * Hydrate database rows while isolating malformed records.
+     * Hydrate occurrence rows while isolating malformed records.
      *
      * @param array<object> $rows Database rows.
      *
@@ -259,20 +265,34 @@ final class OccurrenceRepository
         $occurrences = [];
 
         foreach ($rows as $row) {
-            try {
-                $occurrences[] = Occurrence::hydrateFromRow($row);
-            } catch (Throwable $exception) {
-                error_log(
-                    sprintf(
-                        'Dizzy Events skipped malformed occurrence row %d: %s',
-                        isset($row->id) ? (int) $row->id : 0,
-                        $exception->getMessage()
-                    )
-                );
+            $occurrence = $this->hydrateRow($row);
+
+            if ($occurrence !== null) {
+                $occurrences[] = $occurrence;
             }
         }
 
         return $occurrences;
+    }
+
+    /**
+     * Hydrate a single occurrence row safely.
+     */
+    private function hydrateRow(object $row): ?Occurrence
+    {
+        try {
+            return Occurrence::hydrateFromRow($row);
+        } catch (Throwable $exception) {
+            error_log(
+                sprintf(
+                    'Dizzy Events skipped malformed occurrence %d: %s',
+                    (int) ($row->id ?? 0),
+                    $exception->getMessage()
+                )
+            );
+
+            return null;
+        }
     }
 
     /**
@@ -282,10 +302,6 @@ final class OccurrenceRepository
     {
         $error = DB::lastError();
 
-        if ($error === '') {
-            return $fallback;
-        }
-
-        return $fallback . ' ' . $error;
+        return $error === '' ? $fallback : $fallback . ' ' . $error;
     }
 }
