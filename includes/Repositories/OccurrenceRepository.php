@@ -2,367 +2,253 @@
 
 declare(strict_types=1);
 
-namespace Dizzy\Events\Admin;
+namespace Dizzy\Events\Repositories;
 
-use Dizzy\Events\Repositories\OccurrenceRepository;
+use DateTimeImmutable;
+use DateTimeZone;
+use Dizzy\Events\Models\Occurrence;
 
 defined('ABSPATH') || exit;
 
 /**
- * Occurrence administration meta box.
+ * Handles event occurrences persistence.
  *
- * @package Dizzy\Events\Admin
+ * @package Dizzy\Events\Repositories
  */
-final class OccurrenceMetaBox
+final class OccurrenceRepository
 {
     public function __construct(
-        private OccurrenceRepository $repository
+        private string $table
     ) {
     }
 
 
-    /**
-     * Register hooks.
-     */
-    public function register(): void
-    {
-        add_action(
-            'add_meta_boxes',
-            [
-                $this,
-                'addMetaBox',
-            ]
-        );
-
-
-        add_action(
-            'save_post_event',
-            [
-                $this,
-                'save',
-            ]
-        );
-    }
-
-
 
     /**
-     * Add meta box.
+     * Find occurrences by event.
+     *
+     * @return array<Occurrence>
      */
-    public function addMetaBox(): void
-    {
-        add_meta_box(
-            'dizzy_event_occurrences',
-            __('Event Dates', 'dizzy-events-manager'),
-            [
-                $this,
-                'render',
-            ],
-            'event',
-            'normal',
-            'high'
-        );
-    }
-
-
-
-    /**
-     * Render fields.
-     */
-    public function render(
-        \WP_Post $post
-    ): void {
-
-        wp_nonce_field(
-            'dizzy_occurrence_save',
-            'dizzy_occurrence_nonce'
-        );
-
-
-        $occurrences =
-            $this->repository
-                ->findByEventId(
-                    $post->ID
-                );
-
-        ?>
-
-        <div class="dizzy-occurrences-list">
-
-
-            <?php foreach ($occurrences as $occurrence): ?>
-
-                <?php
-                $this->renderRow(
-                    $occurrence
-                );
-                ?>
-
-            <?php endforeach; ?>
-
-
-        </div>
-
-
-        <p>
-
-            <button
-                type="button"
-                class="button dizzy-add-occurrence"
-            >
-
-                <?php esc_html_e(
-                    'Add Date',
-                    'dizzy-events-manager'
-                ); ?>
-
-            </button>
-
-        </p>
-
-
-
-        <script type="text/html" id="dizzy-occurrence-template">
-
-            <?php
-            $this->renderEmptyRow();
-            ?>
-
-        </script>
-
-
-        <?php
-    }
-
-
-
-    /**
-     * Render existing occurrence row.
-     */
-    private function renderRow(
-        object $occurrence
-    ): void {
-
-        ?>
-
-        <div class="dizzy-occurrence-row">
-
-
-            <p>
-
-                <label>
-                    <?php esc_html_e(
-                        'Start',
-                        'dizzy-events-manager'
-                    ); ?>
-                </label>
-
-
-                <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[start][]"
-                    value="<?php echo esc_attr(
-                        $occurrence
-                            ->startDateTime
-                            ->format(
-                                'Y-m-d\TH:i'
-                            )
-                    ); ?>"
-                >
-
-            </p>
-
-
-
-            <p>
-
-                <label>
-                    <?php esc_html_e(
-                        'End',
-                        'dizzy-events-manager'
-                    ); ?>
-                </label>
-
-
-                <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[end][]"
-                    value="<?php echo esc_attr(
-                        $occurrence
-                            ->endDateTime
-                            ->format(
-                                'Y-m-d\TH:i'
-                            )
-                    ); ?>"
-                >
-
-            </p>
-
-
-
-            <button
-                type="button"
-                class="button dizzy-remove-occurrence"
-            >
-
-                <?php esc_html_e(
-                    'Remove',
-                    'dizzy-events-manager'
-                ); ?>
-
-            </button>
-
-
-        </div>
-
-        <?php
-    }
-
-
-
-    /**
-     * Render empty occurrence row.
-     */
-    private function renderEmptyRow(): void
-    {
-        ?>
-
-        <div class="dizzy-occurrence-row">
-
-
-            <p>
-
-                <label>
-                    <?php esc_html_e(
-                        'Start',
-                        'dizzy-events-manager'
-                    ); ?>
-                </label>
-
-
-                <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[start][]"
-                >
-
-            </p>
-
-
-
-            <p>
-
-                <label>
-                    <?php esc_html_e(
-                        'End',
-                        'dizzy-events-manager'
-                    ); ?>
-                </label>
-
-
-                <input
-                    type="datetime-local"
-                    name="dizzy_occurrences[end][]"
-                >
-
-            </p>
-
-
-
-            <button
-                type="button"
-                class="button dizzy-remove-occurrence"
-            >
-
-                <?php esc_html_e(
-                    'Remove',
-                    'dizzy-events-manager'
-                ); ?>
-
-            </button>
-
-
-        </div>
-
-        <?php
-    }
-
-
-
-    /**
-     * Save occurrences.
-     */
-    public function save(
-        int $postId
-    ): void {
-
-
-        if (
-            ! isset(
-                $_POST['dizzy_occurrence_nonce']
-            )
-        ) {
-            return;
-        }
-
-
-        if (
-            ! wp_verify_nonce(
-                $_POST['dizzy_occurrence_nonce'],
-                'dizzy_occurrence_save'
-            )
-        ) {
-            return;
-        }
-
-
-        if (
-            defined('DOING_AUTOSAVE')
-            &&
-            DOING_AUTOSAVE
-        ) {
-            return;
-        }
-
-
-        if (
-            ! current_user_can(
-                'edit_post',
-                $postId
-            )
-        ) {
-            return;
-        }
-
-
-
-        $data = [];
-
-
-
-        if (
-            isset(
-                $_POST['dizzy_occurrences']
-            )
-            &&
-            is_array(
-                $_POST['dizzy_occurrences']
-            )
-        ) {
-
-            $data =
-                wp_unslash(
-                    $_POST['dizzy_occurrences']
-                );
-
-        }
-
-
-
-        $this->repository
-            ->replaceForEvent(
-                $postId,
-                $data
+    public function findByEventId(
+        int $eventId
+    ): array {
+
+        global $wpdb;
+
+
+        $rows =
+            $wpdb->get_results(
+                $wpdb->prepare(
+                    "
+                    SELECT *
+                    FROM {$this->table}
+                    WHERE event_id = %d
+                    ORDER BY start_datetime ASC
+                    ",
+                    $eventId
+                )
             );
 
+
+        return array_map(
+            static function ($row): Occurrence {
+
+                return Occurrence::hydrateFromRow(
+                    $row
+                );
+
+            },
+            $rows
+        );
     }
+
+
+
+    /**
+     * Replace all occurrences.
+     *
+     * @param array<string,mixed> $data
+     */
+    public function replaceForEvent(
+        int $eventId,
+        array $data
+    ): void {
+
+
+        global $wpdb;
+
+
+        $wpdb->query(
+            'START TRANSACTION'
+        );
+
+
+        try {
+
+
+            $wpdb->delete(
+                $this->table,
+                [
+                    'event_id' => $eventId,
+                ],
+                [
+                    '%d',
+                ]
+            );
+
+
+
+            if (
+                empty($data['start'])
+                ||
+                ! is_array(
+                    $data['start']
+                )
+            ) {
+
+                $wpdb->query(
+                    'COMMIT'
+                );
+
+                return;
+            }
+
+
+
+            foreach ($data['start'] as $index => $start) {
+
+
+                if (
+                    empty($start)
+                ) {
+                    continue;
+                }
+
+
+                $startDate =
+                    $this->parseDate(
+                        $start
+                    );
+
+
+                if (
+                    ! $startDate
+                ) {
+                    continue;
+                }
+
+
+
+                $endDate = null;
+
+
+
+                if (
+                    ! empty(
+                        $data['end'][$index]
+                    )
+                ) {
+
+                    $endDate =
+                        $this->parseDate(
+                            $data['end'][$index]
+                        );
+
+                }
+
+
+
+                $wpdb->insert(
+
+                    $this->table,
+
+                    [
+
+                        'event_id' =>
+                            $eventId,
+
+
+                        'start_datetime' =>
+                            $startDate
+                                ->format(
+                                    'Y-m-d H:i:s'
+                                ),
+
+
+                        'end_datetime' =>
+                            $endDate
+                                ? $endDate->format(
+                                    'Y-m-d H:i:s'
+                                )
+                                : null,
+
+                    ],
+
+
+                    [
+
+                        '%d',
+                        '%s',
+                        '%s',
+
+                    ]
+
+                );
+
+            }
+
+
+            $wpdb->query(
+                'COMMIT'
+            );
+
+
+        } catch (\Throwable $e) {
+
+
+            $wpdb->query(
+                'ROLLBACK'
+            );
+
+
+            throw $e;
+
+        }
+
+    }
+
+
+
+
+    /**
+     * Convert input datetime.
+     */
+    private function parseDate(
+        string $value
+    ): ?DateTimeImmutable {
+
+
+        try {
+
+
+            return new DateTimeImmutable(
+
+                $value,
+
+                new DateTimeZone(
+                    'Europe/Amsterdam'
+                )
+
+            );
+
+
+        } catch (\Exception) {
+
+
+            return null;
+
+        }
+
+    }
+
 }
