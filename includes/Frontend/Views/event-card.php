@@ -15,6 +15,11 @@ $visibleDates     = $datePresentation['visible'];
 $remainingDates   = $datePresentation['remaining'];
 $eventUrl         = esc_url(trim($event->url));
 $imageUrl         = esc_url(trim($event->image));
+$artist           = $event->artist !== null ? trim($event->artist) : '';
+$genre            = $event->genre !== null ? trim($event->genre) : '';
+$venue            = $event->venue !== null ? trim($event->venue) : '';
+$address          = $event->address !== null ? trim($event->address) : '';
+$excerpt          = trim($event->excerpt);
 $mapsUrl          = esc_url(
     $event->mapsUrl !== null
         ? trim($event->mapsUrl)
@@ -60,25 +65,25 @@ $hasEventUrl      = $eventUrl !== '';
         <?php endif; ?>
     </h3>
 
-    <?php if ($event->artist !== null) : ?>
+    <?php if ($artist !== '') : ?>
         <p class="dizzy-event-artist">
-            <?php echo esc_html($event->artist); ?>
+            <?php echo esc_html($artist); ?>
         </p>
     <?php endif; ?>
 
-    <?php if ($event->genre !== null) : ?>
+    <?php if ($genre !== '') : ?>
         <p class="dizzy-event-genre">
-            <?php echo esc_html($event->genre); ?>
+            <?php echo esc_html($genre); ?>
         </p>
     <?php endif; ?>
 
-    <?php if ($event->venue !== null) : ?>
+    <?php if ($venue !== '') : ?>
         <p class="dizzy-event-venue">
-            <?php echo esc_html($event->venue); ?>
+            <?php echo esc_html($venue); ?>
         </p>
     <?php endif; ?>
 
-    <?php if ($event->address !== null) : ?>
+    <?php if ($address !== '') : ?>
         <p class="dizzy-event-address">
             <?php if ($mapsUrl !== '') : ?>
                 <a
@@ -86,10 +91,10 @@ $hasEventUrl      = $eventUrl !== '';
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <?php echo esc_html($event->address); ?>
+                    <?php echo esc_html($address); ?>
                 </a>
             <?php else : ?>
-                <?php echo esc_html($event->address); ?>
+                <?php echo esc_html($address); ?>
             <?php endif; ?>
         </p>
     <?php endif; ?>
@@ -145,9 +150,9 @@ $hasEventUrl      = $eventUrl !== '';
         </p>
     <?php endif; ?>
 
-    <?php if ($event->excerpt !== '') : ?>
+    <?php if ($excerpt !== '') : ?>
         <div class="dizzy-event-excerpt">
-            <?php echo wp_kses_post($event->excerpt); ?>
+            <?php echo wp_kses_post($excerpt); ?>
         </div>
     <?php endif; ?>
 
