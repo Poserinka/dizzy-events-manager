@@ -12,26 +12,21 @@ defined('ABSPATH') || exit;
 /**
  * Repository for event occurrences.
  *
- * Handles database operations related to event occurrences.
- *
  * @package Dizzy\Events\Repositories
  */
 final class OccurrenceRepository extends AbstractRepository
 {
-    /**
-     * Database table key.
-     */
-    protected string $table = 'occurrences';
+    protected string $table = 'dizzy_event_occurrences';
+
 
     /**
-     * Model handled by this repository.
-     *
-     * @return class-string<Occurrence>
+     * Model handled by repository.
      */
     protected function modelClass(): string
     {
         return Occurrence::class;
     }
+
 
     /**
      * Find occurrence by ID.
@@ -53,36 +48,9 @@ final class OccurrenceRepository extends AbstractRepository
         );
     }
 
-    /**
-     * Find upcoming occurrences.
-     *
-     * @return array<Occurrence>
-     */
-    public function findUpcoming(
-        int $limit = 20,
-        int $offset = 0
-    ): array {
-
-        return $this->findMany(
-            "
-            SELECT *
-            FROM {$this->table()}
-            WHERE start_datetime >= %s
-            AND status = %s
-            ORDER BY start_datetime ASC
-            LIMIT %d OFFSET %d
-            ",
-            [
-                current_time('mysql'),
-                OccurrenceStatus::PUBLISHED->value,
-                $limit,
-                $offset,
-            ]
-        );
-    }
 
     /**
-     * Find occurrences for an event.
+     * Find occurrences by event.
      *
      * @return array<Occurrence>
      */
@@ -103,45 +71,46 @@ final class OccurrenceRepository extends AbstractRepository
         );
     }
 
+
     /**
-     * Find occurrences between dates.
+     * Create occurrence.
+     *
+     * @param array<string,mixed> $data
+     */
+    public function create(
+        array $data
+    ): int {
+
+        return $this->insert(
+            $data
+        );
+    }
+
+
+    /**
+     * Find upcoming occurrences.
      *
      * @return array<Occurrence>
      */
-    public function findBetween(
-        string $start,
-        string $end
+    public function findUpcoming(
+        int $limit = 20
     ): array {
 
         return $this->findMany(
             "
             SELECT *
             FROM {$this->table()}
-            WHERE start_datetime BETWEEN %s AND %s
+            WHERE start_datetime >= %s
+            AND status = %s
             ORDER BY start_datetime ASC
+            LIMIT %d
             ",
             [
-                $start,
-                $end,
-            ]
-        );
-    }
+                current_time('mysql'),
 
-    /**
-     * Mark old occurrences as expired.
-     *
-     * @param string $before Date limit.
-     */
-    public function expireBefore(
-        string $before
-    ): bool {
+                OccurrenceStatus::PUBLISHED->value,
 
-        return $this->update(
-            [
-                'status' => OccurrenceStatus::EXPIRED->value,
-            ],
-            [
-                'status' => OccurrenceStatus::PUBLISHED->value,
+                $limit,
             ]
         );
     }
