@@ -10,6 +10,7 @@ use Dizzy\Events\Models\Occurrence;
 
 defined('ABSPATH') || exit;
 
+
 /**
  * Handles event occurrences persistence.
  *
@@ -32,6 +33,7 @@ final class OccurrenceRepository
     public function findByEventId(
         int $eventId
     ): array {
+
 
         global $wpdb;
 
@@ -60,12 +62,14 @@ final class OccurrenceRepository
             },
             $rows
         );
+
     }
 
 
 
+
     /**
-     * Replace all occurrences.
+     * Replace occurrences.
      *
      * @param array<string,mixed> $data
      */
@@ -99,10 +103,12 @@ final class OccurrenceRepository
 
 
             if (
-                empty($data['start'])
+                empty(
+                    $data['start_date']
+                )
                 ||
                 ! is_array(
-                    $data['start']
+                    $data['start_date']
                 )
             ) {
 
@@ -111,47 +117,75 @@ final class OccurrenceRepository
                 );
 
                 return;
+
             }
 
 
 
-            foreach ($data['start'] as $index => $start) {
+            foreach (
+                $data['start_date']
+                as $index => $date
+            ) {
 
 
                 if (
-                    empty($start)
+                    empty($date)
                 ) {
                     continue;
                 }
 
 
-                $startDate =
-                    $this->parseDate(
-                        $start
+
+                $startTime =
+                    $data['start_time'][$index]
+                    ??
+                    '00:00';
+
+
+
+                $start =
+                    $this->createDateTime(
+                        $date,
+                        $startTime
                     );
 
 
+
                 if (
-                    ! $startDate
+                    ! $start
                 ) {
                     continue;
                 }
 
 
 
-                $endDate = null;
+                $end = null;
 
 
 
                 if (
                     ! empty(
-                        $data['end'][$index]
+                        $data['end_date'][$index]
                     )
                 ) {
 
+
                     $endDate =
-                        $this->parseDate(
-                            $data['end'][$index]
+                        $data['end_date'][$index];
+
+
+
+                    $endTime =
+                        $data['end_time'][$index]
+                        ??
+                        '00:00';
+
+
+
+                    $end =
+                        $this->createDateTime(
+                            $endDate,
+                            $endTime
                         );
 
                 }
@@ -169,21 +203,20 @@ final class OccurrenceRepository
 
 
                         'start_datetime' =>
-                            $startDate
+                            $start
                                 ->format(
                                     'Y-m-d H:i:s'
                                 ),
 
 
                         'end_datetime' =>
-                            $endDate
-                                ? $endDate->format(
+                            $end
+                                ? $end->format(
                                     'Y-m-d H:i:s'
                                 )
                                 : null,
 
                     ],
-
 
                     [
 
@@ -196,6 +229,7 @@ final class OccurrenceRepository
                 );
 
             }
+
 
 
             $wpdb->query(
@@ -220,11 +254,13 @@ final class OccurrenceRepository
 
 
 
+
     /**
-     * Convert input datetime.
+     * Create datetime object.
      */
-    private function parseDate(
-        string $value
+    private function createDateTime(
+        string $date,
+        string $time
     ): ?DateTimeImmutable {
 
 
@@ -233,7 +269,9 @@ final class OccurrenceRepository
 
             return new DateTimeImmutable(
 
-                $value,
+                $date .
+                ' ' .
+                $time,
 
                 new DateTimeZone(
                     'Europe/Amsterdam'
