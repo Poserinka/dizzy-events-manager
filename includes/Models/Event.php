@@ -30,35 +30,67 @@ readonly class Event implements Hydrates
     ) {
     }
 
+
+
     /**
      * Create event from source object.
-     *
-     * @param object $source Source object.
      */
-    public static function from(object $source): static
-    {
+    public static function from(
+        object $source
+    ): static {
+
+        $status =
+            EventStatus::tryFrom(
+                (string) ($source->status ?? 'draft')
+            )
+            ??
+            EventStatus::Draft;
+
+
+
         return new self(
-            id: (int) $source->id,
 
-            title: (string) $source->title,
+            id:
+                (int) ($source->id ?? 0),
 
-            slug: (string) $source->slug,
 
-            content: (string) ($source->content ?? ''),
+            title:
+                (string) ($source->title ?? ''),
 
-            status: EventStatus::from(
-                (string) $source->status
-            ),
 
-            createdAt: new DateTimeImmutable(
-                $source->created_at
-            ),
+            slug:
+                (string) ($source->slug ?? ''),
 
-            updatedAt: new DateTimeImmutable(
-                $source->updated_at
-            ),
+
+            content:
+                (string) ($source->content ?? ''),
+
+
+            status:
+                $status,
+
+
+            createdAt:
+                new DateTimeImmutable(
+                    $source->created_at
+                    ??
+                    'now'
+                ),
+
+
+            updatedAt:
+                new DateTimeImmutable(
+                    $source->updated_at
+                    ??
+                    'now'
+                ),
+
         );
     }
+
+
+
+
 
     /**
      * Convert event to array.
@@ -68,21 +100,40 @@ readonly class Event implements Hydrates
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
 
-            'title' => $this->title,
+            'id' =>
+                $this->id,
 
-            'slug' => $this->slug,
 
-            'content' => $this->content,
+            'title' =>
+                $this->title,
 
-            'status' => $this->status->value,
 
-            'created_at' => $this->createdAt
-                ->format('Y-m-d H:i:s'),
+            'slug' =>
+                $this->slug,
 
-            'updated_at' => $this->updatedAt
-                ->format('Y-m-d H:i:s'),
+
+            'content' =>
+                $this->content,
+
+
+            'status' =>
+                $this->status->value,
+
+
+            'created_at' =>
+                $this->createdAt
+                    ->format(
+                        'Y-m-d H:i:s'
+                    ),
+
+
+            'updated_at' =>
+                $this->updatedAt
+                    ->format(
+                        'Y-m-d H:i:s'
+                    ),
+
         ];
     }
 }
