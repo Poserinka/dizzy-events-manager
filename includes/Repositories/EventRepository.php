@@ -70,16 +70,62 @@ final class EventRepository extends AbstractRepository
     {
         $limit = max(1, $limit);
 
-        $query = new WP_Query(
+        return $this->queryPublishedEvents(
             [
-                'post_type'           => self::POST_TYPE,
-                'post_status'         => 'publish',
-                'posts_per_page'      => $limit,
-                'orderby'             => 'date',
-                'order'               => 'DESC',
-                'no_found_rows'       => true,
-                'ignore_sticky_posts' => true,
+                'posts_per_page' => $limit,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
             ]
+        );
+    }
+
+    /**
+     * Find published events by IDs while preserving ID order.
+     *
+     * @param array<int> $eventIds Event post IDs.
+     *
+     * @return array<Event>
+     */
+    public function findPublishedByIds(array $eventIds): array
+    {
+        $eventIds = array_values(
+            array_filter(
+                array_map('absint', $eventIds)
+            )
+        );
+
+        if ($eventIds === []) {
+            return [];
+        }
+
+        return $this->queryPublishedEvents(
+            [
+                'post__in'       => $eventIds,
+                'posts_per_page' => count($eventIds),
+                'orderby'        => 'post__in',
+            ]
+        );
+    }
+
+    /**
+     * Query published event posts.
+     *
+     * @param array<string, mixed> $arguments Additional query arguments.
+     *
+     * @return array<Event>
+     */
+    private function queryPublishedEvents(array $arguments): array
+    {
+        $query = new WP_Query(
+            array_merge(
+                [
+                    'post_type'           => self::POST_TYPE,
+                    'post_status'         => 'publish',
+                    'no_found_rows'       => true,
+                    'ignore_sticky_posts' => true,
+                ],
+                $arguments
+            )
         );
 
         $events = [];
