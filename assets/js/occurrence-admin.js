@@ -7,9 +7,11 @@
     const DizzyOccurrences = {
         init: function () {
             this.prepareRows();
+            this.prepareLimitNotice();
             this.bindEvents();
             this.enableSorting();
             this.refreshOrder();
+            this.refreshControls();
         },
 
         bindEvents: function () {
@@ -42,6 +44,23 @@
                     actions.prepend(manager.createSortHandle());
                 }
             });
+        },
+
+        /**
+         * Add the row-limit explanation near the add button.
+         */
+        prepareLimitNotice: function () {
+            const addButton = $('.dizzy-add-occurrence').first();
+
+            if (! addButton.length || $('.dizzy-occurrence-limit').length) {
+                return;
+            }
+
+            $('<span>', {
+                class: 'description dizzy-occurrence-limit',
+                text: DizzyEventsAdmin.limitLabel,
+                hidden: true
+            }).insertAfter(addButton);
         },
 
         /**
@@ -115,6 +134,11 @@
         addRow: function (event) {
             event.preventDefault();
 
+            if (this.rowCount() >= DizzyEventsAdmin.maxOccurrences) {
+                this.refreshControls();
+                return;
+            }
+
             const row = $('<tr>', {
                 class: 'dizzy-occurrence-row'
             });
@@ -161,6 +185,7 @@
 
             $('#dizzy-occurrence-rows').append(row);
             this.refreshOrder();
+            this.refreshControls();
         },
 
         /**
@@ -178,6 +203,7 @@
                 row.find(
                     'input[name="dizzy_occurrences[sort_order][]"]'
                 ).val('0');
+                this.refreshControls();
 
                 return;
             }
@@ -187,6 +213,30 @@
                 .remove();
 
             this.refreshOrder();
+            this.refreshControls();
+        },
+
+        /**
+         * Return the current number of occurrence rows.
+         */
+        rowCount: function () {
+            return $('.dizzy-occurrence-row').length;
+        },
+
+        /**
+         * Refresh the add-button and limit-message state.
+         */
+        refreshControls: function () {
+            const limitReached = this.rowCount()
+                >= DizzyEventsAdmin.maxOccurrences;
+            const addButton = $('.dizzy-add-occurrence');
+            const notice = $('.dizzy-occurrence-limit');
+
+            addButton
+                .prop('disabled', limitReached)
+                .attr('aria-disabled', limitReached ? 'true' : 'false');
+
+            notice.prop('hidden', ! limitReached);
         },
 
         /**
