@@ -25,6 +25,8 @@ final class OccurrenceRepository
 
     private const EVENT_POST_STATUS = 'publish';
 
+    private const MAX_EVENT_LIMIT = 100;
+
     /**
      * Occurrence repository constructor.
      */
@@ -128,13 +130,12 @@ final class OccurrenceRepository
      *
      * IDs are ordered by their next relevant occurrence time. Ongoing
      * occurrences are ranked at the current time instead of by an old start.
-     * Equal relevance times are resolved by the actual start and event ID.
      *
      * @return array<int>
      */
     public function findUpcomingEventIds(int $limit = 20): array
     {
-        $limit = max(1, $limit);
+        $limit = min(max(1, $limit), self::MAX_EVENT_LIMIT);
         $now   = current_time('mysql');
 
         $eventIds = DB::getColumn(
