@@ -22,6 +22,13 @@ final class FrontendServiceProvider
     public function register(Container $container): void
     {
         $container->singleton(
+            FrontendAssets::class,
+            static function (): FrontendAssets {
+                return new FrontendAssets();
+            }
+        );
+
+        $container->singleton(
             EventShortcode::class,
             static function () use ($container): EventShortcode {
                 return new EventShortcode(
@@ -56,16 +63,17 @@ final class FrontendServiceProvider
         );
 
         add_action(
-            'template_redirect',
+            'wp',
             static function () use ($container): void {
-                $container->get(SingleEvent::class)->register();
+                $container->get(FrontendAssets::class)->register();
+                $container->get(EventSchema::class)->register();
             }
         );
 
         add_action(
-            'wp',
+            'template_redirect',
             static function () use ($container): void {
-                $container->get(EventSchema::class)->register();
+                $container->get(SingleEvent::class)->register();
             }
         );
     }
