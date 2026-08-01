@@ -33,6 +33,13 @@ final class ReservationService
             throw new RuntimeException('Event ID is required.');
         }
 
+        if (
+            isset($data['occurrence_id'])
+            && (int) $data['occurrence_id'] < 0
+        ) {
+            throw new RuntimeException('Invalid occurrence ID.');
+        }
+
         $reservationId = $this->repository->save($data);
 
         if (! empty($data['email']) && is_string($data['email'])) {
