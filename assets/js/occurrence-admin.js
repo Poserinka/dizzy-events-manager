@@ -25,6 +25,33 @@
         },
 
         /**
+         * Create a time select field.
+         */
+        createTimeSelect: function (name) {
+            const select = $('<select>', {
+                name: name
+            });
+
+            select.append(
+                $('<option>', {
+                    value: '',
+                    text: DizzyEventsAdmin.selectTimeLabel
+                })
+            );
+
+            DizzyEventsAdmin.timeOptions.forEach(function (time) {
+                select.append(
+                    $('<option>', {
+                        value: time,
+                        text: time.replace(':', '.')
+                    })
+                );
+            });
+
+            return select;
+        },
+
+        /**
          * Add a new occurrence row.
          */
         addRow: function (event) {
@@ -42,10 +69,9 @@
                     })
                 ),
                 $('<td>').append(
-                    $('<input>', {
-                        type: 'time',
-                        name: 'dizzy_occurrences[start_time][]'
-                    })
+                    this.createTimeSelect(
+                        'dizzy_occurrences[start_time][]'
+                    )
                 ),
                 $('<td>').append(
                     $('<input>', {
@@ -54,10 +80,9 @@
                     })
                 ),
                 $('<td>').append(
-                    $('<input>', {
-                        type: 'time',
-                        name: 'dizzy_occurrences[end_time][]'
-                    })
+                    this.createTimeSelect(
+                        'dizzy_occurrences[end_time][]'
+                    )
                 ),
                 $('<td>').append(
                     $('<input>', {
@@ -88,7 +113,7 @@
             if (rows.length <= 1) {
                 const row = rows.first();
 
-                row.find('input:not([type="hidden"])').val('');
+                row.find('input:not([type="hidden"]), select').val('');
                 row.find(
                     'input[name="dizzy_occurrences[sort_order][]"]'
                 ).val('0');
