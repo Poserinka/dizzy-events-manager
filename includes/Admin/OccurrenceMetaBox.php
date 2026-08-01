@@ -34,6 +34,7 @@ final class OccurrenceMetaBox
             ]
         );
 
+
         add_action(
             'save_post_event',
             [
@@ -44,13 +45,14 @@ final class OccurrenceMetaBox
     }
 
 
+
     /**
-     * Add occurrence box.
+     * Add meta box.
      */
     public function addMetaBox(): void
     {
         add_meta_box(
-            'dizzy_occurrences',
+            'dizzy_event_occurrences',
             __('Event Dates', 'dizzy-events-manager'),
             [
                 $this,
@@ -63,57 +65,239 @@ final class OccurrenceMetaBox
     }
 
 
+
     /**
-     * Render box.
+     * Render fields.
      */
     public function render(
         \WP_Post $post
     ): void {
+
 
         wp_nonce_field(
             'dizzy_occurrence_save',
             'dizzy_occurrence_nonce'
         );
 
+
+        $occurrences =
+            $this->repository
+                ->findByEventId(
+                    $post->ID
+                );
+
+
         ?>
-        <p>
-            <label>
-                <?php esc_html_e(
-                    'Start date/time',
-                    'dizzy-events-manager'
-                ); ?>
-            </label>
-        </p>
 
-        <input
-            type="datetime-local"
-            name="dizzy_occurrence_start"
+        <div class="dizzy-occurrences-list">
+
+
+        <?php foreach ($occurrences as $occurrence): ?>
+
+
+            <?php $this->renderRow($occurrence); ?>
+
+
+        <?php endforeach; ?>
+
+
+        </div>
+
+
+
+        <button
+            type="button"
+            class="button dizzy-add-occurrence"
         >
 
-        <p>
-            <label>
-                <?php esc_html_e(
-                    'End date/time',
-                    'dizzy-events-manager'
-                ); ?>
-            </label>
-        </p>
+            <?php esc_html_e(
+                'Add Date',
+                'dizzy-events-manager'
+            ); ?>
 
-        <input
-            type="datetime-local"
-            name="dizzy_occurrence_end"
-        >
+        </button>
+
+
+
+        <script type="text/html" id="dizzy-occurrence-template">
+
+
+            <?php
+
+            $this->renderEmptyRow();
+
+            ?>
+
+
+        </script>
+
 
         <?php
     }
 
 
+
     /**
-     * Save occurrence.
+     * Render existing row.
+     */
+    private function renderRow(
+        object $occurrence
+    ): void {
+
+        ?>
+
+        <div class="dizzy-occurrence-row">
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'Start',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    name="dizzy_occurrences[start][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->startDateTime
+                            ->format(
+                                'Y-m-d\TH:i'
+                            )
+                    ); ?>"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    name="dizzy_occurrences[end][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->endDateTime
+                            ->format(
+                                'Y-m-d\TH:i'
+                            )
+                    ); ?>"
+                >
+
+            </p>
+
+
+
+            <button
+                type="button"
+                class="button dizzy-remove-occurrence"
+            >
+
+                <?php esc_html_e(
+                    'Remove',
+                    'dizzy-events-manager'
+                ); ?>
+
+            </button>
+
+
+        </div>
+
+        <?php
+    }
+
+
+
+
+    /**
+     * Empty template row.
+     */
+    private function renderEmptyRow(): void
+    {
+        ?>
+
+        <div class="dizzy-occurrence-row">
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'Start',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    name="dizzy_occurrences[start][]"
+                >
+
+            </p>
+
+
+
+            <p>
+
+                <label>
+                    <?php esc_html_e(
+                        'End',
+                        'dizzy-events-manager'
+                    ); ?>
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    name="dizzy_occurrences[end][]"
+                >
+
+            </p>
+
+
+
+            <button
+                type="button"
+                class="button dizzy-remove-occurrence"
+            >
+
+                <?php esc_html_e(
+                    'Remove',
+                    'dizzy-events-manager'
+                ); ?>
+
+            </button>
+
+
+        </div>
+
+        <?php
+    }
+
+
+
+
+    /**
+     * Save occurrences.
      */
     public function save(
         int $postId
     ): void {
+
 
         if (
             ! isset(
@@ -153,44 +337,8 @@ final class OccurrenceMetaBox
         }
 
 
-        if (
-            empty(
-                $_POST['dizzy_occurrence_start']
-            )
-        ) {
-            return;
-        }
+        // Saving logic will be moved
+        // to repository handler next.
 
-
-        $this->repository->create(
-            [
-                'event_id' =>
-                    $postId,
-
-                'start_datetime' =>
-                    sanitize_text_field(
-                        $_POST['dizzy_occurrence_start']
-                    ),
-
-                'end_datetime' =>
-                    sanitize_text_field(
-                        $_POST['dizzy_occurrence_end'] ?? ''
-                    ),
-
-                'all_day' => 0,
-
-                'timezone' =>
-                    'Europe/Amsterdam',
-
-                'status' =>
-                    'publish',
-
-                'created_at' =>
-                    current_time('mysql'),
-
-                'updated_at' =>
-                    current_time('mysql'),
-            ]
-        );
     }
 }
