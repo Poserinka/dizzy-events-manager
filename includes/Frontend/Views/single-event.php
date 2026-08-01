@@ -14,10 +14,8 @@ if (! $post instanceof \WP_Post) {
 $eventId = $post->ID;
 
 
-/**
- * Application instance.
- */
-$app = $GLOBALS['dizzy_events_application'] ?? null;
+$app =
+    $GLOBALS['dizzy_events_application'] ?? null;
 
 
 if (! $app) {
@@ -50,107 +48,249 @@ $event =
 $occurrences =
     $data['occurrences'];
 
+
+$details =
+    \Dizzy\Events\Models\EventDetails::fromMeta(
+        get_post_meta(
+            $eventId
+        )
+    );
+
 ?>
 
 <div class="dizzy-single-event">
 
 
-    <header class="dizzy-event-header">
-
-        <?php if (has_post_thumbnail($eventId)): ?>
-
-            <div class="dizzy-event-image">
-
-                <?php
-
-                echo get_the_post_thumbnail(
-                    $eventId,
-                    'large'
-                );
-
-                ?>
-
-            </div>
-
-        <?php endif; ?>
+<header class="dizzy-event-header">
 
 
-        <h1>
+<?php if ($details->featured): ?>
 
-            <?php echo esc_html(
-                $event->title
-            ); ?>
+<span class="dizzy-event-featured">
 
-        </h1>
+<?php esc_html_e(
+    'Featured Event',
+    'dizzy-events-manager'
+); ?>
+
+</span>
+
+<?php endif; ?>
 
 
-    </header>
+<?php if (has_post_thumbnail($eventId)): ?>
+
+<div class="dizzy-event-image">
+
+<?php
+
+echo get_the_post_thumbnail(
+    $eventId,
+    'large'
+);
+
+?>
+
+</div>
+
+<?php endif; ?>
 
 
+<h1>
 
-    <div class="dizzy-event-content">
+<?php echo esc_html(
+    $event->title
+); ?>
 
-        <?php
+</h1>
 
-        echo wp_kses_post(
-            apply_filters(
-                'the_content',
-                $event->content
-            )
-        );
 
-        ?>
-
-    </div>
+</header>
 
 
 
-    <?php if (! empty($occurrences)): ?>
+<div class="dizzy-event-meta">
 
 
-        <section class="dizzy-event-dates">
+<?php if ($details->artist): ?>
+
+<p>
+
+<strong>
+<?php esc_html_e(
+    'Artist:',
+    'dizzy-events-manager'
+); ?>
+</strong>
+
+<?php echo esc_html(
+    $details->artist
+); ?>
+
+</p>
+
+<?php endif; ?>
 
 
-            <h2>
 
-                <?php esc_html_e(
-                    'Dates',
-                    'dizzy-events-manager'
-                ); ?>
+<?php if ($details->genre): ?>
 
-            </h2>
+<p>
 
+<strong>
+<?php esc_html_e(
+    'Genre:',
+    'dizzy-events-manager'
+); ?>
+</strong>
 
-            <ul>
+<?php echo esc_html(
+    $details->genre
+); ?>
 
+</p>
 
-            <?php foreach ($occurrences as $occurrence): ?>
-
-
-                <li>
-
-                    <?php echo esc_html(
-                        $occurrence
-                            ->startDateTime
-                            ->format(
-                                'd F Y - H:i'
-                            )
-                    ); ?>
+<?php endif; ?>
 
 
-                </li>
+
+<?php if ($details->venue): ?>
+
+<p>
+
+<strong>
+<?php esc_html_e(
+    'Venue:',
+    'dizzy-events-manager'
+); ?>
+</strong>
+
+<?php echo esc_html(
+    $details->venue
+); ?>
+
+</p>
+
+<?php endif; ?>
 
 
-            <?php endforeach; ?>
+</div>
 
 
-            </ul>
+
+<div class="dizzy-event-content">
+
+<?php
+
+echo wp_kses_post(
+    apply_filters(
+        'the_content',
+        $event->content
+    )
+);
+
+?>
+
+</div>
 
 
-        </section>
+
+<?php if (!empty($occurrences)): ?>
 
 
-    <?php endif; ?>
+<section class="dizzy-event-dates">
+
+
+<h2>
+
+<?php esc_html_e(
+    'Dates',
+    'dizzy-events-manager'
+); ?>
+
+</h2>
+
+
+<ul>
+
+
+<?php foreach ($occurrences as $occurrence): ?>
+
+
+<li>
+
+<?php echo esc_html(
+    $occurrence
+        ->startDateTime
+        ->format(
+            'd F Y - H:i'
+        )
+); ?>
+
+</li>
+
+
+<?php endforeach; ?>
+
+
+</ul>
+
+
+</section>
+
+
+<?php endif; ?>
+
+
+
+<?php if ($details->ticketPrice !== null): ?>
+
+<p class="dizzy-event-price">
+
+<strong>
+
+<?php esc_html_e(
+    'Price:',
+    'dizzy-events-manager'
+); ?>
+
+</strong>
+
+
+<?php echo esc_html(
+    number_format(
+        $details->ticketPrice,
+        2
+    )
+); ?>
+
+€
+
+</p>
+
+<?php endif; ?>
+
+
+
+<?php if ($details->ticketUrl): ?>
+
+<a
+class="dizzy-event-ticket"
+href="<?php echo esc_url(
+    $details->ticketUrl
+); ?>"
+target="_blank"
+rel="noopener"
+>
+
+<?php esc_html_e(
+    'Buy Ticket',
+    'dizzy-events-manager'
+); ?>
+
+</a>
+
+<?php endif; ?>
 
 
 </div>
