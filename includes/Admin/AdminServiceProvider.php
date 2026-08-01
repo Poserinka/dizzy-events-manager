@@ -23,6 +23,7 @@ final class AdminServiceProvider
         Container $container
     ): void {
 
+
         $container->singleton(
             EventMetaBox::class,
             static function (): EventMetaBox {
@@ -58,9 +59,19 @@ final class AdminServiceProvider
         );
 
 
+        $container->singleton(
+            EventDetailsMetaBox::class,
+            static function (): EventDetailsMetaBox {
+
+                return new EventDetailsMetaBox();
+            }
+        );
+
+
         add_action(
             'admin_init',
             static function () use ($container): void {
+
 
                 $container
                     ->get(EventMetaBox::class)
@@ -74,6 +85,11 @@ final class AdminServiceProvider
 
                 $container
                     ->get(OccurrenceTable::class)
+                    ->register();
+
+
+                $container
+                    ->get(EventDetailsMetaBox::class)
                     ->register();
 
             }
