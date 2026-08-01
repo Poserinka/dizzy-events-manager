@@ -27,6 +27,8 @@ final class OccurrenceRepository
 
     private const MAX_EVENT_LIMIT = 100;
 
+    private const EVENT_ID_BATCH_SIZE = 100;
+
     /**
      * Occurrence repository constructor.
      */
@@ -81,45 +83,18 @@ final class OccurrenceRepository
             return [];
         }
 
-        $placeholders = implode(
-            ', ',
-            array_fill(0, count($eventIds), '%d')
-        );
-        $now = current_time('mysql');
-
-        $rows = DB::getResults(
-            "
-            SELECT occurrences.*
-            FROM {$this->table} AS occurrences
-            INNER JOIN {$this->postsTable} AS events
-                ON events.ID = occurrences.event_id
-            WHERE occurrences.event_id IN ({$placeholders})
-                AND {$this->publishedUpcomingConditions()}
-            ORDER BY
-                occurrences.event_id ASC,
-                occurrences.start_datetime ASC,
-                occurrences.sort_order ASC
-            ",
-            [
-                ...$eventIds,
-                ...$this->publishedUpcomingArguments($now),
-            ]
-        );
-
         $grouped = array_fill_keys($eventIds, []);
+        $now     = current_time('mysql');
 
-        foreach ($rows as $row) {
-            $occurrence = $this->hydrateRow($row);
-
-            if ($occurrence === null) {
-                continue;
-            }
-
-            $eventId = (int) ($row->event_id ?? 0);
-
-            if (isset($grouped[$eventId])) {
-                $grouped[$eventId][] = $occurrence;
-            }
+        foreach (
+            array_chunk($eventIds, self::EVENT_ID_BATCH_SIZE)
+            as $eventIdBatch
+        ) {
+            $this->appendUpcomingOccurrenceBatch(
+                $grouped,
+                $eventIdBatch,
+                $now
+            );
         }
 
         return $grouped;
@@ -317,6 +292,56 @@ final class OccurrenceRepository
                     'Could not delete event occurrences.'
                 )
             );
+        }
+    }
+
+    /**
+     * Append one batch of upcoming occurrence results to grouped data.
+     *
+     * @param array<int, array<Occurrence>> $grouped Grouped occurrence data.
+     * @param array<int>                    $eventIds Event IDs in this batch.
+     */
+    private function appendUpcomingOccurrenceBatch(
+        array &$grouped,
+        array $eventIds,
+        string $now
+    ): void {
+        $placeholders = implode(
+            ', ',
+            array_fill(0, count($eventIds), '%d')
+        );
+
+        $rows = DB::getResults(
+            "
+            SELECT occurrences.*
+            FROM {$this->table} AS occurrences
+            INNER JOIN {$this->postsTable} AS events
+                ON events.ID = occurrences.event_id
+            WHERE occurrences.event_id IN ({$placeholders})
+                AND {$this->publishedUpcomingConditions()}
+            ORDER BY
+                occurrences.event_id ASC,
+                occurrences.start_datetime ASC,
+                occurrences.sort_order ASC
+            ",
+            [
+                ...$eventIds,
+                ...$this->publishedUpcomingArguments($now),
+            ]
+        );
+
+        foreach ($rows as $row) {
+            $occurrence = $this->hydrateRow($row);
+
+            if ($occurrence === null) {
+                continue;
+            }
+
+            $eventId = (int) ($row->event_id ?? 0);
+
+            if (isset($grouped[$eventId])) {
+                $grouped[$eventId][] = $occurrence;
+            }
         }
     }
 
