@@ -180,6 +180,47 @@ final class OccurrenceRepository
     }
 
     /**
+     * Check whether an event has a current or upcoming published occurrence.
+     */
+    public function hasUpcomingForEvent(int $eventId): bool
+    {
+        if ($eventId <= 0) {
+            return false;
+        }
+
+        $now = current_time('mysql');
+
+        return DB::exists(
+            "
+            SELECT 1
+            FROM {$this->table} AS occurrences
+            INNER JOIN {$this->postsTable} AS events
+                ON events.ID = occurrences.event_id
+            WHERE occurrences.event_id = %d
+                AND occurrences.status = %s
+                AND events.post_type = %s
+                AND events.post_status = %s
+                AND (
+                    occurrences.end_datetime >= %s
+                    OR (
+                        occurrences.end_datetime IS NULL
+                        AND occurrences.start_datetime >= %s
+                    )
+                )
+            LIMIT 1
+            ",
+            [
+                $eventId,
+                'publish',
+                'event',
+                'publish',
+                $now,
+                $now,
+            ]
+        );
+    }
+
+    /**
      * Replace all occurrences belonging to an event.
      *
      * The occurrence data must already be validated and normalized.
