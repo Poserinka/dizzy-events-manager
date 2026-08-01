@@ -7,6 +7,7 @@
     const DizzyOccurrences = {
         init: function () {
             this.bindEvents();
+            this.enableSorting();
             this.refreshOrder();
         },
 
@@ -21,6 +22,44 @@
                 'click',
                 '.dizzy-remove-occurrence',
                 this.removeRow.bind(this)
+            );
+        },
+
+        /**
+         * Enable drag-and-drop sorting.
+         */
+        enableSorting: function () {
+            const rows = $('#dizzy-occurrence-rows');
+
+            if (! rows.length || typeof rows.sortable !== 'function') {
+                return;
+            }
+
+            rows.sortable({
+                axis: 'y',
+                handle: '.dizzy-sort-handle',
+                items: '> .dizzy-occurrence-row',
+                placeholder: 'dizzy-sort-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: 'pointer',
+                update: this.refreshOrder.bind(this)
+            });
+        },
+
+        /**
+         * Create a drag handle.
+         */
+        createSortHandle: function () {
+            return $('<button>', {
+                type: 'button',
+                class: 'button-link dizzy-sort-handle',
+                title: DizzyEventsAdmin.dragLabel,
+                'aria-label': DizzyEventsAdmin.dragLabel
+            }).append(
+                $('<span>', {
+                    class: 'dashicons dashicons-move',
+                    'aria-hidden': 'true'
+                })
             );
         },
 
@@ -84,7 +123,10 @@
                         'dizzy_occurrences[end_time][]'
                     )
                 ),
-                $('<td>').append(
+                $('<td>', {
+                    class: 'dizzy-occurrence-actions'
+                }).append(
+                    this.createSortHandle(),
                     $('<input>', {
                         type: 'hidden',
                         name: 'dizzy_occurrences[sort_order][]',
