@@ -6,6 +6,7 @@ namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Reservations\ReservationService;
 
+
 defined('ABSPATH') || exit;
 
 final class ReservationController
@@ -30,8 +31,20 @@ final class ReservationController
 
     public function render(): string
     {
+        $message = '';
+
+        if (isset($_GET['reservation'])) {
+            $message = 'Reservation request received.';
+        }
+
         ob_start();
         ?>
+        <?php if ($message !== '') : ?>
+            <div class="dizzy-reservation-message">
+                <?php echo esc_html($message); ?>
+            </div>
+        <?php endif; ?>
+
         <form method="post" class="dizzy-reservation-form">
             <?php wp_nonce_field('dizzy_reservation_submit', 'dizzy_reservation_nonce'); ?>
 
@@ -71,5 +84,8 @@ final class ReservationController
             'email' => sanitize_email(wp_unslash($_POST['email'] ?? '')),
             'guests' => absint($_POST['guests'] ?? 1),
         ]);
+
+        wp_safe_redirect(add_query_arg('reservation', 'success'));
+        exit;
     }
 }
