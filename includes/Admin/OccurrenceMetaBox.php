@@ -31,7 +31,7 @@ final class OccurrenceMetaBox
             'add_meta_boxes_event',
             [
                 $this,
-                'add'
+                'add',
             ]
         );
 
@@ -40,10 +40,12 @@ final class OccurrenceMetaBox
             'save_post_event',
             [
                 $this,
-                'save'
+                'save',
             ]
         );
     }
+
+
 
 
 
@@ -63,7 +65,7 @@ final class OccurrenceMetaBox
 
             [
                 $this,
-                'render'
+                'render',
             ],
 
             'event',
@@ -74,6 +76,8 @@ final class OccurrenceMetaBox
 
         );
     }
+
+
 
 
 
@@ -103,10 +107,12 @@ final class OccurrenceMetaBox
 
         ?>
 
+
         <div class="dizzy-occurrences-wrapper">
 
 
-            <table class="widefat">
+            <table class="widefat dizzy-occurrences-table">
+
 
                 <thead>
 
@@ -119,12 +125,14 @@ final class OccurrenceMetaBox
                         ); ?>
                     </th>
 
+
                     <th>
                         <?php esc_html_e(
                             'Start Time',
                             'dizzy-events-manager'
                         ); ?>
                     </th>
+
 
                     <th>
                         <?php esc_html_e(
@@ -133,6 +141,7 @@ final class OccurrenceMetaBox
                         ); ?>
                     </th>
 
+
                     <th>
                         <?php esc_html_e(
                             'End Time',
@@ -140,12 +149,17 @@ final class OccurrenceMetaBox
                         ); ?>
                     </th>
 
+
+                    <th></th>
+
                 </tr>
 
                 </thead>
 
 
-                <tbody>
+
+                <tbody id="dizzy-occurrence-rows">
+
 
 
                 <?php if (! empty($occurrences)): ?>
@@ -154,94 +168,30 @@ final class OccurrenceMetaBox
                     <?php foreach ($occurrences as $index => $occurrence): ?>
 
 
-                        <tr>
+                        <?php
 
+                        $this->renderRow(
+                            $occurrence,
+                            $index
+                        );
 
-                            <td>
-
-                                <input
-                                    type="date"
-                                    name="dizzy_occurrences[start_date][]"
-                                    value="<?php echo esc_attr(
-                                        $occurrence
-                                            ->startDateTime
-                                            ->format(
-                                                'Y-m-d'
-                                            )
-                                    ); ?>"
-                                >
-
-                            </td>
-
-
-
-                            <td>
-
-                                <input
-                                    type="time"
-                                    name="dizzy_occurrences[start_time][]"
-                                    value="<?php echo esc_attr(
-                                        $occurrence
-                                            ->startDateTime
-                                            ->format(
-                                                'H:i'
-                                            )
-                                    ); ?>"
-                                >
-
-                            </td>
-
-
-
-                            <td>
-
-                                <input
-                                    type="date"
-                                    name="dizzy_occurrences[end_date][]"
-                                    value="<?php echo esc_attr(
-                                        $occurrence->endDateTime
-                                            ? $occurrence
-                                                ->endDateTime
-                                                ->format(
-                                                    'Y-m-d'
-                                                )
-                                            : ''
-                                    ); ?>"
-                                >
-
-                            </td>
-
-
-
-                            <td>
-
-                                <input
-                                    type="time"
-                                    name="dizzy_occurrences[end_time][]"
-                                    value="<?php echo esc_attr(
-                                        $occurrence->endDateTime
-                                            ? $occurrence
-                                                ->endDateTime
-                                                ->format(
-                                                    'H:i'
-                                                )
-                                            : ''
-                                    ); ?>"
-                                >
-
-                            </td>
-
-
-                        </tr>
+                        ?>
 
 
                     <?php endforeach; ?>
 
 
+
                 <?php else: ?>
 
 
-                    <?php $this->emptyRow(); ?>
+                    <?php
+
+                    $this->renderEmptyRow(
+                        0
+                    );
+
+                    ?>
 
 
                 <?php endif; ?>
@@ -253,6 +203,25 @@ final class OccurrenceMetaBox
             </table>
 
 
+
+            <p>
+
+                <button
+                    type="button"
+                    class="button button-secondary dizzy-add-occurrence"
+                >
+
+                    <?php esc_html_e(
+                        'Add Date',
+                        'dizzy-events-manager'
+                    ); ?>
+
+                </button>
+
+            </p>
+
+
+
         </div>
 
 
@@ -261,14 +230,135 @@ final class OccurrenceMetaBox
 
 
 
+
+
     /**
-     * Empty default row.
+     * Render existing occurrence row.
      */
-    private function emptyRow(): void
-    {
+    private function renderRow(
+        object $occurrence,
+        int $index
+    ): void {
+
         ?>
 
-        <tr>
+        <tr class="dizzy-occurrence-row">
+
+
+            <td>
+
+                <input
+                    type="date"
+                    name="dizzy_occurrences[start_date][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->startDateTime
+                            ->format('Y-m-d')
+                    ); ?>"
+                >
+
+            </td>
+
+
+
+            <td>
+
+                <input
+                    type="time"
+                    name="dizzy_occurrences[start_time][]"
+                    value="<?php echo esc_attr(
+                        $occurrence
+                            ->startDateTime
+                            ->format('H:i')
+                    ); ?>"
+                >
+
+            </td>
+
+
+
+            <td>
+
+                <input
+                    type="date"
+                    name="dizzy_occurrences[end_date][]"
+                    value="<?php echo esc_attr(
+                        $occurrence->endDateTime
+                            ? $occurrence
+                                ->endDateTime
+                                ->format('Y-m-d')
+                            : ''
+                    ); ?>"
+                >
+
+            </td>
+
+
+
+            <td>
+
+                <input
+                    type="time"
+                    name="dizzy_occurrences[end_time][]"
+                    value="<?php echo esc_attr(
+                        $occurrence->endDateTime
+                            ? $occurrence
+                                ->endDateTime
+                                ->format('H:i')
+                            : ''
+                    ); ?>"
+                >
+
+            </td>
+
+
+
+            <td>
+
+                <input
+                    type="hidden"
+                    name="dizzy_occurrences[sort_order][]"
+                    value="<?php echo esc_attr(
+                        $index
+                    ); ?>"
+                >
+
+
+                <button
+                    type="button"
+                    class="button dizzy-remove-occurrence"
+                >
+
+                    <?php esc_html_e(
+                        'Remove',
+                        'dizzy-events-manager'
+                    ); ?>
+
+                </button>
+
+            </td>
+
+
+        </tr>
+
+        <?php
+    }
+
+
+
+
+
+    /**
+     * Render empty row.
+     */
+    private function renderEmptyRow(
+        int $index
+    ): void {
+
+        ?>
+
+        <tr class="dizzy-occurrence-row">
+
 
             <td>
 
@@ -278,6 +368,7 @@ final class OccurrenceMetaBox
                 >
 
             </td>
+
 
 
             <td>
@@ -290,6 +381,7 @@ final class OccurrenceMetaBox
             </td>
 
 
+
             <td>
 
                 <input
@@ -298,6 +390,7 @@ final class OccurrenceMetaBox
                 >
 
             </td>
+
 
 
             <td>
@@ -310,10 +403,39 @@ final class OccurrenceMetaBox
             </td>
 
 
+
+            <td>
+
+                <input
+                    type="hidden"
+                    name="dizzy_occurrences[sort_order][]"
+                    value="<?php echo esc_attr(
+                        $index
+                    ); ?>"
+                >
+
+
+                <button
+                    type="button"
+                    class="button dizzy-remove-occurrence"
+                >
+
+                    <?php esc_html_e(
+                        'Remove',
+                        'dizzy-events-manager'
+                    ); ?>
+
+                </button>
+
+            </td>
+
+
         </tr>
 
         <?php
     }
+
+
 
 
 
@@ -338,7 +460,11 @@ final class OccurrenceMetaBox
         if (
             ! wp_verify_nonce(
 
-                $_POST['dizzy_occurrences_nonce'],
+                sanitize_text_field(
+                    wp_unslash(
+                        $_POST['dizzy_occurrences_nonce']
+                    )
+                ),
 
                 'dizzy_event_occurrences_save'
 
@@ -353,6 +479,16 @@ final class OccurrenceMetaBox
             defined('DOING_AUTOSAVE')
             &&
             DOING_AUTOSAVE
+        ) {
+            return;
+        }
+
+
+
+        if (
+            wp_is_post_revision(
+                $postId
+            )
         ) {
             return;
         }
@@ -378,7 +514,9 @@ final class OccurrenceMetaBox
             is_array(
                 $_POST['dizzy_occurrences']
             )
-                ? $_POST['dizzy_occurrences']
+                ? wp_unslash(
+                    $_POST['dizzy_occurrences']
+                )
                 : [];
 
 
