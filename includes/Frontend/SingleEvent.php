@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend;
 
+use Dizzy\Events\Models\Occurrence;
 use Dizzy\Events\Services\EventService;
+use WP_Post;
 
 defined('ABSPATH') || exit;
 
@@ -15,12 +17,13 @@ defined('ABSPATH') || exit;
  */
 final class SingleEvent
 {
+    /**
+     * Create the single event renderer.
+     */
     public function __construct(
         private EventService $service
     ) {
     }
-
-
 
     /**
      * Register hooks.
@@ -36,92 +39,53 @@ final class SingleEvent
         );
     }
 
-
-
     /**
      * Load custom template.
      */
-    public function template(
-        string $template
-    ): string {
-
-
-        if (
-            ! is_singular('event')
-        ) {
+    public function template(string $template): string
+    {
+        if (! is_singular('event')) {
             return $template;
         }
-
-
 
         global $post;
 
-
-
-        if (
-            ! $post instanceof \WP_Post
-        ) {
+        if (! $post instanceof WP_Post) {
             return $template;
         }
 
+        $data = $this->service->getEvent((int) $post->ID);
 
-
-        $data =
-            $this->service
-                ->getEvent(
-                    $post->ID
-                );
-
-
-
-        if (
-            ! $data
-        ) {
+        if ($data === null) {
             return $template;
         }
 
-
-
-        $data['upcomingOccurrences'] =
-            $this->service
-                ->getUpcomingOccurrences(
-                    $post->ID
-                );
-
-
-
-        $data['pastOccurrences'] =
-            $this->service
-                ->getPastOccurrences(
-                    $post->ID
-                );
-
-
-
-        set_query_var(
-            'dizzy_event_data',
-            $data
+        $data['upcomingOccurrences'] = array_values(
+            array_filter(
+                $data['occurrences'],
+                static function (Occurrence $occurrence): bool {
+                    return $occurrence->isUpcoming();
+                }
+            )
         );
 
-
-
-        $custom =
-            DIZZY_EVENTS_PATH .
-            'includes/Frontend/Views/single-event.php';
-
-
-
-        if (
-            file_exists(
-                $custom
+        $data['pastOccurrences'] = array_values(
+            array_filter(
+                $data['occurrences'],
+                static function (Occurrence $occurrence): bool {
+                    return ! $occurrence->isUpcoming();
+                }
             )
-        ) {
+        );
 
-            return $custom;
+        set_query_var('dizzy_event_data', $data);
 
+        $customTemplate = DIZZY_EVENTS_PATH
+            . 'includes/Frontend/Views/single-event.php';
+
+        if (file_exists($customTemplate)) {
+            return $customTemplate;
         }
-
-
 
         return $template;
     }
