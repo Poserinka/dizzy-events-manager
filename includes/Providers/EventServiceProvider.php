@@ -8,6 +8,7 @@ use Dizzy\Events\Core\Container;
 use Dizzy\Events\Repositories\EventRepository;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\EventService;
+use Dizzy\Events\Services\OccurrenceService;
 
 defined('ABSPATH') || exit;
 
@@ -21,9 +22,8 @@ final class EventServiceProvider
     /**
      * Register services.
      */
-    public function register(
-        Container $container
-    ): void {
+    public function register(Container $container): void
+    {
         $container->singleton(
             EventRepository::class,
             static function (): EventRepository {
@@ -46,12 +46,17 @@ final class EventServiceProvider
             EventService::class,
             static function () use ($container): EventService {
                 return new EventService(
-                    $container->get(
-                        EventRepository::class
-                    ),
-                    $container->get(
-                        OccurrenceRepository::class
-                    )
+                    $container->get(EventRepository::class),
+                    $container->get(OccurrenceRepository::class)
+                );
+            }
+        );
+
+        $container->singleton(
+            OccurrenceService::class,
+            static function () use ($container): OccurrenceService {
+                return new OccurrenceService(
+                    $container->get(OccurrenceRepository::class)
                 );
             }
         );
