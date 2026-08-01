@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 defined('ABSPATH') || exit;
 
@@ -46,18 +47,23 @@ readonly class Occurrence
             isset($row->timezone) ? (string) $row->timezone : ''
         );
 
-        $start = new DateTimeImmutable(
-            (string) $row->start_datetime,
-            $timezone
+        $start = self::parseDateTime(
+            isset($row->start_datetime) ? (string) $row->start_datetime : '',
+            $timezone,
+            'start_datetime'
         );
 
-        $end = ! empty($row->end_datetime)
-            ? new DateTimeImmutable((string) $row->end_datetime, $timezone)
+        $endValue = isset($row->end_datetime)
+            ? trim((string) $row->end_datetime)
+            : '';
+
+        $end = $endValue !== ''
+            ? self::parseDateTime($endValue, $timezone, 'end_datetime')
             : null;
 
         return new self(
-            id: (int) $row->id,
-            eventId: (int) $row->event_id,
+            id: isset($row->id) ? (int) $row->id : 0,
+            eventId: isset($row->event_id) ? (int) $row->event_id : 0,
             startDateTime: $start,
             endDateTime: $end
         );
@@ -75,6 +81,40 @@ readonly class Occurrence
         $activeUntil = $this->endDateTime ?? $this->startDateTime;
 
         return $activeUntil >= $now;
+    }
+
+    /**
+     * Parse a stored database date strictly.
+     */
+    private static function parseDateTime(
+        string $value,
+        DateTimeZone $timezone,
+        string $field
+    ): DateTimeImmutable {
+        $dateTime = DateTimeImmutable::createFromFormat(
+            '!Y-m-d H:i:s',
+            $value,
+            $timezone
+        );
+        $errors = DateTimeImmutable::getLastErrors();
+
+        if (
+            $dateTime === false
+            || (
+                is_array($errors)
+                && (
+                    $errors['warning_count'] > 0
+                    || $errors['error_count'] > 0
+                )
+            )
+            || $dateTime->format('Y-m-d H:i:s') !== $value
+        ) {
+            throw new UnexpectedValueException(
+                sprintf('Invalid occurrence %s value: %s', $field, $value)
+            );
+        }
+
+        return $dateTime;
     }
 
     /**
