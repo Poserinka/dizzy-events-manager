@@ -13,6 +13,8 @@ defined('ABSPATH') || exit;
  */
 final class AdminAssets
 {
+    private const MAX_OCCURRENCES = 100;
+
     /**
      * Register hooks.
      */
@@ -69,7 +71,16 @@ final class AdminAssets
                     'Drag to reorder',
                     'dizzy-events-manager'
                 ),
-                'timeOptions' => OccurrenceMetaBox::timeOptions(),
+                'limitLabel' => sprintf(
+                    /* translators: %d: maximum number of event dates. */
+                    esc_html__(
+                        'An event can contain no more than %d dates.',
+                        'dizzy-events-manager'
+                    ),
+                    self::MAX_OCCURRENCES
+                ),
+                'maxOccurrences' => self::MAX_OCCURRENCES,
+                'timeOptions'    => OccurrenceMetaBox::timeOptions(),
             ]
         );
 
