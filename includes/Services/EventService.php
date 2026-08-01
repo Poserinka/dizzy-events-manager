@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Services;
 
+use Dizzy\Events\Enums\EventStatus;
 use Dizzy\Events\Models\Event;
 use Dizzy\Events\Models\EventDetails;
 use Dizzy\Events\Models\Occurrence;
@@ -31,7 +32,7 @@ final class EventService
     }
 
     /**
-     * Get event with occurrences and details.
+     * Get a published event with occurrences and details.
      *
      * @return array{
      *     event: Event,
@@ -43,7 +44,10 @@ final class EventService
     {
         $event = $this->eventRepository->findById($eventId);
 
-        if ($event === null) {
+        if (
+            $event === null
+            || $event->status !== EventStatus::PUBLISHED
+        ) {
             return null;
         }
 
@@ -85,6 +89,7 @@ final class EventService
             },
             $events
         );
+
         $occurrencesByEvent = $this->occurrenceRepository
             ->findUpcomingByEventIds($eventIds);
         $data = [];
