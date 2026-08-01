@@ -38,7 +38,8 @@ final class EventServiceProvider
                 global $wpdb;
 
                 return new OccurrenceRepository(
-                    $wpdb->prefix . 'dizzy_event_occurrences'
+                    $wpdb->prefix . 'dizzy_event_occurrences',
+                    $wpdb->posts
                 );
             }
         );
@@ -76,7 +77,7 @@ final class EventServiceProvider
                 } catch (Throwable $exception) {
                     error_log(
                         sprintf(
-                            'Dizzy Events occurrence cleanup failed for event %d: %s',
+                            'Dizzy Events could not delete occurrences for event %d: %s',
                             $postId,
                             $exception->getMessage()
                         )
