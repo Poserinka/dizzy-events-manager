@@ -17,10 +17,7 @@ final class ReservationAdmin
 
     public function register(): void
     {
-        add_action(
-            'admin_menu',
-            [$this, 'registerMenu']
-        );
+        add_action('admin_menu', [$this, 'registerMenu']);
     }
 
     public function registerMenu(): void
@@ -41,8 +38,23 @@ final class ReservationAdmin
             return;
         }
 
-        echo '<div class="wrap"><h1>Reservations</h1>';
-        echo '<p>Reservation management is connected.</p>';
-        echo '</div>';
+        $reservations = $this->repository->all();
+
+        echo '<div class="wrap">';
+        echo '<h1>Reservations</h1>';
+        echo '<table class="widefat fixed striped">';
+        echo '<thead><tr><th>Name</th><th>Email</th><th>Event</th><th>Guests</th><th>Status</th></tr></thead><tbody>';
+
+        foreach ($reservations as $reservation) {
+            echo '<tr>';
+            echo '<td>' . esc_html((string) ($reservation['name'] ?? '')) . '</td>';
+            echo '<td>' . esc_html((string) ($reservation['email'] ?? '')) . '</td>';
+            echo '<td>' . esc_html((string) ($reservation['event_id'] ?? '')) . '</td>';
+            echo '<td>' . esc_html((string) ($reservation['guests'] ?? '')) . '</td>';
+            echo '<td>' . esc_html((string) ($reservation['status'] ?? 'pending')) . '</td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody></table></div>';
     }
 }
