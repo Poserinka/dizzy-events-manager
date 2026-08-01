@@ -59,6 +59,65 @@ final class OccurrenceRepository
     }
 
     /**
+     * Find upcoming published occurrences grouped by event ID.
+     *
+     * @param array<int> $eventIds Event IDs.
+     *
+     * @return array<int, array<Occurrence>>
+     */
+    public function findUpcomingByEventIds(array $eventIds): array
+    {
+        $eventIds = array_values(
+            array_unique(
+                array_filter(
+                    array_map('absint', $eventIds)
+                )
+            )
+        );
+
+        if ($eventIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(
+            ', ',
+            array_fill(0, count($eventIds), '%d')
+        );
+        $now = current_time('mysql', true);
+
+        $rows = DB::getResults(
+            "
+            SELECT *
+            FROM {$this->table}
+            WHERE event_id IN ({$placeholders})
+                AND status = %s
+                AND start_datetime >= %s
+            ORDER BY event_id ASC, sort_order ASC, start_datetime ASC
+            ",
+            [
+                ...$eventIds,
+                'publish',
+                $now,
+            ]
+        );
+
+        $grouped = array_fill_keys($eventIds, []);
+
+        foreach ($rows as $row) {
+            $occurrence = Occurrence::hydrateFromRow($row);
+            $eventId    = (int) $row->event_id;
+
+            if (! isset($grouped[$eventId])) {
+                continue;
+            }
+
+            $grouped[$eventId][] = $occurrence;
+        }
+
+        return $grouped;
+    }
+
+    /**
      * Find event IDs with upcoming published occurrences.
      *
      * IDs are ordered by their next occurrence date.
@@ -118,7 +177,7 @@ final class OccurrenceRepository
             );
         }
 
-        $database = DB::instance();
+        $database  = DB::instance();
         $timestamp = current_time('mysql', true);
 
         if ($database->query('START TRANSACTION') === false) {
