@@ -47,6 +47,7 @@ final class AdminAssets
             DIZZY_EVENTS_URL . 'assets/js/occurrence-admin.js',
             [
                 'jquery',
+                'jquery-ui-sortable',
             ],
             DIZZY_EVENTS_VERSION,
             true
@@ -62,6 +63,10 @@ final class AdminAssets
                 ),
                 'selectTimeLabel' => esc_html__(
                     'Select time',
+                    'dizzy-events-manager'
+                ),
+                'dragLabel' => esc_html__(
+                    'Drag to reorder',
                     'dizzy-events-manager'
                 ),
                 'timeOptions' => OccurrenceMetaBox::timeOptions(),
