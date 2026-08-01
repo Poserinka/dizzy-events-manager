@@ -45,6 +45,19 @@ final class AdminServiceProvider
         );
 
 
+        $container->singleton(
+            OccurrenceTable::class,
+            static function () use ($container): OccurrenceTable {
+
+                return new OccurrenceTable(
+                    $container->get(
+                        OccurrenceRepository::class
+                    )
+                );
+            }
+        );
+
+
         add_action(
             'admin_init',
             static function () use ($container): void {
@@ -56,6 +69,11 @@ final class AdminServiceProvider
 
                 $container
                     ->get(OccurrenceMetaBox::class)
+                    ->register();
+
+
+                $container
+                    ->get(OccurrenceTable::class)
                     ->register();
 
             }
