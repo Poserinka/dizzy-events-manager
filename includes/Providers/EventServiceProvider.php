@@ -9,6 +9,7 @@ use Dizzy\Events\Repositories\EventRepository;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\EventService;
 use Dizzy\Events\Services\OccurrenceService;
+use Throwable;
 
 defined('ABSPATH') || exit;
 
@@ -58,6 +59,29 @@ final class EventServiceProvider
                 return new OccurrenceService(
                     $container->get(OccurrenceRepository::class)
                 );
+            }
+        );
+
+        add_action(
+            'before_delete_post',
+            static function (int $postId) use ($container): void {
+                if (get_post_type($postId) !== 'event') {
+                    return;
+                }
+
+                try {
+                    $container
+                        ->get(OccurrenceRepository::class)
+                        ->deleteForEvent($postId);
+                } catch (Throwable $exception) {
+                    error_log(
+                        sprintf(
+                            'Dizzy Events occurrence cleanup failed for event %d: %s',
+                            $postId,
+                            $exception->getMessage()
+                        )
+                    );
+                }
             }
         );
     }
