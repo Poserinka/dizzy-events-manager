@@ -26,11 +26,13 @@ final class Schema
         all_day tinyint(1) NOT NULL DEFAULT 0,
         timezone varchar(64) NOT NULL DEFAULT 'Europe/Amsterdam',
         status varchar(32) NOT NULL DEFAULT 'publish',
+        sort_order int(11) NOT NULL DEFAULT 0,
         created_at datetime NOT NULL,
         updated_at datetime NOT NULL,
         PRIMARY KEY  (id),
         KEY event_id (event_id),
         KEY start_datetime (start_datetime),
+        KEY sort_order (sort_order),
         KEY status (status)
         ";
     }
