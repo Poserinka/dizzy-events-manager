@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-
 /**
  * Plugin constants.
  */
@@ -34,7 +33,6 @@ define(
     plugin_dir_url(__FILE__)
 );
 
-
 /**
  * Composer autoload.
  */
@@ -44,19 +42,15 @@ if (file_exists($autoload)) {
     require_once $autoload;
 }
 
-
 /**
  * Database migrations.
  */
 register_activation_hook(
     __FILE__,
     static function (): void {
-
         \Dizzy\Events\Database\Migrations::run();
-
     }
 );
-
 
 /**
  * Bootstrap application.
@@ -64,14 +58,11 @@ register_activation_hook(
 add_action(
     'plugins_loaded',
     static function (): void {
+        \Dizzy\Events\Database\Migrations::run();
 
-        $application =
-            new \Dizzy\Events\Core\Application();
-
+        $application = new \Dizzy\Events\Core\Application();
         $application->boot();
 
-        $GLOBALS['dizzy_events_application'] =
-            $application;
-
+        $GLOBALS['dizzy_events_application'] = $application;
     }
 );
