@@ -59,8 +59,7 @@ final class SingleEvent
 
 
         if (
-            ! $post
-            instanceof \WP_Post
+            ! $post instanceof \WP_Post
         ) {
             return $template;
         }
@@ -80,6 +79,22 @@ final class SingleEvent
         ) {
             return $template;
         }
+
+
+
+        $data['upcomingOccurrences'] =
+            $this->service
+                ->getUpcomingOccurrences(
+                    $post->ID
+                );
+
+
+
+        $data['pastOccurrences'] =
+            $this->service
+                ->getPastOccurrences(
+                    $post->ID
+                );
 
 
 
