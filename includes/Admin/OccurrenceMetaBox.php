@@ -7,6 +7,7 @@ namespace Dizzy\Events\Admin;
 use Dizzy\Events\Models\Occurrence;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\OccurrenceService;
+use Throwable;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -18,6 +19,11 @@ defined('ABSPATH') || exit;
  */
 final class OccurrenceMetaBox
 {
+    /**
+     * Query argument used for persistence errors.
+     */
+    private const ERROR_QUERY_ARG = 'dizzy_occurrence_error';
+
     /**
      * Occurrence meta box constructor.
      */
@@ -45,6 +51,14 @@ final class OccurrenceMetaBox
             [
                 $this,
                 'save',
+            ]
+        );
+
+        add_action(
+            'admin_notices',
+            [
+                $this,
+                'renderPersistenceErrorNotice',
             ]
         );
     }
@@ -320,10 +334,59 @@ final class OccurrenceMetaBox
             );
         }
 
-        $this->service->replaceForEvent(
-            $postId,
-            $data
-        );
+        try {
+            $this->service->replaceForEvent(
+                $postId,
+                $data
+            );
+        } catch (Throwable $exception) {
+            error_log(
+                sprintf(
+                    'Dizzy Events occurrence save failed for event %d: %s',
+                    $postId,
+                    $exception->getMessage()
+                )
+            );
+
+            add_filter(
+                'redirect_post_location',
+                static function (string $location): string {
+                    return add_query_arg(
+                        self::ERROR_QUERY_ARG,
+                        '1',
+                        $location
+                    );
+                }
+            );
+        }
+    }
+
+    /**
+     * Render occurrence persistence error notice.
+     */
+    public function renderPersistenceErrorNotice(): void
+    {
+        if (
+            ! isset($_GET[self::ERROR_QUERY_ARG])
+            || sanitize_text_field(
+                wp_unslash($_GET[self::ERROR_QUERY_ARG])
+            ) !== '1'
+        ) {
+            return;
+        }
+
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p>
+                <?php
+                esc_html_e(
+                    'The event was saved, but its dates could not be updated. Please try again and check the error log if the problem continues.',
+                    'dizzy-events-manager'
+                );
+                ?>
+            </p>
+        </div>
+        <?php
     }
 
     /**
