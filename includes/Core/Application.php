@@ -8,6 +8,7 @@ use Dizzy\Events\Admin\AdminServiceProvider;
 use Dizzy\Events\Frontend\FrontendServiceProvider;
 use Dizzy\Events\Providers\EventServiceProvider;
 use Dizzy\Events\Providers\PostTypeServiceProvider;
+use Dizzy\Events\Providers\ReservationServiceProvider;
 
 defined('ABSPATH') || exit;
 
@@ -20,64 +21,35 @@ defined('ABSPATH') || exit;
  */
 final class Application
 {
-    /**
-     * Service container.
-     */
     private Container $container;
 
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->container = new Container();
     }
 
-
-    /**
-     * Boot application.
-     */
     public function boot(): void
     {
         $this->registerProviders();
     }
 
-
-    /**
-     * Get container instance.
-     */
     public function container(): Container
     {
         return $this->container;
     }
 
-
-    /**
-     * Register providers.
-     */
     private function registerProviders(): void
     {
         $providers = [
-
             EventServiceProvider::class,
-
+            ReservationServiceProvider::class,
             AdminServiceProvider::class,
-
             PostTypeServiceProvider::class,
-
             FrontendServiceProvider::class,
-
         ];
 
-
         foreach ($providers as $provider) {
-
-            (new $provider())
-                ->register(
-                    $this->container
-                );
-
+            (new $provider())->register($this->container);
         }
     }
 }
