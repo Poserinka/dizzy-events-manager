@@ -6,20 +6,13 @@ namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Frontend\Builders\EventPresentationBuilder;
+use Dizzy\Events\Reservations\ReservationService;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
 
-/**
- * Registers frontend services.
- *
- * @package Dizzy\Events\Frontend
- */
 final class FrontendServiceProvider
 {
-    /**
-     * Register frontend services.
-     */
     public function register(Container $container): void
     {
         $container->singleton(
@@ -33,6 +26,15 @@ final class FrontendServiceProvider
             EventPresentationBuilder::class,
             static function (): EventPresentationBuilder {
                 return new EventPresentationBuilder();
+            }
+        );
+
+        $container->singleton(
+            ReservationController::class,
+            static function () use ($container): ReservationController {
+                return new ReservationController(
+                    $container->get(ReservationService::class)
+                );
             }
         );
 
@@ -68,6 +70,7 @@ final class FrontendServiceProvider
             'init',
             static function () use ($container): void {
                 $container->get(EventShortcode::class)->register();
+                $container->get(ReservationController::class)->register();
             }
         );
 
