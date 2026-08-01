@@ -92,9 +92,11 @@ final class EventDetailsMetaBox
                 $value = $defaultValue;
             }
 
-            $inputType = in_array($field, ['maps_url', 'ticket_url'], true)
-                ? 'url'
-                : 'text';
+            $inputType = match ($field) {
+                'maps_url', 'ticket_url' => 'url',
+                'ticket_price'           => 'number',
+                default                  => 'text',
+            };
             ?>
             <p>
                 <label for="dizzy-<?php echo esc_attr($field); ?>">
@@ -113,7 +115,18 @@ final class EventDetailsMetaBox
                     class="widefat"
                     name="dizzy_<?php echo esc_attr($field); ?>"
                     value="<?php echo esc_attr((string) $value); ?>"
+                    <?php if ($field === 'ticket_price') : ?>
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                    <?php endif; ?>
                 >
+
+                <?php if ($field === 'ticket_price') : ?>
+                    <span class="description">
+                        <?php esc_html_e('Price in euros.', 'dizzy-events-manager'); ?>
+                    </span>
+                <?php endif; ?>
             </p>
             <?php
         }
@@ -171,9 +184,14 @@ final class EventDetailsMetaBox
             }
 
             $value = wp_unslash($_POST[$key]);
-            $value = in_array($field, ['maps_url', 'ticket_url'], true)
-                ? esc_url_raw($value)
-                : sanitize_text_field($value);
+
+            if (in_array($field, ['maps_url', 'ticket_url'], true)) {
+                $value = esc_url_raw($value);
+            } elseif ($field === 'ticket_price') {
+                $value = $this->sanitizeTicketPrice($value);
+            } else {
+                $value = sanitize_text_field($value);
+            }
 
             update_post_meta(
                 $postId,
@@ -187,6 +205,22 @@ final class EventDetailsMetaBox
             '_dizzy_featured',
             isset($_POST['dizzy_featured']) ? '1' : '0'
         );
+    }
+
+    /**
+     * Normalize a submitted ticket price.
+     */
+    private function sanitizeTicketPrice(string $value): string
+    {
+        $value = trim(str_replace(',', '.', $value));
+
+        if ($value === '' || ! is_numeric($value)) {
+            return '';
+        }
+
+        $price = max(0.0, (float) $value);
+
+        return number_format($price, 2, '.', '');
     }
 
     /**
