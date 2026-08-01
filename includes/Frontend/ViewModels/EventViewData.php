@@ -54,12 +54,15 @@ readonly class EventViewData
         EventDetails $details,
         array $occurrences
     ): self {
-        $dates = array_map(
-            static function (Occurrence $occurrence): OccurrenceViewData {
-                return OccurrenceViewData::from($occurrence);
-            },
-            $occurrences
-        );
+        $dates = [];
+
+        foreach ($occurrences as $occurrence) {
+            if (! $occurrence instanceof Occurrence) {
+                continue;
+            }
+
+            $dates[] = OccurrenceViewData::from($occurrence);
+        }
 
         return new self(
             id: $event->id,
