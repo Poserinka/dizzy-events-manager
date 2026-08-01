@@ -8,6 +8,7 @@ use Dizzy\Events\Models\Event;
 use Dizzy\Events\Models\EventDetails;
 use Dizzy\Events\Models\Occurrence;
 use Throwable;
+use WP_Post;
 
 defined('ABSPATH') || exit;
 
@@ -167,14 +168,34 @@ readonly class EventViewData
     }
 
     /**
-     * Build the event card excerpt.
+     * Build the event card excerpt with an explicit post context.
      */
     private static function excerpt(Event $event): string
     {
-        $excerpt = get_the_excerpt($event->id);
+        $post = get_post($event->id);
 
-        if (is_string($excerpt) && trim($excerpt) !== '') {
-            return $excerpt;
+        if ($post instanceof WP_Post) {
+            try {
+                $excerpt = get_the_excerpt($post);
+
+                if (is_string($excerpt) && trim($excerpt) !== '') {
+                    return $excerpt;
+                }
+            } catch (Throwable $exception) {
+                error_log(
+                    sprintf(
+                        'Dizzy Events excerpt filtering failed for event %d: %s',
+                        $event->id,
+                        $exception->getMessage()
+                    )
+                );
+            }
+
+            $manualExcerpt = trim($post->post_excerpt);
+
+            if ($manualExcerpt !== '') {
+                return $manualExcerpt;
+            }
         }
 
         return wp_trim_words(
