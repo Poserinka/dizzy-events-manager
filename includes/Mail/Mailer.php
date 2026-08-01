@@ -14,10 +14,12 @@ final class Mailer
         string $message,
         array $headers = []
     ): bool {
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
         return wp_mail(
             $to,
             $subject,
-            $message,
+            wpautop($message),
             $headers
         );
     }
