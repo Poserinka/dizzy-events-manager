@@ -81,3 +81,15 @@
     padding: 15px;
 
 }
+
+.dizzy-sort-handle {
+    cursor: move;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.dizzy-sort-placeholder {
+    height: 80px;
+    border: 2px dashed #999;
+    margin-bottom: 15px;
+}
