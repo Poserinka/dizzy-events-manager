@@ -35,6 +35,8 @@ final class ReservationController
         <form method="post" class="dizzy-reservation-form">
             <?php wp_nonce_field('dizzy_reservation_submit', 'dizzy_reservation_nonce'); ?>
 
+            <input type="hidden" name="event_id" value="<?php echo esc_attr((string) get_the_ID()); ?>">
+
             <input type="text" name="name" required placeholder="Name">
             <input type="email" name="email" required placeholder="Email">
             <input type="number" name="guests" min="1" required placeholder="Guests">
@@ -62,6 +64,7 @@ final class ReservationController
         }
 
         $this->service->create([
+            'event_id' => absint($_POST['event_id'] ?? 0),
             'name' => sanitize_text_field(wp_unslash($_POST['name'] ?? '')),
             'email' => sanitize_email(wp_unslash($_POST['email'] ?? '')),
             'guests' => absint($_POST['guests'] ?? 1),
