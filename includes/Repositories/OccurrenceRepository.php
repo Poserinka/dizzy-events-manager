@@ -158,6 +158,30 @@ final class OccurrenceRepository
     }
 
     /**
+     * Delete all occurrences belonging to an event.
+     */
+    public function deleteForEvent(int $eventId): void
+    {
+        if ($eventId <= 0) {
+            return;
+        }
+
+        $deleted = DB::instance()->delete(
+            $this->table,
+            ['event_id' => $eventId],
+            ['%d']
+        );
+
+        if ($deleted === false) {
+            throw new RuntimeException(
+                $this->getDatabaseError(
+                    'Could not delete event occurrences.'
+                )
+            );
+        }
+    }
+
+    /**
      * Replace all occurrences belonging to an event.
      *
      * The occurrence data must already be validated and normalized.
