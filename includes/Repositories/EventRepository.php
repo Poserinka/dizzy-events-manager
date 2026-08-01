@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Dizzy\Events\Repositories;
 
 use Dizzy\Events\Models\Event;
-use WP_Query;
 use WP_Post;
+use WP_Query;
 
 defined('ABSPATH') || exit;
 
@@ -24,10 +24,14 @@ final class EventRepository extends AbstractRepository
      */
     private const POST_TYPE = 'event';
 
+
+
     /**
      * Table is not used for WordPress posts.
      */
     protected string $table = 'posts';
+
+
 
     /**
      * Model handled by repository.
@@ -39,6 +43,10 @@ final class EventRepository extends AbstractRepository
         return Event::class;
     }
 
+
+
+
+
     /**
      * Find event by ID.
      */
@@ -46,16 +54,40 @@ final class EventRepository extends AbstractRepository
         int $id
     ): ?Event {
 
-        $post = get_post($id);
 
-        if (! $post instanceof WP_Post) {
+        $post =
+            get_post($id);
+
+
+
+        if (
+            ! $post instanceof WP_Post
+        ) {
             return null;
         }
 
+
+
+        if (
+            $post->post_type !== self::POST_TYPE
+        ) {
+            return null;
+        }
+
+
+
         return $this->hydrate(
-            $this->convertPost($post)
+
+            $this->convertPost(
+                $post
+            )
+
         );
     }
+
+
+
+
 
     /**
      * Find published events.
@@ -66,29 +98,78 @@ final class EventRepository extends AbstractRepository
         int $limit = 20
     ): array {
 
-        $query = new WP_Query(
-            [
-                'post_type'      => self::POST_TYPE,
-                'post_status'    => 'publish',
-                'posts_per_page' => $limit,
-            ]
-        );
+
+        $query =
+            new WP_Query(
+
+                [
+
+                    'post_type' =>
+                        self::POST_TYPE,
+
+
+                    'post_status' =>
+                        'publish',
+
+
+                    'posts_per_page' =>
+                        $limit,
+
+
+                    'no_found_rows' =>
+                        true,
+
+
+                    'ignore_sticky_posts' =>
+                        true,
+
+
+                ]
+
+            );
+
+
 
         $events = [];
 
-        foreach ($query->posts as $post) {
 
-            if (! $post instanceof WP_Post) {
+
+        foreach (
+            $query->posts as $post
+        ) {
+
+
+            if (
+                ! $post instanceof WP_Post
+            ) {
                 continue;
             }
 
-            $events[] = $this->hydrate(
-                $this->convertPost($post)
-            );
+
+
+            $events[] =
+                $this->hydrate(
+
+                    $this->convertPost(
+                        $post
+                    )
+
+                );
+
         }
+
+
+
+        wp_reset_postdata();
+
+
 
         return $events;
     }
+
+
+
+
 
     /**
      * Convert WP_Post to source object.
@@ -97,20 +178,36 @@ final class EventRepository extends AbstractRepository
         WP_Post $post
     ): object {
 
+
         return (object) [
-            'id' => $post->ID,
 
-            'title' => $post->post_title,
+            'id' =>
+                (int) $post->ID,
 
-            'slug' => $post->post_name,
 
-            'content' => $post->post_content,
+            'title' =>
+                (string) $post->post_title,
 
-            'status' => $post->post_status,
 
-            'created_at' => $post->post_date,
+            'slug' =>
+                (string) $post->post_name,
 
-            'updated_at' => $post->post_modified,
+
+            'content' =>
+                (string) $post->post_content,
+
+
+            'status' =>
+                (string) $post->post_status,
+
+
+            'created_at' =>
+                $post->post_date,
+
+
+            'updated_at' =>
+                $post->post_modified,
+
         ];
     }
 }
