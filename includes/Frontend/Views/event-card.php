@@ -13,7 +13,14 @@ defined('ABSPATH') || exit;
 $datePresentation = $event->cardDatePresentation();
 $visibleDates     = $datePresentation['visible'];
 $remainingDates   = $datePresentation['remaining'];
-$hasEventUrl      = $event->url !== '';
+$eventUrl         = trim($event->url);
+$mapsUrl          = $event->mapsUrl !== null
+    ? trim($event->mapsUrl)
+    : '';
+$ticketUrl        = $event->ticketUrl !== null
+    ? trim($event->ticketUrl)
+    : '';
+$hasEventUrl      = $eventUrl !== '';
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
@@ -24,7 +31,7 @@ $hasEventUrl      = $event->url !== '';
 
     <?php if ($event->image !== '') : ?>
         <?php if ($hasEventUrl) : ?>
-            <a href="<?php echo esc_url($event->url); ?>">
+            <a href="<?php echo esc_url($eventUrl); ?>">
                 <img
                     src="<?php echo esc_url($event->image); ?>"
                     alt="<?php echo esc_attr($event->title); ?>"
@@ -40,7 +47,7 @@ $hasEventUrl      = $event->url !== '';
 
     <h3 class="dizzy-event-title">
         <?php if ($hasEventUrl) : ?>
-            <a href="<?php echo esc_url($event->url); ?>">
+            <a href="<?php echo esc_url($eventUrl); ?>">
                 <?php echo esc_html($event->title); ?>
             </a>
         <?php else : ?>
@@ -68,9 +75,9 @@ $hasEventUrl      = $event->url !== '';
 
     <?php if ($event->address !== null) : ?>
         <p class="dizzy-event-address">
-            <?php if ($event->mapsUrl !== null) : ?>
+            <?php if ($mapsUrl !== '') : ?>
                 <a
-                    href="<?php echo esc_url($event->mapsUrl); ?>"
+                    href="<?php echo esc_url($mapsUrl); ?>"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
@@ -112,7 +119,7 @@ $hasEventUrl      = $event->url !== '';
                     );
                     ?>
                     <?php if ($hasEventUrl) : ?>
-                        <a href="<?php echo esc_url($event->url); ?>">
+                        <a href="<?php echo esc_url($eventUrl); ?>">
                             <?php echo esc_html($moreDatesLabel); ?>
                         </a>
                     <?php else : ?>
@@ -139,10 +146,10 @@ $hasEventUrl      = $event->url !== '';
         </div>
     <?php endif; ?>
 
-    <?php if ($event->ticketUrl !== null) : ?>
+    <?php if ($ticketUrl !== '') : ?>
         <a
             class="dizzy-event-ticket"
-            href="<?php echo esc_url($event->ticketUrl); ?>"
+            href="<?php echo esc_url($ticketUrl); ?>"
             target="_blank"
             rel="noopener noreferrer"
         >
@@ -153,7 +160,7 @@ $hasEventUrl      = $event->url !== '';
     <?php if ($hasEventUrl) : ?>
         <a
             class="dizzy-event-link"
-            href="<?php echo esc_url($event->url); ?>"
+            href="<?php echo esc_url($eventUrl); ?>"
         >
             <?php esc_html_e('Read more', 'dizzy-events-manager'); ?>
         </a>
