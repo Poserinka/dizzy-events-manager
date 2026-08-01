@@ -25,6 +25,8 @@ final class OccurrenceRepository
 
 
 
+
+
     /**
      * Find occurrences by event.
      *
@@ -53,6 +55,7 @@ final class OccurrenceRepository
 
 
         return array_map(
+
             static function ($row): Occurrence {
 
                 return Occurrence::hydrateFromRow(
@@ -60,9 +63,10 @@ final class OccurrenceRepository
                 );
 
             },
-            $rows
-        );
 
+            $rows
+
+        );
     }
 
 
@@ -70,7 +74,7 @@ final class OccurrenceRepository
 
 
     /**
-     * Replace all occurrences for event.
+     * Replace all occurrences.
      *
      * @param array<string,mixed> $data
      */
@@ -78,7 +82,6 @@ final class OccurrenceRepository
         int $eventId,
         array $data
     ): void {
-
 
         global $wpdb;
 
@@ -109,55 +112,55 @@ final class OccurrenceRepository
 
 
 
-
-            if (
-                empty(
+            $dates =
+                isset(
                     $data['start_date']
                 )
-                ||
-                ! is_array(
+                &&
+                is_array(
                     $data['start_date']
                 )
-            ) {
-
-                $wpdb->query(
-                    'COMMIT'
-                );
-
-                return;
-
-            }
-
+                    ? $data['start_date']
+                    : [];
 
 
 
             foreach (
-                $data['start_date']
-                as $index => $date
+                $dates as $index => $date
             ) {
+
+
+                $date =
+                    sanitize_text_field(
+                        (string) $date
+                    );
+
 
 
                 if (
                     empty($date)
                 ) {
-
                     continue;
-
                 }
 
 
 
-                $startTime =
-                    $data['start_time'][$index]
-                    ??
-                    '00:00';
+                $time =
+                    isset(
+                        $data['start_time'][$index]
+                    )
+                        ? sanitize_text_field(
+                            (string)
+                            $data['start_time'][$index]
+                        )
+                        : '00:00';
 
 
 
                 $start =
                     $this->createDateTime(
                         $date,
-                        $startTime
+                        $time
                     );
 
 
@@ -165,11 +168,8 @@ final class OccurrenceRepository
                 if (
                     ! $start
                 ) {
-
                     continue;
-
                 }
-
 
 
 
@@ -177,21 +177,35 @@ final class OccurrenceRepository
 
 
 
+                $endDate =
+                    $data['end_date'][$index]
+                    ??
+                    '';
+
+
+
+                $endTime =
+                    $data['end_time'][$index]
+                    ??
+                    '00:00';
+
+
+
                 if (
-                    ! empty(
-                        $data['end_date'][$index]
-                    )
+                    ! empty($endDate)
                 ) {
 
 
                     $end =
                         $this->createDateTime(
 
-                            $data['end_date'][$index],
+                            sanitize_text_field(
+                                (string) $endDate
+                            ),
 
-                            $data['end_time'][$index]
-                            ??
-                            '00:00'
+                            sanitize_text_field(
+                                (string) $endTime
+                            )
 
                         );
 
@@ -199,16 +213,14 @@ final class OccurrenceRepository
 
 
 
-
                 $sortOrder =
                     isset(
                         $data['sort_order'][$index]
                     )
-                    ? (int)
-                        $data['sort_order'][$index]
-                    : $index;
-
-
+                        ? absint(
+                            $data['sort_order'][$index]
+                        )
+                        : $index;
 
 
 
@@ -234,6 +246,10 @@ final class OccurrenceRepository
                                     'Y-m-d H:i:s'
                                 )
                                 : null,
+
+
+                        'all_day' =>
+                            0,
 
 
                         'timezone' =>
@@ -267,19 +283,13 @@ final class OccurrenceRepository
                     [
 
                         '%d',
-
                         '%s',
-
                         '%s',
-
-                        '%s',
-
                         '%d',
-
                         '%s',
-
+                        '%d',
                         '%s',
-
+                        '%s',
                         '%s',
 
                     ]
