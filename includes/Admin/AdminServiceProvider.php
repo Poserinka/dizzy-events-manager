@@ -23,22 +23,11 @@ final class AdminServiceProvider
     public function register(Container $container): void
     {
         $container->singleton(
-            EventMetaBox::class,
-            static function (): EventMetaBox {
-                return new EventMetaBox();
-            }
-        );
-
-        $container->singleton(
             OccurrenceMetaBox::class,
             static function () use ($container): OccurrenceMetaBox {
                 return new OccurrenceMetaBox(
-                    $container->get(
-                        OccurrenceRepository::class
-                    ),
-                    $container->get(
-                        OccurrenceService::class
-                    )
+                    $container->get(OccurrenceRepository::class),
+                    $container->get(OccurrenceService::class)
                 );
             }
         );
@@ -47,9 +36,7 @@ final class AdminServiceProvider
             OccurrenceTable::class,
             static function () use ($container): OccurrenceTable {
                 return new OccurrenceTable(
-                    $container->get(
-                        OccurrenceRepository::class
-                    )
+                    $container->get(OccurrenceRepository::class)
                 );
             }
         );
@@ -71,10 +58,6 @@ final class AdminServiceProvider
         add_action(
             'admin_init',
             static function () use ($container): void {
-                $container
-                    ->get(EventMetaBox::class)
-                    ->register();
-
                 $container
                     ->get(OccurrenceMetaBox::class)
                     ->register();
