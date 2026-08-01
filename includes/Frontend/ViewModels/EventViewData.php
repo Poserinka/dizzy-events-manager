@@ -80,13 +80,31 @@ readonly class EventViewData
     }
 
     /**
+     * Get event-card date presentation data.
+     *
+     * @return array{
+     *     visible: array<OccurrenceViewData>,
+     *     remaining: int
+     * }
+     */
+    public function cardDatePresentation(): array
+    {
+        $visible = array_slice($this->dates, 0, $this->cardDateLimit());
+
+        return [
+            'visible'   => $visible,
+            'remaining' => max(0, count($this->dates) - count($visible)),
+        ];
+    }
+
+    /**
      * Get dates displayed on an event card.
      *
      * @return array<OccurrenceViewData>
      */
     public function cardDates(): array
     {
-        return array_slice($this->dates, 0, $this->cardDateLimit());
+        return $this->cardDatePresentation()['visible'];
     }
 
     /**
@@ -94,7 +112,7 @@ readonly class EventViewData
      */
     public function remainingCardDateCount(): int
     {
-        return max(0, count($this->dates) - count($this->cardDates()));
+        return $this->cardDatePresentation()['remaining'];
     }
 
     /**
