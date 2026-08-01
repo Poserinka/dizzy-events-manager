@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Core\Container;
+use Dizzy\Events\Frontend\Builders\EventPresentationBuilder;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -25,6 +26,13 @@ final class FrontendServiceProvider
             FrontendAssets::class,
             static function (): FrontendAssets {
                 return new FrontendAssets();
+            }
+        );
+
+        $container->singleton(
+            EventPresentationBuilder::class,
+            static function (): EventPresentationBuilder {
+                return new EventPresentationBuilder();
             }
         );
 
