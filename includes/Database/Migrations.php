@@ -16,7 +16,7 @@ final class Migrations
     /**
      * Current database version.
      */
-    private const VERSION = '1.0.2';
+    private const VERSION = '1.0.3';
 
     /**
      * Option key.
@@ -38,6 +38,7 @@ final class Migrations
         }
 
         self::createOccurrencesTable();
+        self::createReservationsTable();
 
         update_option(
             self::OPTION,
@@ -45,24 +46,36 @@ final class Migrations
         );
     }
 
-    /**
-     * Create or update the occurrences table.
-     */
     private static function createOccurrencesTable(): void
     {
         global $wpdb;
 
-        $table   = $wpdb->prefix . 'dizzy_event_occurrences';
+        $table = $wpdb->prefix . 'dizzy_event_occurrences';
         $charset = $wpdb->get_charset_collate();
 
         $sql = sprintf(
-            "
-            CREATE TABLE %s (
-                %s
-            ) %s;
-            ",
+            "CREATE TABLE %s (%s) %s;",
             $table,
             Schema::occurrences(),
+            $charset
+        );
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        dbDelta($sql);
+    }
+
+    private static function createReservationsTable(): void
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'dizzy_event_reservations';
+        $charset = $wpdb->get_charset_collate();
+
+        $sql = sprintf(
+            "CREATE TABLE %s (%s) %s;",
+            $table,
+            Schema::reservations(),
             $charset
         );
 
