@@ -23,12 +23,18 @@ $event =
     $data['event'] ?? null;
 
 
-$occurrences =
-    $data['occurrences'] ?? [];
-
-
 $details =
     $data['details'] ?? null;
+
+
+$upcomingOccurrences =
+    $data['upcomingOccurrences']
+    ?? [];
+
+
+$pastOccurrences =
+    $data['pastOccurrences']
+    ?? [];
 
 
 
@@ -43,6 +49,7 @@ if (
 ?>
 
 <div class="dizzy-single-event">
+
 
 
 <header class="dizzy-event-header">
@@ -95,6 +102,8 @@ echo get_the_post_thumbnail(
 
 
 
+
+
 <div class="dizzy-event-meta">
 
 
@@ -103,10 +112,12 @@ echo get_the_post_thumbnail(
 <p>
 
 <strong>
+
 <?php esc_html_e(
     'Artist:',
     'dizzy-events-manager'
 ); ?>
+
 </strong>
 
 <?php echo esc_html(
@@ -119,15 +130,19 @@ echo get_the_post_thumbnail(
 
 
 
+
+
 <?php if ($details->genre): ?>
 
 <p>
 
 <strong>
+
 <?php esc_html_e(
     'Genre:',
     'dizzy-events-manager'
 ); ?>
+
 </strong>
 
 <?php echo esc_html(
@@ -140,15 +155,19 @@ echo get_the_post_thumbnail(
 
 
 
+
+
 <?php if ($details->venue): ?>
 
 <p>
 
 <strong>
+
 <?php esc_html_e(
     'Venue:',
     'dizzy-events-manager'
 ); ?>
+
 </strong>
 
 <?php echo esc_html(
@@ -165,15 +184,23 @@ echo get_the_post_thumbnail(
 
 
 
+
+
+
 <div class="dizzy-event-content">
 
 <?php
 
 echo wp_kses_post(
+
     apply_filters(
+
         'the_content',
+
         $event->content
+
     )
+
 );
 
 ?>
@@ -183,7 +210,10 @@ echo wp_kses_post(
 
 
 
-<?php if (! empty($occurrences)): ?>
+
+
+
+<?php if (! empty($upcomingOccurrences)): ?>
 
 
 <section class="dizzy-event-dates">
@@ -192,7 +222,7 @@ echo wp_kses_post(
 <h2>
 
 <?php esc_html_e(
-    'Dates',
+    'Upcoming Dates',
     'dizzy-events-manager'
 ); ?>
 
@@ -203,18 +233,22 @@ echo wp_kses_post(
 <ul>
 
 
-<?php foreach ($occurrences as $occurrence): ?>
+<?php foreach ($upcomingOccurrences as $occurrence): ?>
 
 
 <li>
 
 <?php echo esc_html(
 
-    $occurrence
-        ->startDateTime
-        ->format(
-            'd F Y - H:i'
-        )
+    wp_date(
+
+        'd F Y - H:i',
+
+        $occurrence
+            ->startDateTime
+            ->getTimestamp()
+
+    )
 
 ); ?>
 
@@ -235,9 +269,73 @@ echo wp_kses_post(
 
 
 
+
+
+
+<?php if (! empty($pastOccurrences)): ?>
+
+
+<section class="dizzy-event-past-dates">
+
+
+<h2>
+
+<?php esc_html_e(
+    'Past Dates',
+    'dizzy-events-manager'
+); ?>
+
+</h2>
+
+
+
+<ul>
+
+
+<?php foreach ($pastOccurrences as $occurrence): ?>
+
+
+<li>
+
+<?php echo esc_html(
+
+    wp_date(
+
+        'd F Y - H:i',
+
+        $occurrence
+            ->startDateTime
+            ->getTimestamp()
+
+    )
+
+); ?>
+
+</li>
+
+
+<?php endforeach; ?>
+
+
+</ul>
+
+
+</section>
+
+
+<?php endif; ?>
+
+
+
+
+
+
+
 <?php if ($details->ticketPrice !== null): ?>
 
+
 <p class="dizzy-event-price">
+
 
 <strong>
 
@@ -250,22 +348,30 @@ echo wp_kses_post(
 
 
 <?php echo esc_html(
+
     number_format(
         $details->ticketPrice,
         2
     )
+
 ); ?>
 
 €
 
+
 </p>
+
 
 <?php endif; ?>
 
 
 
 
+
+
+
 <?php if ($details->ticketUrl): ?>
+
 
 <a
 class="dizzy-event-ticket"
@@ -276,14 +382,18 @@ target="_blank"
 rel="noopener"
 >
 
+
 <?php esc_html_e(
     'Buy Ticket',
     'dizzy-events-manager'
 ); ?>
 
+
 </a>
 
+
 <?php endif; ?>
+
 
 
 </div>
