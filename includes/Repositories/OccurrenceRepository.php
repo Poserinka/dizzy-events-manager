@@ -29,6 +29,8 @@ final class OccurrenceRepository
 
     private const EVENT_ID_BATCH_SIZE = 100;
 
+    private const MAX_OCCURRENCES_PER_EVENT = 100;
+
     /**
      * Occurrence repository constructor.
      */
@@ -194,6 +196,15 @@ final class OccurrenceRepository
         if ($eventId <= 0) {
             throw new InvalidArgumentException(
                 'A valid event ID is required to replace occurrences.'
+            );
+        }
+
+        if (count($occurrences) > self::MAX_OCCURRENCES_PER_EVENT) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'An event cannot contain more than %d occurrences.',
+                    self::MAX_OCCURRENCES_PER_EVENT
+                )
             );
         }
 
