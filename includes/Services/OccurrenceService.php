@@ -60,47 +60,27 @@ final class OccurrenceService
      */
     private function normalizeOccurrences(array $data): array
     {
-        $startDates = $this->getArrayValue(
-            $data,
-            'start_date'
-        );
-
-        $startTimes = $this->getArrayValue(
-            $data,
-            'start_time'
-        );
-
-        $endDates = $this->getArrayValue(
-            $data,
-            'end_date'
-        );
-
-        $endTimes = $this->getArrayValue(
-            $data,
-            'end_time'
-        );
-
-        $sortOrders = $this->getArrayValue(
-            $data,
-            'sort_order'
-        );
+        $startDates = $this->getArrayValue($data, 'start_date');
+        $startTimes = $this->getArrayValue($data, 'start_time');
+        $endDates   = $this->getArrayValue($data, 'end_date');
+        $endTimes   = $this->getArrayValue($data, 'end_time');
+        $sortOrders = $this->getArrayValue($data, 'sort_order');
 
         $timezone     = wp_timezone();
         $timezoneName = $timezone->getName();
         $occurrences  = [];
 
         foreach ($startDates as $index => $startDateValue) {
-            $startDate = sanitize_text_field(
-                (string) $startDateValue
-            );
+            $startDate = $this->sanitizeValue($startDateValue);
+            $startTime = $this->sanitizeValue($startTimes[$index] ?? '');
 
-            if ($startDate === '') {
+            if ($startDate === '' && $startTime === '') {
                 continue;
             }
 
-            $startTime = sanitize_text_field(
-                (string) ($startTimes[$index] ?? '00:00')
-            );
+            if ($startDate === '' || $startTime === '') {
+                continue;
+            }
 
             $startDateTime = $this->createDateTime(
                 $startDate,
@@ -112,11 +92,26 @@ final class OccurrenceService
                 continue;
             }
 
-            $endDateTime = $this->createOptionalEndDateTime(
-                $endDates[$index] ?? '',
-                $endTimes[$index] ?? '',
-                $timezone
-            );
+            $endDate = $this->sanitizeValue($endDates[$index] ?? '');
+            $endTime = $this->sanitizeValue($endTimes[$index] ?? '');
+
+            if (($endDate === '') !== ($endTime === '')) {
+                continue;
+            }
+
+            $endDateTime = null;
+
+            if ($endDate !== '' && $endTime !== '') {
+                $endDateTime = $this->createDateTime(
+                    $endDate,
+                    $endTime,
+                    $timezone
+                );
+
+                if ($endDateTime === null) {
+                    continue;
+                }
+            }
 
             if (
                 $endDateTime !== null
@@ -130,12 +125,8 @@ final class OccurrenceService
                 : (int) $index;
 
             $occurrences[] = [
-                'start_datetime' => $startDateTime->format(
-                    'Y-m-d H:i:s'
-                ),
-                'end_datetime'   => $endDateTime?->format(
-                    'Y-m-d H:i:s'
-                ),
+                'start_datetime' => $startDateTime->format('Y-m-d H:i:s'),
+                'end_datetime'   => $endDateTime?->format('Y-m-d H:i:s'),
                 'all_day'        => 0,
                 'timezone'       => $timezoneName,
                 'sort_order'     => $sortOrder,
@@ -144,37 +135,6 @@ final class OccurrenceService
         }
 
         return $occurrences;
-    }
-
-    /**
-     * Create an optional end date and time.
-     */
-    private function createOptionalEndDateTime(
-        mixed $dateValue,
-        mixed $timeValue,
-        DateTimeZone $timezone
-    ): ?DateTimeImmutable {
-        $date = sanitize_text_field(
-            (string) $dateValue
-        );
-
-        if ($date === '') {
-            return null;
-        }
-
-        $time = sanitize_text_field(
-            (string) $timeValue
-        );
-
-        if ($time === '') {
-            $time = '00:00';
-        }
-
-        return $this->createDateTime(
-            $date,
-            $time,
-            $timezone
-        );
     }
 
     /**
@@ -215,6 +175,18 @@ final class OccurrenceService
         }
 
         return $dateTime;
+    }
+
+    /**
+     * Sanitize one submitted scalar value.
+     */
+    private function sanitizeValue(mixed $value): string
+    {
+        if (! is_scalar($value)) {
+            return '';
+        }
+
+        return sanitize_text_field((string) $value);
     }
 
     /**
