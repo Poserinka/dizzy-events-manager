@@ -391,13 +391,14 @@ final class OccurrenceMetaBox
     private function validationMessage(int $row, string $code): string
     {
         $messages = [
-            'invalid_event'       => __('The event identifier is invalid.', 'dizzy-events-manager'),
-            'start_date_required' => __('A start date is required.', 'dizzy-events-manager'),
-            'start_time_required' => __('A start time is required.', 'dizzy-events-manager'),
-            'invalid_start'       => __('The start date or time is invalid.', 'dizzy-events-manager'),
-            'incomplete_end'      => __('The end date and end time must be entered together.', 'dizzy-events-manager'),
-            'invalid_end'         => __('The end date or time is invalid.', 'dizzy-events-manager'),
-            'end_before_start'    => __('The end time must not be earlier than the start time.', 'dizzy-events-manager'),
+            'invalid_event'        => __('The event identifier is invalid.', 'dizzy-events-manager'),
+            'too_many_occurrences' => __('An event can contain no more than 100 dates.', 'dizzy-events-manager'),
+            'start_date_required'  => __('A start date is required.', 'dizzy-events-manager'),
+            'start_time_required'  => __('A start time is required.', 'dizzy-events-manager'),
+            'invalid_start'        => __('The start date or time is invalid.', 'dizzy-events-manager'),
+            'incomplete_end'       => __('The end date and end time must be entered together.', 'dizzy-events-manager'),
+            'invalid_end'          => __('The end date or time is invalid.', 'dizzy-events-manager'),
+            'end_before_start'     => __('The end time must not be earlier than the start time.', 'dizzy-events-manager'),
         ];
 
         $message = $messages[$code]
