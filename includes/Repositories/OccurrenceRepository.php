@@ -28,7 +28,7 @@ final class OccurrenceRepository
     }
 
     /**
-     * Find occurrences belonging to an event.
+     * Find occurrences belonging to an event in their manual admin order.
      *
      * @return array<Occurrence>
      */
@@ -43,7 +43,7 @@ final class OccurrenceRepository
             SELECT *
             FROM {$this->table}
             WHERE event_id = %d
-            ORDER BY start_datetime ASC, sort_order ASC
+            ORDER BY sort_order ASC, start_datetime ASC
             ",
             [$eventId]
         );
