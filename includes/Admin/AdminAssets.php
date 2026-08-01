@@ -27,47 +27,24 @@ final class AdminAssets
         );
     }
 
-
     /**
      * Enqueue admin assets.
      */
-    public function enqueue(
-        string $hook
-    ): void {
-
-
-        if (
-            ! in_array(
-                $hook,
-                [
-                    'post.php',
-                    'post-new.php',
-                ],
-                true
-            )
-        ) {
+    public function enqueue(string $hook): void
+    {
+        if (! in_array($hook, ['post.php', 'post-new.php'], true)) {
             return;
         }
 
+        $screen = get_current_screen();
 
-        $screen =
-            get_current_screen();
-
-
-        if (
-            ! $screen
-            ||
-            $screen->post_type !== 'event'
-        ) {
+        if (! $screen || $screen->post_type !== 'event') {
             return;
         }
-
-
 
         wp_enqueue_script(
             'dizzy-events-admin',
-            DIZZY_EVENTS_URL .
-            'assets/js/occurrence-admin.js',
+            DIZZY_EVENTS_URL . 'assets/js/occurrence-admin.js',
             [
                 'jquery',
             ],
@@ -75,36 +52,22 @@ final class AdminAssets
             true
         );
 
-
-
         wp_localize_script(
             'dizzy-events-admin',
             'DizzyEventsAdmin',
             [
-
-                'ajaxUrl' =>
-                    admin_url(
-                        'admin-ajax.php'
-                    ),
-
-
-                'nonce' =>
-                    wp_create_nonce(
-                        'dizzy_events_admin'
-                    ),
-
+                'removeLabel' => esc_html__(
+                    'Remove',
+                    'dizzy-events-manager'
+                ),
             ]
         );
 
-
-
         wp_enqueue_style(
             'dizzy-events-admin',
-            DIZZY_EVENTS_URL .
-            'assets/css/admin.css',
+            DIZZY_EVENTS_URL . 'assets/css/admin.css',
             [],
             DIZZY_EVENTS_VERSION
         );
-
     }
 }
