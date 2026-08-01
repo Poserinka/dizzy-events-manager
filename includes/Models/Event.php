@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Models;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Dizzy\Events\Contracts\Hydrates;
 use Dizzy\Events\Enums\EventStatus;
 
@@ -39,17 +40,24 @@ readonly class Event implements Hydrates
             (string) ($source->status ?? EventStatus::DRAFT->value)
         ) ?? EventStatus::DRAFT;
 
+        $timezone = wp_timezone();
+        $fallback = new DateTimeImmutable('now', $timezone);
+
         return new self(
             id: (int) ($source->id ?? 0),
             title: (string) ($source->title ?? ''),
             slug: (string) ($source->slug ?? ''),
             content: (string) ($source->content ?? ''),
             status: $status,
-            createdAt: new DateTimeImmutable(
-                (string) ($source->created_at ?? 'now')
+            createdAt: self::hydrateDateTime(
+                $source->created_at ?? null,
+                $timezone,
+                $fallback
             ),
-            updatedAt: new DateTimeImmutable(
-                (string) ($source->updated_at ?? 'now')
+            updatedAt: self::hydrateDateTime(
+                $source->updated_at ?? null,
+                $timezone,
+                $fallback
             ),
         );
     }
@@ -70,5 +78,52 @@ readonly class Event implements Hydrates
             'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
             'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
+    }
+
+    /**
+     * Hydrate a strict WordPress local date-time value.
+     */
+    private static function hydrateDateTime(
+        mixed $value,
+        DateTimeZone $timezone,
+        DateTimeImmutable $fallback
+    ): DateTimeImmutable {
+        if (! is_scalar($value)) {
+            return $fallback;
+        }
+
+        $date = trim((string) $value);
+
+        if ($date === '' || $date === '0000-00-00 00:00:00') {
+            return $fallback;
+        }
+
+        $dateTime = DateTimeImmutable::createFromFormat(
+            '!Y-m-d H:i:s',
+            $date,
+            $timezone
+        );
+
+        if ($dateTime === false) {
+            return $fallback;
+        }
+
+        $errors = DateTimeImmutable::getLastErrors();
+
+        if (
+            is_array($errors)
+            && (
+                $errors['warning_count'] > 0
+                || $errors['error_count'] > 0
+            )
+        ) {
+            return $fallback;
+        }
+
+        if ($dateTime->format('Y-m-d H:i:s') !== $date) {
+            return $fallback;
+        }
+
+        return $dateTime;
     }
 }
