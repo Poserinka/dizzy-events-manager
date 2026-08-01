@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend;
 
-use Dizzy\Events\Frontend\ViewModels\EventViewData;
+use Dizzy\Events\Frontend\Builders\EventPresentationBuilder;
 use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
@@ -20,7 +20,8 @@ final class EventShortcode
      * Create the event shortcode.
      */
     public function __construct(
-        private EventService $service
+        private EventService $service,
+        private EventPresentationBuilder $builder
     ) {
     }
 
@@ -77,7 +78,7 @@ final class EventShortcode
         <div class="dizzy-events">
             <?php foreach ($eventData as $data) : ?>
                 <?php
-                $viewData = EventViewData::from(
+                $viewData = $this->builder->build(
                     $data['event'],
                     $data['details'],
                     $data['occurrences']
