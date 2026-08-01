@@ -4,57 +4,41 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-global $post;
-
-if (! $post instanceof \WP_Post) {
-    return;
-}
-
-
-$eventId = $post->ID;
-
-
-$app =
-    $GLOBALS['dizzy_events_application'] ?? null;
-
-
-if (! $app) {
-    return;
-}
-
-
-$service =
-    $app
-        ->container()
-        ->get(
-            \Dizzy\Events\Services\EventService::class
-        );
-
 
 $data =
-    $service
-        ->getEvent($eventId);
+    get_query_var(
+        'dizzy_event_data'
+    );
 
 
-if (! $data) {
+if (
+    ! is_array($data)
+) {
     return;
 }
+
 
 
 $event =
-    $data['event'];
+    $data['event'] ?? null;
 
 
 $occurrences =
-    $data['occurrences'];
+    $data['occurrences'] ?? [];
 
 
 $details =
-    \Dizzy\Events\Models\EventDetails::fromMeta(
-        get_post_meta(
-            $eventId
-        )
-    );
+    $data['details'] ?? null;
+
+
+
+if (
+    ! $event
+    ||
+    ! $details
+) {
+    return;
+}
 
 ?>
 
@@ -78,14 +62,15 @@ $details =
 <?php endif; ?>
 
 
-<?php if (has_post_thumbnail($eventId)): ?>
+
+<?php if (has_post_thumbnail($event->id)): ?>
 
 <div class="dizzy-event-image">
 
 <?php
 
 echo get_the_post_thumbnail(
-    $eventId,
+    $event->id,
     'large'
 );
 
@@ -94,6 +79,7 @@ echo get_the_post_thumbnail(
 </div>
 
 <?php endif; ?>
+
 
 
 <h1>
@@ -178,6 +164,7 @@ echo get_the_post_thumbnail(
 
 
 
+
 <div class="dizzy-event-content">
 
 <?php
@@ -195,7 +182,8 @@ echo wp_kses_post(
 
 
 
-<?php if (!empty($occurrences)): ?>
+
+<?php if (! empty($occurrences)): ?>
 
 
 <section class="dizzy-event-dates">
@@ -211,6 +199,7 @@ echo wp_kses_post(
 </h2>
 
 
+
 <ul>
 
 
@@ -220,11 +209,13 @@ echo wp_kses_post(
 <li>
 
 <?php echo esc_html(
+
     $occurrence
         ->startDateTime
         ->format(
             'd F Y - H:i'
         )
+
 ); ?>
 
 </li>
@@ -240,6 +231,7 @@ echo wp_kses_post(
 
 
 <?php endif; ?>
+
 
 
 
@@ -269,6 +261,7 @@ echo wp_kses_post(
 </p>
 
 <?php endif; ?>
+
 
 
 
