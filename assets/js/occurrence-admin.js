@@ -14,6 +14,8 @@
 
             this.initSortable();
 
+            this.updateOrder();
+
         },
 
 
@@ -49,16 +51,21 @@
                     .html();
 
 
+
             if (!template) {
                 return;
             }
+
 
 
             $('.dizzy-occurrences-list')
                 .append(template);
 
 
+
             DizzyEventsAdmin.initDatePicker();
+
+            DizzyEventsAdmin.updateOrder();
 
         },
 
@@ -74,6 +81,10 @@
                     '.dizzy-occurrence-row'
                 )
                 .remove();
+
+
+
+            DizzyEventsAdmin.updateOrder();
 
         },
 
@@ -93,8 +104,11 @@
                                 'hasDatepicker'
                             )
                         ) {
+
                             return;
+
                         }
+
 
 
                         $(this)
@@ -102,6 +116,7 @@
 
                                 dateFormat:
                                     'yy-mm-dd',
+
 
                                 minDate:
                                     0
@@ -122,10 +137,13 @@
                 $('.dizzy-occurrences-list');
 
 
+
             if (
                 ! list.length
             ) {
+
                 return;
+
             }
 
 
@@ -141,10 +159,44 @@
 
 
                 placeholder:
-                    'dizzy-sort-placeholder'
+                    'dizzy-sort-placeholder',
 
+
+                update:
+                    function () {
+
+                        DizzyEventsAdmin.updateOrder();
+
+                    }
 
             });
+
+
+        },
+
+
+
+        updateOrder: function () {
+
+
+            $('.dizzy-occurrences-list')
+                .find(
+                    '.dizzy-occurrence-row'
+                )
+                .each(
+                    function (index) {
+
+
+                        $(this)
+                            .find(
+                                '.dizzy-occurrence-order'
+                            )
+                            .val(
+                                index
+                            );
+
+                    }
+                );
 
 
         }
