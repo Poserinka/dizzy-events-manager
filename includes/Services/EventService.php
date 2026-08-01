@@ -106,6 +106,24 @@ final class EventService
     }
 
     /**
+     * Group loaded occurrences by temporal state.
+     *
+     * @param array<Occurrence> $occurrences Occurrence records.
+     *
+     * @return array{
+     *     upcoming: array<Occurrence>,
+     *     past: array<Occurrence>
+     * }
+     */
+    public function groupOccurrences(array $occurrences): array
+    {
+        return [
+            'upcoming' => $this->filterAndSortOccurrences($occurrences, true),
+            'past'     => $this->filterAndSortOccurrences($occurrences, false),
+        ];
+    }
+
+    /**
      * Get upcoming occurrences in chronological order.
      *
      * @return array<Occurrence>
