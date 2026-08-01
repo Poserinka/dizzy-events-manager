@@ -16,8 +16,18 @@ final class ReservationRepository
 
     public function __construct(wpdb $wpdb)
     {
-        $this->wpdb  = $wpdb;
+        $this->wpdb = $wpdb;
         $this->table = $wpdb->prefix . 'dizzy_event_reservations';
+    }
+
+    public function all(): array
+    {
+        $results = $this->wpdb->get_results(
+            "SELECT * FROM {$this->table} ORDER BY id DESC",
+            ARRAY_A
+        );
+
+        return is_array($results) ? $results : [];
     }
 
     public function find(int $reservationId): ?array
@@ -35,32 +45,18 @@ final class ReservationRepository
 
     public function save(array $data): int
     {
-        $this->wpdb->insert(
-            $this->table,
-            $data
-        );
+        $this->wpdb->insert($this->table, $data);
 
         return (int) $this->wpdb->insert_id;
     }
 
     public function update(int $reservationId, array $data): bool
     {
-        return false !== $this->wpdb->update(
-            $this->table,
-            $data,
-            [
-                'id' => $reservationId,
-            ]
-        );
+        return false !== $this->wpdb->update($this->table, $data, ['id' => $reservationId]);
     }
 
     public function delete(int $reservationId): bool
     {
-        return false !== $this->wpdb->delete(
-            $this->table,
-            [
-                'id' => $reservationId,
-            ]
-        );
+        return false !== $this->wpdb->delete($this->table, ['id' => $reservationId]);
     }
 }
