@@ -13,6 +13,7 @@ defined('ABSPATH') || exit;
 $datePresentation = $event->cardDatePresentation();
 $visibleDates     = $datePresentation['visible'];
 $remainingDates   = $datePresentation['remaining'];
+$hasEventUrl      = $event->url !== '';
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
@@ -22,18 +23,29 @@ $remainingDates   = $datePresentation['remaining'];
     <?php endif; ?>
 
     <?php if ($event->image !== '') : ?>
-        <a href="<?php echo esc_url($event->url); ?>">
+        <?php if ($hasEventUrl) : ?>
+            <a href="<?php echo esc_url($event->url); ?>">
+                <img
+                    src="<?php echo esc_url($event->image); ?>"
+                    alt="<?php echo esc_attr($event->title); ?>"
+                >
+            </a>
+        <?php else : ?>
             <img
                 src="<?php echo esc_url($event->image); ?>"
                 alt="<?php echo esc_attr($event->title); ?>"
             >
-        </a>
+        <?php endif; ?>
     <?php endif; ?>
 
     <h3 class="dizzy-event-title">
-        <a href="<?php echo esc_url($event->url); ?>">
+        <?php if ($hasEventUrl) : ?>
+            <a href="<?php echo esc_url($event->url); ?>">
+                <?php echo esc_html($event->title); ?>
+            </a>
+        <?php else : ?>
             <?php echo esc_html($event->title); ?>
-        </a>
+        <?php endif; ?>
     </h3>
 
     <?php if ($event->artist !== null) : ?>
@@ -87,22 +99,25 @@ $remainingDates   = $datePresentation['remaining'];
 
             <?php if ($remainingDates > 0) : ?>
                 <p class="dizzy-event-more-dates">
-                    <a href="<?php echo esc_url($event->url); ?>">
-                        <?php
-                        echo esc_html(
-                            sprintf(
-                                /* translators: %d: number of additional event dates. */
-                                _n(
-                                    '+%d more date',
-                                    '+%d more dates',
-                                    $remainingDates,
-                                    'dizzy-events-manager'
-                                ),
-                                $remainingDates
-                            )
-                        );
-                        ?>
-                    </a>
+                    <?php
+                    $moreDatesLabel = sprintf(
+                        /* translators: %d: number of additional event dates. */
+                        _n(
+                            '+%d more date',
+                            '+%d more dates',
+                            $remainingDates,
+                            'dizzy-events-manager'
+                        ),
+                        $remainingDates
+                    );
+                    ?>
+                    <?php if ($hasEventUrl) : ?>
+                        <a href="<?php echo esc_url($event->url); ?>">
+                            <?php echo esc_html($moreDatesLabel); ?>
+                        </a>
+                    <?php else : ?>
+                        <?php echo esc_html($moreDatesLabel); ?>
+                    <?php endif; ?>
                 </p>
             <?php endif; ?>
         </section>
@@ -135,10 +150,12 @@ $remainingDates   = $datePresentation['remaining'];
         </a>
     <?php endif; ?>
 
-    <a
-        class="dizzy-event-link"
-        href="<?php echo esc_url($event->url); ?>"
-    >
-        <?php esc_html_e('Read more', 'dizzy-events-manager'); ?>
-    </a>
+    <?php if ($hasEventUrl) : ?>
+        <a
+            class="dizzy-event-link"
+            href="<?php echo esc_url($event->url); ?>"
+        >
+            <?php esc_html_e('Read more', 'dizzy-events-manager'); ?>
+        </a>
+    <?php endif; ?>
 </article>
