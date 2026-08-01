@@ -43,7 +43,7 @@ final class OccurrenceRepository
             SELECT *
             FROM {$this->table}
             WHERE event_id = %d
-            ORDER BY sort_order ASC, start_datetime ASC
+            ORDER BY start_datetime ASC, sort_order ASC
             ",
             [
                 $eventId,
@@ -92,7 +92,7 @@ final class OccurrenceRepository
             WHERE event_id IN ({$placeholders})
                 AND status = %s
                 AND start_datetime >= %s
-            ORDER BY event_id ASC, sort_order ASC, start_datetime ASC
+            ORDER BY event_id ASC, start_datetime ASC, sort_order ASC
             ",
             [
                 ...$eventIds,
