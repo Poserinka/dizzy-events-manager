@@ -1,1 +1,83 @@
+.dizzy-occurrences-list {
+    margin-bottom: 20px;
+}
 
+
+
+.dizzy-occurrence-row {
+
+    background: #ffffff;
+
+    border: 1px solid #dcdcde;
+
+    border-radius: 6px;
+
+    padding: 15px;
+
+    margin-bottom: 15px;
+
+}
+
+
+
+.dizzy-occurrence-row p {
+
+    display: inline-flex;
+
+    flex-direction: column;
+
+    margin-right: 15px;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.dizzy-occurrence-row label {
+
+    font-weight: 600;
+
+    margin-bottom: 5px;
+
+}
+
+
+
+.dizzy-occurrence-row input {
+
+    min-width: 160px;
+
+}
+
+
+
+.dizzy-remove-occurrence {
+
+    margin-top: 24px !important;
+
+}
+
+
+
+.dizzy-add-occurrence {
+
+    margin-top: 10px;
+
+}
+
+
+
+#dizzy_event_occurrences {
+
+    max-width: 100%;
+
+}
+
+
+
+#dizzy_event_occurrences .inside {
+
+    padding: 15px;
+
+}
