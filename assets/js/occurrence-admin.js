@@ -3,18 +3,16 @@
     'use strict';
 
 
-    const DizzyEventsAdmin = {
+
+    /**
+     * Occurrence admin manager.
+     */
+    const DizzyOccurrences = {
 
 
         init: function () {
 
             this.bindEvents();
-
-            this.initDatePicker();
-
-            this.initSortable();
-
-            this.updateOrder();
 
         },
 
@@ -26,14 +24,15 @@
             $(document).on(
                 'click',
                 '.dizzy-add-occurrence',
-                this.addOccurrence
+                this.addRow.bind(this)
             );
+
 
 
             $(document).on(
                 'click',
                 '.dizzy-remove-occurrence',
-                this.removeOccurrence
+                this.removeRow.bind(this)
             );
 
 
@@ -41,39 +40,117 @@
 
 
 
-        addOccurrence: function (event) {
+        /**
+         * Add new occurrence row.
+         */
+        addRow: function (event) {
+
 
             event.preventDefault();
 
 
-            const template =
-                $('#dizzy-occurrence-template')
-                    .html();
+
+            const row =
+                `
+                <tr class="dizzy-occurrence-row">
+
+                    <td>
+                        <input
+                            type="date"
+                            name="dizzy_occurrences[start_date][]"
+                        >
+                    </td>
+
+
+                    <td>
+                        <input
+                            type="time"
+                            name="dizzy_occurrences[start_time][]"
+                        >
+                    </td>
+
+
+                    <td>
+                        <input
+                            type="date"
+                            name="dizzy_occurrences[end_date][]"
+                        >
+                    </td>
+
+
+                    <td>
+                        <input
+                            type="time"
+                            name="dizzy_occurrences[end_time][]"
+                        >
+                    </td>
+
+
+                    <td>
+
+                        <input
+                            type="hidden"
+                            name="dizzy_occurrences[sort_order][]"
+                            value="0"
+                        >
+
+
+                        <button
+                            type="button"
+                            class="button dizzy-remove-occurrence"
+                        >
+                            Remove
+                        </button>
+
+
+                    </td>
+
+                </tr>
+                `;
 
 
 
-            if (!template) {
-                return;
-            }
+            $('#dizzy-occurrence-rows')
+                .append(row);
 
 
-
-            $('.dizzy-occurrences-list')
-                .append(template);
-
-
-
-            DizzyEventsAdmin.initDatePicker();
-
-            DizzyEventsAdmin.updateOrder();
+            this.refreshOrder();
 
         },
 
 
 
-        removeOccurrence: function (event) {
+
+
+        /**
+         * Remove occurrence row.
+         */
+        removeRow: function (event) {
+
 
             event.preventDefault();
+
+
+
+            const rows =
+                $('.dizzy-occurrence-row');
+
+
+
+            if (
+                rows.length <= 1
+            ) {
+
+
+                rows
+                    .find('input')
+                    .val('');
+
+
+                return;
+
+            }
+
 
 
             $(event.currentTarget)
@@ -84,135 +161,52 @@
 
 
 
-            DizzyEventsAdmin.updateOrder();
+            this.refreshOrder();
 
         },
 
 
 
-        initDatePicker: function () {
 
 
-            $('.dizzy-occurrence-date')
-                .each(
-                    function () {
+        /**
+         * Refresh sort order values.
+         */
+        refreshOrder: function () {
 
 
-                        if (
-                            $(this)
-                            .hasClass(
-                                'hasDatepicker'
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-
-                        $(this)
-                            .datepicker({
-
-                                dateFormat:
-                                    'yy-mm-dd',
-
-
-                                minDate:
-                                    0
-
-                            });
-
-                    }
-                );
-
-        },
-
-
-
-        initSortable: function () {
-
-
-            const list =
-                $('.dizzy-occurrences-list');
-
-
-
-            if (
-                ! list.length
-            ) {
-
-                return;
-
-            }
-
-
-
-            list.sortable({
-
-                items:
-                    '.dizzy-occurrence-row',
-
-
-                handle:
-                    '.dizzy-sort-handle',
-
-
-                placeholder:
-                    'dizzy-sort-placeholder',
-
-
-                update:
-                    function () {
-
-                        DizzyEventsAdmin.updateOrder();
-
-                    }
-
-            });
-
-
-        },
-
-
-
-        updateOrder: function () {
-
-
-            $('.dizzy-occurrences-list')
-                .find(
-                    '.dizzy-occurrence-row'
-                )
+            $('.dizzy-occurrence-row')
                 .each(
                     function (index) {
 
 
                         $(this)
                             .find(
-                                '.dizzy-occurrence-order'
+                                'input[name="dizzy_occurrences[sort_order][]"]'
                             )
-                            .val(
-                                index
-                            );
+                            .val(index);
+
 
                     }
                 );
 
-
-        }
+        },
 
 
     };
 
 
 
+
+
     $(document).ready(
         function () {
 
-            DizzyEventsAdmin.init();
+            DizzyOccurrences.init();
 
         }
     );
+
 
 
 })(jQuery);
