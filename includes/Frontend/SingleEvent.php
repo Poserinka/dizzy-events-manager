@@ -21,6 +21,7 @@ final class SingleEvent
     }
 
 
+
     /**
      * Register hooks.
      */
@@ -36,12 +37,14 @@ final class SingleEvent
     }
 
 
+
     /**
      * Load custom template.
      */
     public function template(
         string $template
     ): string {
+
 
         if (
             ! is_singular('event')
@@ -50,15 +53,59 @@ final class SingleEvent
         }
 
 
+
+        global $post;
+
+
+
+        if (
+            ! $post
+            instanceof \WP_Post
+        ) {
+            return $template;
+        }
+
+
+
+        $data =
+            $this->service
+                ->getEvent(
+                    $post->ID
+                );
+
+
+
+        if (
+            ! $data
+        ) {
+            return $template;
+        }
+
+
+
+        set_query_var(
+            'dizzy_event_data',
+            $data
+        );
+
+
+
         $custom =
             DIZZY_EVENTS_PATH .
             'includes/Frontend/Views/single-event.php';
 
 
-        if (file_exists($custom)) {
+
+        if (
+            file_exists(
+                $custom
+            )
+        ) {
 
             return $custom;
+
         }
+
 
 
         return $template;
