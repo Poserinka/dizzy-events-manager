@@ -126,7 +126,8 @@ final class OccurrenceRepository
     /**
      * Find published event IDs with current or upcoming occurrences.
      *
-     * IDs are ordered by their next occurrence date.
+     * IDs are ordered by their next relevant occurrence time. Ongoing
+     * occurrences are ranked at the current time instead of by an old start.
      *
      * @return array<int>
      */
@@ -143,11 +144,18 @@ final class OccurrenceRepository
                 ON events.ID = occurrences.event_id
             WHERE {$this->publishedUpcomingConditions()}
             GROUP BY occurrences.event_id
-            ORDER BY MIN(occurrences.start_datetime) ASC
+            ORDER BY MIN(
+                CASE
+                    WHEN occurrences.start_datetime < %s THEN %s
+                    ELSE occurrences.start_datetime
+                END
+            ) ASC
             LIMIT %d
             ",
             [
                 ...$this->publishedUpcomingArguments($now),
+                $now,
+                $now,
                 $limit,
             ]
         );
