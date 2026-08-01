@@ -31,18 +31,28 @@ readonly class OccurrenceViewData
     {
         $timestamp = $occurrence->startDateTime->getTimestamp();
         $timezone  = $occurrence->startDateTime->getTimezone();
+        $dateFormat = self::formatOption('date_format', 'j F Y');
+        $timeFormat = self::formatOption('time_format', 'H:i');
 
         return new self(
-            date: wp_date(
-                (string) get_option('date_format'),
-                $timestamp,
-                $timezone
-            ),
-            time: wp_date(
-                (string) get_option('time_format'),
-                $timestamp,
-                $timezone
-            ),
+            date: wp_date($dateFormat, $timestamp, $timezone),
+            time: wp_date($timeFormat, $timestamp, $timezone),
         );
+    }
+
+    /**
+     * Get a usable WordPress date or time format option.
+     */
+    private static function formatOption(string $option, string $fallback): string
+    {
+        $format = get_option($option);
+
+        if (! is_string($format)) {
+            return $fallback;
+        }
+
+        $format = trim($format);
+
+        return $format === '' ? $fallback : $format;
     }
 }
