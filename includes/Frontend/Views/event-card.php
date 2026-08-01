@@ -9,6 +9,10 @@ declare(strict_types=1);
  */
 
 defined('ABSPATH') || exit;
+
+$visibleDateLimit = 3;
+$visibleDates     = array_slice($event->dates, 0, $visibleDateLimit);
+$remainingDates   = max(0, count($event->dates) - count($visibleDates));
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
@@ -66,20 +70,41 @@ defined('ABSPATH') || exit;
         </p>
     <?php endif; ?>
 
-    <?php if ($event->dates !== []) : ?>
+    <?php if ($visibleDates !== []) : ?>
         <section class="dizzy-event-dates">
             <h4>
                 <?php esc_html_e('Dates', 'dizzy-events-manager'); ?>
             </h4>
 
             <ul>
-                <?php foreach ($event->dates as $date) : ?>
+                <?php foreach ($visibleDates as $date) : ?>
                     <li>
                         <strong><?php echo esc_html($date->date); ?></strong>
                         <span><?php echo esc_html($date->time); ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>
+
+            <?php if ($remainingDates > 0) : ?>
+                <p class="dizzy-event-more-dates">
+                    <a href="<?php echo esc_url($event->url); ?>">
+                        <?php
+                        echo esc_html(
+                            sprintf(
+                                /* translators: %d: number of additional event dates. */
+                                _n(
+                                    '+%d more date',
+                                    '+%d more dates',
+                                    $remainingDates,
+                                    'dizzy-events-manager'
+                                ),
+                                $remainingDates
+                            )
+                        );
+                        ?>
+                    </a>
+                </p>
+            <?php endif; ?>
         </section>
     <?php endif; ?>
 
