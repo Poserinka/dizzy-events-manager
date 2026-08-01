@@ -49,6 +49,7 @@ final class Schema
         return "
         id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         event_id bigint(20) unsigned NOT NULL,
+        occurrence_id bigint(20) unsigned NULL,
         name varchar(190) NOT NULL,
         email varchar(190) NOT NULL,
         phone varchar(64) NULL,
@@ -59,6 +60,7 @@ final class Schema
         updated_at datetime NOT NULL,
         PRIMARY KEY (id),
         KEY event_id (event_id),
+        KEY occurrence_id (occurrence_id),
         KEY status (status),
         KEY email (email)
         ";
