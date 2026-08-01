@@ -28,20 +28,37 @@ final class OccurrenceService
     /**
      * Replace all occurrences belonging to an event.
      *
+     * Existing records remain unchanged when submitted rows contain errors.
+     *
      * @param array<string, mixed> $data Submitted occurrence data.
+     *
+     * @return array<int, array{row:int, code:string}>
      */
     public function replaceForEvent(
         int $eventId,
         array $data
-    ): void {
+    ): array {
         if ($eventId <= 0) {
-            return;
+            return [
+                [
+                    'row'  => 0,
+                    'code' => 'invalid_event',
+                ],
+            ];
+        }
+
+        $normalized = $this->normalizeOccurrences($data);
+
+        if ($normalized['errors'] !== []) {
+            return $normalized['errors'];
         }
 
         $this->repository->replaceForEvent(
             $eventId,
-            $this->normalizeOccurrences($data)
+            $normalized['occurrences']
         );
+
+        return [];
     }
 
     /**
@@ -49,14 +66,17 @@ final class OccurrenceService
      *
      * @param array<string, mixed> $data Submitted occurrence data.
      *
-     * @return array<int, array{
-     *     start_datetime: string,
-     *     end_datetime: string|null,
-     *     all_day: int,
-     *     timezone: string,
-     *     sort_order: int,
-     *     status: string
-     * }>
+     * @return array{
+     *     occurrences:array<int, array{
+     *         start_datetime:string,
+     *         end_datetime:string|null,
+     *         all_day:int,
+     *         timezone:string,
+     *         sort_order:int,
+     *         status:string
+     *     }>,
+     *     errors:array<int, array{row:int, code:string}>
+     * }
      */
     private function normalizeOccurrences(array $data): array
     {
@@ -69,16 +89,37 @@ final class OccurrenceService
         $timezone     = wp_timezone();
         $timezoneName = $timezone->getName();
         $occurrences  = [];
+        $errors       = [];
+        $rowCount     = max(
+            count($startDates),
+            count($startTimes),
+            count($endDates),
+            count($endTimes)
+        );
 
-        foreach ($startDates as $index => $startDateValue) {
-            $startDate = $this->sanitizeValue($startDateValue);
+        for ($index = 0; $index < $rowCount; $index++) {
+            $rowNumber = $index + 1;
+            $startDate = $this->sanitizeValue($startDates[$index] ?? '');
             $startTime = $this->sanitizeValue($startTimes[$index] ?? '');
+            $endDate   = $this->sanitizeValue($endDates[$index] ?? '');
+            $endTime   = $this->sanitizeValue($endTimes[$index] ?? '');
 
-            if ($startDate === '' && $startTime === '') {
+            if (
+                $startDate === ''
+                && $startTime === ''
+                && $endDate === ''
+                && $endTime === ''
+            ) {
                 continue;
             }
 
-            if ($startDate === '' || $startTime === '') {
+            if ($startDate === '') {
+                $errors[] = $this->error($rowNumber, 'start_date_required');
+                continue;
+            }
+
+            if ($startTime === '') {
+                $errors[] = $this->error($rowNumber, 'start_time_required');
                 continue;
             }
 
@@ -89,13 +130,12 @@ final class OccurrenceService
             );
 
             if ($startDateTime === null) {
+                $errors[] = $this->error($rowNumber, 'invalid_start');
                 continue;
             }
 
-            $endDate = $this->sanitizeValue($endDates[$index] ?? '');
-            $endTime = $this->sanitizeValue($endTimes[$index] ?? '');
-
             if (($endDate === '') !== ($endTime === '')) {
+                $errors[] = $this->error($rowNumber, 'incomplete_end');
                 continue;
             }
 
@@ -109,6 +149,7 @@ final class OccurrenceService
                 );
 
                 if ($endDateTime === null) {
+                    $errors[] = $this->error($rowNumber, 'invalid_end');
                     continue;
                 }
             }
@@ -117,12 +158,13 @@ final class OccurrenceService
                 $endDateTime !== null
                 && $endDateTime < $startDateTime
             ) {
+                $errors[] = $this->error($rowNumber, 'end_before_start');
                 continue;
             }
 
             $sortOrder = isset($sortOrders[$index])
                 ? absint($sortOrders[$index])
-                : (int) $index;
+                : $index;
 
             $occurrences[] = [
                 'start_datetime' => $startDateTime->format('Y-m-d H:i:s'),
@@ -134,7 +176,23 @@ final class OccurrenceService
             ];
         }
 
-        return $occurrences;
+        return [
+            'occurrences' => $occurrences,
+            'errors'      => $errors,
+        ];
+    }
+
+    /**
+     * Build a validation error entry.
+     *
+     * @return array{row:int, code:string}
+     */
+    private function error(int $row, string $code): array
+    {
+        return [
+            'row'  => $row,
+            'code' => $code,
+        ];
     }
 
     /**
@@ -207,6 +265,6 @@ final class OccurrenceService
             return [];
         }
 
-        return $data[$key];
+        return array_values($data[$key]);
     }
 }
