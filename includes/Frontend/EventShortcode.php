@@ -17,6 +17,16 @@ defined('ABSPATH') || exit;
 final class EventShortcode
 {
     /**
+     * Default number of events to display.
+     */
+    private const DEFAULT_LIMIT = 10;
+
+    /**
+     * Maximum number of events allowed per shortcode.
+     */
+    private const MAX_LIMIT = 100;
+
+    /**
      * Create the event shortcode.
      */
     public function __construct(
@@ -41,11 +51,24 @@ final class EventShortcode
     /**
      * Render events.
      *
+     * Supported usage: [dizzy_events limit="10"]
+     *
      * @param array<string, mixed> $atts Shortcode attributes.
      */
     public function render(array $atts = []): string
     {
-        $events = $this->service->getUpcomingEvents(10);
+        $attributes = shortcode_atts(
+            [
+                'limit' => (string) self::DEFAULT_LIMIT,
+            ],
+            $atts,
+            'dizzy_events'
+        );
+
+        $limit  = absint($attributes['limit']);
+        $limit  = $limit > 0 ? $limit : self::DEFAULT_LIMIT;
+        $limit  = min($limit, self::MAX_LIMIT);
+        $events = $this->service->getUpcomingEvents($limit);
 
         if ($events === []) {
             return sprintf(
