@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
+use Dizzy\Events\Models\EventDetails;
+
 defined('ABSPATH') || exit;
 
 $details = $args['details'] ?? null;
 
-if (! $details instanceof \Dizzy\Events\Models\EventDetails) {
+if (! $details instanceof EventDetails) {
     return;
 }
 
+$mapsUrl = esc_url(trim($details->mapsUrl));
 ?>
 <div class="dizzy-event-meta">
     <?php if ($details->artist !== null) : ?>
@@ -30,7 +33,7 @@ if (! $details instanceof \Dizzy\Events\Models\EventDetails) {
         </p>
     <?php endif; ?>
 
-    <?php if ($details->venue !== null) : ?>
+    <?php if ($details->venue !== '') : ?>
         <p>
             <strong>
                 <?php esc_html_e('Venue:', 'dizzy-events-manager'); ?>
@@ -39,15 +42,15 @@ if (! $details instanceof \Dizzy\Events\Models\EventDetails) {
         </p>
     <?php endif; ?>
 
-    <?php if ($details->address !== null) : ?>
+    <?php if ($details->address !== '') : ?>
         <p>
             <strong>
                 <?php esc_html_e('Address:', 'dizzy-events-manager'); ?>
             </strong>
 
-            <?php if ($details->mapsUrl !== null) : ?>
+            <?php if ($mapsUrl !== '') : ?>
                 <a
-                    href="<?php echo esc_url($details->mapsUrl); ?>"
+                    href="<?php echo $mapsUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
