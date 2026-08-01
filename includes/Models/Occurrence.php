@@ -78,22 +78,6 @@ readonly class Occurrence
     }
 
     /**
-     * Format date.
-     */
-    public function formattedDate(): string
-    {
-        return $this->startDateTime->format('d F Y');
-    }
-
-    /**
-     * Format time.
-     */
-    public function formattedTime(): string
-    {
-        return $this->startDateTime->format('H:i');
-    }
-
-    /**
      * Resolve a stored timezone safely.
      */
     private static function resolveTimezone(string $timezone): DateTimeZone
