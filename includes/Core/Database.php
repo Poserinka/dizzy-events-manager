@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 /**
  * Database installer and table registry.
  *
- * Responsible only for:
+ * Responsible for:
  *
  * - database version
  * - table names
@@ -23,7 +23,7 @@ final class Database
     /**
      * Database schema version.
      */
-    public const VERSION = '1.1.0';
+    public const VERSION = '1.0.1';
 
 
 
@@ -55,18 +55,24 @@ final class Database
 
 
 
+
+
     /**
-     * Returns one table name.
+     * Returns table name.
      */
     public static function table(
         string $key
     ): string {
 
-        $tables = self::tables();
+        $tables =
+            self::tables();
+
 
         return $tables[$key] ?? '';
 
     }
+
+
 
 
 
@@ -75,9 +81,11 @@ final class Database
      */
     public static function install(): void
     {
-        $installed = get_option(
-            Config::OPTION_DB_VERSION
-        );
+        $installed =
+            get_option(
+                Config::OPTION_DB_VERSION
+            );
+
 
 
         if (
@@ -87,7 +95,13 @@ final class Database
         }
 
 
+
         self::createTables();
+
+        self::migrate(
+            $installed
+        );
+
 
 
         update_option(
@@ -98,15 +112,19 @@ final class Database
 
 
 
+
+
     /**
-     * Creates plugin tables.
+     * Create tables.
      */
     private static function createTables(): void
     {
         global $wpdb;
 
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        require_once ABSPATH .
+            'wp-admin/includes/upgrade.php';
+
 
 
         $charset =
@@ -118,6 +136,67 @@ final class Database
             self::table(
                 Config::TABLE_OCCURRENCES
             );
+
+
+
+        dbDelta(
+"
+CREATE TABLE {$occurrences} (
+
+id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+event_id BIGINT(20) UNSIGNED NOT NULL,
+
+start_datetime DATETIME NOT NULL,
+
+end_datetime DATETIME NULL,
+
+all_day TINYINT(1) NOT NULL DEFAULT 0,
+
+timezone VARCHAR(64) NOT NULL DEFAULT 'Europe/Amsterdam',
+
+sort_order INT(11) NOT NULL DEFAULT 0,
+
+status VARCHAR(32) NOT NULL DEFAULT 'publish',
+
+created_at DATETIME NOT NULL,
+
+updated_at DATETIME NOT NULL,
+
+PRIMARY KEY (id),
+
+KEY event_id (event_id),
+
+KEY start_datetime (start_datetime),
+
+KEY sort_order (sort_order),
+
+KEY status (status)
+
+) {$charset};
+"
+        );
+
+
+
+        self::createOtherTables(
+            $charset
+        );
+    }
+
+
+
+
+
+    /**
+     * Create remaining tables.
+     */
+    private static function createOtherTables(
+        string $charset
+    ): void {
+
+        global $wpdb;
+
 
 
         $artists =
@@ -141,47 +220,9 @@ final class Database
 
         dbDelta(
 "
-CREATE TABLE {$occurrences} (
-
-id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-
-event_id BIGINT UNSIGNED NOT NULL,
-
-start_datetime DATETIME NOT NULL,
-
-end_datetime DATETIME NULL,
-
-all_day TINYINT(1) NOT NULL DEFAULT 0,
-
-timezone VARCHAR(100) NULL,
-
-status VARCHAR(20) DEFAULT 'publish',
-
-sort_order INT NOT NULL DEFAULT 0,
-
-created_at DATETIME NOT NULL,
-
-updated_at DATETIME NOT NULL,
-
-PRIMARY KEY (id),
-
-KEY event_id (event_id),
-
-KEY start_datetime (start_datetime),
-
-KEY sort_order (sort_order)
-
-) {$charset};
-"
-);
-
-
-
-        dbDelta(
-"
 CREATE TABLE {$artists} (
 
-id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
 name VARCHAR(255) NOT NULL,
 
@@ -207,7 +248,7 @@ UNIQUE KEY slug(slug)
 
 ) {$charset};
 "
-);
+        );
 
 
 
@@ -215,9 +256,9 @@ UNIQUE KEY slug(slug)
 "
 CREATE TABLE {$relations} (
 
-event_id BIGINT UNSIGNED NOT NULL,
+event_id BIGINT(20) UNSIGNED NOT NULL,
 
-artist_id BIGINT UNSIGNED NOT NULL,
+artist_id BIGINT(20) UNSIGNED NOT NULL,
 
 role VARCHAR(100) NULL,
 
@@ -227,7 +268,7 @@ KEY artist_id(artist_id)
 
 ) {$charset};
 "
-);
+        );
 
 
 
@@ -235,7 +276,7 @@ KEY artist_id(artist_id)
 "
 CREATE TABLE {$logs} (
 
-id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
 level VARCHAR(20) NOT NULL,
 
@@ -255,6 +296,66 @@ KEY created_at(created_at)
 
 ) {$charset};
 "
-);
+        );
+    }
+
+
+
+
+
+    /**
+     * Database migrations.
+     */
+    private static function migrate(
+        ?string $installed
+    ): void {
+
+
+        global $wpdb;
+
+
+        if (
+            version_compare(
+                (string) $installed,
+                '1.0.1',
+                '<'
+            )
+        ) {
+
+
+            $table =
+                self::table(
+                    Config::TABLE_OCCURRENCES
+                );
+
+
+
+            $column =
+                $wpdb->get_results(
+                    "
+                    SHOW COLUMNS FROM {$table}
+                    LIKE 'sort_order'
+                    "
+                );
+
+
+
+            if (
+                empty($column)
+            ) {
+
+                $wpdb->query(
+                    "
+                    ALTER TABLE {$table}
+                    ADD sort_order INT(11)
+                    NOT NULL DEFAULT 0
+                    AFTER timezone
+                    "
+                );
+
+            }
+
+        }
+
     }
 }
