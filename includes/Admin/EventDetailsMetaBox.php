@@ -15,6 +15,12 @@ defined('ABSPATH') || exit;
  */
 final class EventDetailsMetaBox
 {
+    private const DEFAULT_VENUE = 'Jazzcafé Dizzy';
+
+    private const DEFAULT_ADDRESS = "'s-Gravendijkwal 127, 3021 EK Rotterdam";
+
+    private const DEFAULT_MAPS_URL = 'https://maps.app.goo.gl/t73PkgDRtb6RvKFMA';
+
     /**
      * Register hooks.
      */
@@ -66,19 +72,29 @@ final class EventDetailsMetaBox
         );
 
         $fields = [
-            'artist',
-            'genre',
-            'venue',
-            'ticket_url',
-            'ticket_price',
+            'artist'       => '',
+            'genre'        => '',
+            'venue'        => self::DEFAULT_VENUE,
+            'address'      => self::DEFAULT_ADDRESS,
+            'maps_url'     => self::DEFAULT_MAPS_URL,
+            'ticket_url'   => '',
+            'ticket_price' => '',
         ];
 
-        foreach ($fields as $field) {
+        foreach ($fields as $field => $defaultValue) {
             $value = get_post_meta(
                 $post->ID,
                 '_dizzy_' . $field,
                 true
             );
+
+            if ($value === '') {
+                $value = $defaultValue;
+            }
+
+            $inputType = in_array($field, ['maps_url', 'ticket_url'], true)
+                ? 'url'
+                : 'text';
             ?>
             <p>
                 <label for="dizzy-<?php echo esc_attr($field); ?>">
@@ -93,7 +109,7 @@ final class EventDetailsMetaBox
 
                 <input
                     id="dizzy-<?php echo esc_attr($field); ?>"
-                    type="<?php echo $field === 'ticket_url' ? 'url' : 'text'; ?>"
+                    type="<?php echo esc_attr($inputType); ?>"
                     class="widefat"
                     name="dizzy_<?php echo esc_attr($field); ?>"
                     value="<?php echo esc_attr((string) $value); ?>"
@@ -141,6 +157,8 @@ final class EventDetailsMetaBox
             'artist',
             'genre',
             'venue',
+            'address',
+            'maps_url',
             'ticket_url',
             'ticket_price',
         ];
@@ -153,7 +171,7 @@ final class EventDetailsMetaBox
             }
 
             $value = wp_unslash($_POST[$key]);
-            $value = $field === 'ticket_url'
+            $value = in_array($field, ['maps_url', 'ticket_url'], true)
                 ? esc_url_raw($value)
                 : sanitize_text_field($value);
 
