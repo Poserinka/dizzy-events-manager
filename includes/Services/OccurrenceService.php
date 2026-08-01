@@ -17,6 +17,8 @@ defined('ABSPATH') || exit;
  */
 final class OccurrenceService
 {
+    private const MAX_OCCURRENCES_PER_EVENT = 100;
+
     /**
      * Occurrence service constructor.
      */
@@ -85,17 +87,27 @@ final class OccurrenceService
         $endDates   = $this->getArrayValue($data, 'end_date');
         $endTimes   = $this->getArrayValue($data, 'end_time');
         $sortOrders = $this->getArrayValue($data, 'sort_order');
+        $rowCount   = max(
+            count($startDates),
+            count($startTimes),
+            count($endDates),
+            count($endTimes),
+            count($sortOrders)
+        );
+
+        if ($rowCount > self::MAX_OCCURRENCES_PER_EVENT) {
+            return [
+                'occurrences' => [],
+                'errors'      => [
+                    $this->error(0, 'too_many_occurrences'),
+                ],
+            ];
+        }
 
         $timezone     = wp_timezone();
         $timezoneName = $timezone->getName();
         $occurrences  = [];
         $errors       = [];
-        $rowCount     = max(
-            count($startDates),
-            count($startTimes),
-            count($endDates),
-            count($endTimes)
-        );
 
         for ($index = 0; $index < $rowCount; $index++) {
             $rowNumber = $index + 1;
