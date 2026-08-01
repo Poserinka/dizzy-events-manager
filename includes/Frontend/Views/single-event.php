@@ -2,47 +2,24 @@
 
 declare(strict_types=1);
 
+use Dizzy\Events\Frontend\ViewModels\SingleEventViewData;
+
 defined('ABSPATH') || exit;
 
+$data = get_query_var('dizzy_event_data');
 
-$data =
-    get_query_var(
-        'dizzy_event_data'
-    );
-
-
-if (
-    ! is_array($data)
-) {
+if (! $data instanceof SingleEventViewData) {
     return;
 }
 
-
-
-$event =
-    $data['event'] ?? null;
-
-
-$details =
-    $data['details'] ?? null;
-
-
-if (
-    ! $event
-    ||
-    ! $details
-) {
-    return;
-}
-
+$event   = $data->event;
+$details = $data->details;
 
 ?>
 
 <div class="dizzy-single-event">
 
-
 <?php
-
 get_template_part(
     'includes/Frontend/Views/partials/event-header',
     null,
@@ -51,13 +28,9 @@ get_template_part(
         'details' => $details,
     ]
 );
-
 ?>
 
-
-
 <?php
-
 get_template_part(
     'includes/Frontend/Views/partials/event-meta',
     null,
@@ -65,13 +38,9 @@ get_template_part(
         'details' => $details,
     ]
 );
-
 ?>
 
-
-
 <?php
-
 get_template_part(
     'includes/Frontend/Views/partials/event-content',
     null,
@@ -79,33 +48,20 @@ get_template_part(
         'event' => $event,
     ]
 );
-
 ?>
 
-
-
 <?php
-
 get_template_part(
     'includes/Frontend/Views/partials/event-dates',
     null,
     [
-        'upcomingOccurrences' =>
-            $data['upcomingOccurrences']
-            ?? [],
-
-        'pastOccurrences' =>
-            $data['pastOccurrences']
-            ?? [],
+        'upcomingOccurrences' => $data->upcomingOccurrences,
+        'pastOccurrences'     => $data->pastOccurrences,
     ]
 );
-
 ?>
 
-
-
 <?php
-
 get_template_part(
     'includes/Frontend/Views/partials/event-ticket',
     null,
@@ -113,8 +69,6 @@ get_template_part(
         'details' => $details,
     ]
 );
-
 ?>
-
 
 </div>
