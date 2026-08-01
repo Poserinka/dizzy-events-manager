@@ -15,13 +15,21 @@ defined('ABSPATH') || exit;
  */
 readonly class EventDetails
 {
+    private const DEFAULT_VENUE = 'Jazzcafé Dizzy';
+
+    private const DEFAULT_ADDRESS = "'s-Gravendijkwal 127, 3021 EK Rotterdam";
+
+    private const DEFAULT_MAPS_URL = 'https://maps.app.goo.gl/t73PkgDRtb6RvKFMA';
+
     /**
      * Create event details.
      */
     public function __construct(
         public ?string $artist,
         public ?string $genre,
-        public ?string $venue,
+        public string $venue,
+        public string $address,
+        public string $mapsUrl,
         public ?string $ticketUrl,
         public ?float $ticketPrice,
         public bool $featured,
@@ -46,7 +54,13 @@ readonly class EventDetails
             ),
             venue: self::stringValue(
                 self::metaValue($meta, 'venue')
-            ),
+            ) ?? self::DEFAULT_VENUE,
+            address: self::stringValue(
+                self::metaValue($meta, 'address')
+            ) ?? self::DEFAULT_ADDRESS,
+            mapsUrl: self::stringValue(
+                self::metaValue($meta, 'maps_url')
+            ) ?? self::DEFAULT_MAPS_URL,
             ticketUrl: self::stringValue(
                 self::metaValue($meta, 'ticket_url')
             ),
