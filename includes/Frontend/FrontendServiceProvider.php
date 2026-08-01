@@ -40,7 +40,8 @@ final class FrontendServiceProvider
             EventShortcode::class,
             static function () use ($container): EventShortcode {
                 return new EventShortcode(
-                    $container->get(EventService::class)
+                    $container->get(EventService::class),
+                    $container->get(EventPresentationBuilder::class)
                 );
             }
         );
