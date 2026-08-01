@@ -83,7 +83,7 @@ final class OccurrenceRepository
             ', ',
             array_fill(0, count($eventIds), '%d')
         );
-        $now = current_time('mysql', true);
+        $now = current_time('mysql');
 
         $rows = DB::getResults(
             "
@@ -127,7 +127,7 @@ final class OccurrenceRepository
     public function findUpcomingEventIds(int $limit = 20): array
     {
         $limit = max(1, $limit);
-        $now   = current_time('mysql', true);
+        $now   = current_time('mysql');
 
         $eventIds = DB::getColumn(
             "
