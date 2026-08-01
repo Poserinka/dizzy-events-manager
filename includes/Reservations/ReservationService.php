@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Reservations;
 
+use Dizzy\Events\Mail\Mailer;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -16,7 +17,8 @@ defined('ABSPATH') || exit;
 final class ReservationService
 {
     public function __construct(
-        private readonly ReservationRepository $repository
+        private readonly ReservationRepository $repository,
+        private readonly Mailer $mailer
     ) {
     }
 
@@ -31,7 +33,17 @@ final class ReservationService
             throw new RuntimeException('Event ID is required.');
         }
 
-        return $this->repository->save($data);
+        $reservationId = $this->repository->save($data);
+
+        if (! empty($data['email']) && is_string($data['email'])) {
+            $this->mailer->send(
+                $data['email'],
+                'Reservation received',
+                'Your reservation request has been received.'
+            );
+        }
+
+        return $reservationId;
     }
 
     /**
