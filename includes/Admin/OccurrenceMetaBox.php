@@ -49,7 +49,7 @@ final class OccurrenceMetaBox
 
 
     /**
-     * Add occurrence meta box.
+     * Add meta box.
      */
     public function addMetaBox(): void
     {
@@ -88,18 +88,21 @@ final class OccurrenceMetaBox
                     $post->ID
                 );
 
-        ?>
 
+        ?>
 
         <div class="dizzy-occurrences-list">
 
 
-            <?php foreach ($occurrences as $occurrence): ?>
+            <?php foreach ($occurrences as $index => $occurrence): ?>
 
                 <?php
+
                 $this->renderRow(
-                    $occurrence
+                    $occurrence,
+                    $index
                 );
+
                 ?>
 
             <?php endforeach; ?>
@@ -144,11 +147,13 @@ final class OccurrenceMetaBox
 
 
 
+
     /**
-     * Render saved occurrence row.
+     * Render occurrence row.
      */
     private function renderRow(
-        object $occurrence
+        object $occurrence,
+        int $order
     ): void {
 
         ?>
@@ -161,6 +166,16 @@ final class OccurrenceMetaBox
             </span>
 
 
+            <input
+                type="hidden"
+                class="dizzy-occurrence-order"
+                name="dizzy_occurrences[sort_order][]"
+                value="<?php echo esc_attr(
+                    $order
+                ); ?>"
+            >
+
+
 
             <p>
 
@@ -179,9 +194,7 @@ final class OccurrenceMetaBox
                     value="<?php echo esc_attr(
                         $occurrence
                             ->startDateTime
-                            ->format(
-                                'Y-m-d'
-                            )
+                            ->format('Y-m-d')
                     ); ?>"
                 >
 
@@ -205,9 +218,7 @@ final class OccurrenceMetaBox
                     value="<?php echo esc_attr(
                         $occurrence
                             ->startDateTime
-                            ->format(
-                                'H:i'
-                            )
+                            ->format('H:i')
                     ); ?>"
                 >
 
@@ -232,9 +243,7 @@ final class OccurrenceMetaBox
                     value="<?php echo esc_attr(
                         $occurrence
                             ->endDateTime
-                            ?->format(
-                                'Y-m-d'
-                            )
+                            ?->format('Y-m-d')
                     ); ?>"
                 >
 
@@ -258,9 +267,7 @@ final class OccurrenceMetaBox
                     value="<?php echo esc_attr(
                         $occurrence
                             ->endDateTime
-                            ?->format(
-                                'H:i'
-                            )
+                            ?->format('H:i')
                     ); ?>"
                 >
 
@@ -283,20 +290,17 @@ final class OccurrenceMetaBox
 
         </div>
 
-
         <?php
     }
 
 
 
 
-
     /**
-     * Render empty row template.
+     * Render empty row.
      */
     private function renderEmptyRow(): void
     {
-
         ?>
 
         <div class="dizzy-occurrence-row">
@@ -308,6 +312,15 @@ final class OccurrenceMetaBox
 
 
 
+            <input
+                type="hidden"
+                class="dizzy-occurrence-order"
+                name="dizzy_occurrences[sort_order][]"
+                value="0"
+            >
+
+
+
             <p>
 
                 <label>
@@ -400,7 +413,6 @@ final class OccurrenceMetaBox
 
 
         </div>
-
 
         <?php
     }
@@ -426,7 +438,6 @@ final class OccurrenceMetaBox
         }
 
 
-
         if (
             ! wp_verify_nonce(
                 $_POST['dizzy_occurrence_nonce'],
@@ -437,7 +448,6 @@ final class OccurrenceMetaBox
         }
 
 
-
         if (
             defined('DOING_AUTOSAVE')
             &&
@@ -445,7 +455,6 @@ final class OccurrenceMetaBox
         ) {
             return;
         }
-
 
 
         if (
@@ -481,5 +490,4 @@ final class OccurrenceMetaBox
             );
 
     }
-
 }
