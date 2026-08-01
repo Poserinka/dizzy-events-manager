@@ -3,25 +3,19 @@
     'use strict';
 
 
-    /**
-     * Dizzy Events admin handler.
-     */
     const DizzyEventsAdmin = {
 
 
-        /**
-         * Initialize.
-         */
         init: function () {
 
             this.bindEvents();
 
+            this.initDatePicker();
+
         },
 
 
-        /**
-         * Bind events.
-         */
+
         bindEvents: function () {
 
 
@@ -42,9 +36,7 @@
         },
 
 
-        /**
-         * Add occurrence row.
-         */
+
         addOccurrence: function (event) {
 
             event.preventDefault();
@@ -63,20 +55,60 @@
             $('.dizzy-occurrences-list')
                 .append(template);
 
+
+            DizzyEventsAdmin.initDatePicker();
+
         },
 
 
-        /**
-         * Remove occurrence row.
-         */
+
         removeOccurrence: function (event) {
 
             event.preventDefault();
 
 
             $(event.currentTarget)
-                .closest('.dizzy-occurrence-row')
+                .closest(
+                    '.dizzy-occurrence-row'
+                )
                 .remove();
+
+        },
+
+
+
+        initDatePicker: function () {
+
+
+            $('.dizzy-occurrence-date')
+                .each(
+                    function () {
+
+
+                        if (
+                            $(this)
+                            .hasClass(
+                                'hasDatepicker'
+                            )
+                        ) {
+                            return;
+                        }
+
+
+                        $(this)
+                            .datepicker({
+
+                                dateFormat:
+                                    'yy-mm-dd',
+
+
+                                minDate:
+                                    0
+
+                            });
+
+                    }
+                );
 
         }
 
@@ -84,11 +116,14 @@
     };
 
 
-    $(document).ready(function () {
 
-        DizzyEventsAdmin.init();
+    $(document).ready(
+        function () {
 
-    });
+            DizzyEventsAdmin.init();
+
+        }
+    );
 
 
 })(jQuery);
