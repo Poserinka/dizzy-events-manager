@@ -34,7 +34,6 @@ final class OccurrenceRepository
         int $eventId
     ): array {
 
-
         global $wpdb;
 
 
@@ -45,11 +44,12 @@ final class OccurrenceRepository
                     SELECT *
                     FROM {$this->table}
                     WHERE event_id = %d
-                    ORDER BY start_datetime ASC
+                    ORDER BY sort_order ASC, start_datetime ASC
                     ",
                     $eventId
                 )
             );
+
 
 
         return array_map(
@@ -68,8 +68,9 @@ final class OccurrenceRepository
 
 
 
+
     /**
-     * Replace occurrences.
+     * Replace all occurrences for event.
      *
      * @param array<string,mixed> $data
      */
@@ -82,23 +83,30 @@ final class OccurrenceRepository
         global $wpdb;
 
 
+
         $wpdb->query(
             'START TRANSACTION'
         );
+
 
 
         try {
 
 
             $wpdb->delete(
+
                 $this->table,
+
                 [
                     'event_id' => $eventId,
                 ],
+
                 [
                     '%d',
                 ]
+
             );
+
 
 
 
@@ -122,6 +130,7 @@ final class OccurrenceRepository
 
 
 
+
             foreach (
                 $data['start_date']
                 as $index => $date
@@ -131,7 +140,9 @@ final class OccurrenceRepository
                 if (
                     empty($date)
                 ) {
+
                     continue;
+
                 }
 
 
@@ -154,8 +165,11 @@ final class OccurrenceRepository
                 if (
                     ! $start
                 ) {
+
                     continue;
+
                 }
+
 
 
 
@@ -170,25 +184,31 @@ final class OccurrenceRepository
                 ) {
 
 
-                    $endDate =
-                        $data['end_date'][$index];
-
-
-
-                    $endTime =
-                        $data['end_time'][$index]
-                        ??
-                        '00:00';
-
-
-
                     $end =
                         $this->createDateTime(
-                            $endDate,
-                            $endTime
+
+                            $data['end_date'][$index],
+
+                            $data['end_time'][$index]
+                            ??
+                            '00:00'
+
                         );
 
                 }
+
+
+
+
+                $sortOrder =
+                    isset(
+                        $data['sort_order'][$index]
+                    )
+                    ? (int)
+                        $data['sort_order'][$index]
+                    : $index;
+
+
 
 
 
@@ -203,10 +223,9 @@ final class OccurrenceRepository
 
 
                         'start_datetime' =>
-                            $start
-                                ->format(
-                                    'Y-m-d H:i:s'
-                                ),
+                            $start->format(
+                                'Y-m-d H:i:s'
+                            ),
 
 
                         'end_datetime' =>
@@ -216,12 +235,51 @@ final class OccurrenceRepository
                                 )
                                 : null,
 
+
+                        'timezone' =>
+                            'Europe/Amsterdam',
+
+
+                        'sort_order' =>
+                            $sortOrder,
+
+
+                        'status' =>
+                            'publish',
+
+
+                        'created_at' =>
+                            current_time(
+                                'mysql',
+                                true
+                            ),
+
+
+                        'updated_at' =>
+                            current_time(
+                                'mysql',
+                                true
+                            ),
+
                     ],
+
 
                     [
 
                         '%d',
+
                         '%s',
+
+                        '%s',
+
+                        '%s',
+
+                        '%d',
+
+                        '%s',
+
+                        '%s',
+
                         '%s',
 
                     ]
@@ -235,6 +293,7 @@ final class OccurrenceRepository
             $wpdb->query(
                 'COMMIT'
             );
+
 
 
         } catch (\Throwable $e) {
@@ -256,7 +315,7 @@ final class OccurrenceRepository
 
 
     /**
-     * Create datetime object.
+     * Create DateTime object.
      */
     private function createDateTime(
         string $date,
@@ -269,9 +328,7 @@ final class OccurrenceRepository
 
             return new DateTimeImmutable(
 
-                $date .
-                ' ' .
-                $time,
+                $date . ' ' . $time,
 
                 new DateTimeZone(
                     'Europe/Amsterdam'
