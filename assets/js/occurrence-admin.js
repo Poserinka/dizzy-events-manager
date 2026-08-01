@@ -12,6 +12,8 @@
 
             this.initDatePicker();
 
+            this.initSortable();
+
         },
 
 
@@ -101,7 +103,6 @@
                                 dateFormat:
                                     'yy-mm-dd',
 
-
                                 minDate:
                                     0
 
@@ -109,6 +110,42 @@
 
                     }
                 );
+
+        },
+
+
+
+        initSortable: function () {
+
+
+            const list =
+                $('.dizzy-occurrences-list');
+
+
+            if (
+                ! list.length
+            ) {
+                return;
+            }
+
+
+
+            list.sortable({
+
+                items:
+                    '.dizzy-occurrence-row',
+
+
+                handle:
+                    '.dizzy-sort-handle',
+
+
+                placeholder:
+                    'dizzy-sort-placeholder'
+
+
+            });
+
 
         }
 
