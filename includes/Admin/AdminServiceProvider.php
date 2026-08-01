@@ -33,15 +33,6 @@ final class AdminServiceProvider
         );
 
         $container->singleton(
-            OccurrenceTable::class,
-            static function () use ($container): OccurrenceTable {
-                return new OccurrenceTable(
-                    $container->get(OccurrenceRepository::class)
-                );
-            }
-        );
-
-        $container->singleton(
             EventDetailsMetaBox::class,
             static function (): EventDetailsMetaBox {
                 return new EventDetailsMetaBox();
@@ -60,10 +51,6 @@ final class AdminServiceProvider
             static function () use ($container): void {
                 $container
                     ->get(OccurrenceMetaBox::class)
-                    ->register();
-
-                $container
-                    ->get(OccurrenceTable::class)
                     ->register();
 
                 $container
