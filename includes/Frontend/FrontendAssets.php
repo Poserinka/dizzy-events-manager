@@ -28,30 +28,15 @@ final class FrontendAssets
     }
 
     /**
-     * Enqueue event styles when they can be used.
+     * Enqueue event frontend styles.
      */
     public function enqueue(): void
     {
-        if (! is_singular('event') && ! $this->currentPostHasShortcode()) {
-            return;
-        }
-
         wp_enqueue_style(
             'dizzy-events-frontend',
             DIZZY_EVENTS_URL . 'assets/css/frontend.css',
             [],
             DIZZY_EVENTS_VERSION
         );
-    }
-
-    /**
-     * Determine whether the current post contains the event shortcode.
-     */
-    private function currentPostHasShortcode(): bool
-    {
-        global $post;
-
-        return $post instanceof \WP_Post
-            && has_shortcode($post->post_content, 'dizzy_events');
     }
 }
