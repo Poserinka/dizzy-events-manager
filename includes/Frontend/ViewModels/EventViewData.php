@@ -60,9 +60,9 @@ readonly class EventViewData
         return new self(
             id: $event->id,
             title: $event->title,
-            url: get_permalink($event->id),
-            image: get_the_post_thumbnail_url($event->id, 'large') ?: '',
-            excerpt: $event->excerpt ?? '',
+            url: self::permalink($event->id),
+            image: self::featuredImage($event->id),
+            excerpt: self::excerpt($event),
             artist: $details->artist,
             genre: $details->genre,
             venue: $details->venue,
@@ -72,6 +72,43 @@ readonly class EventViewData
             ticketPrice: $details->ticketPrice,
             featured: $details->featured,
             dates: $dates,
+        );
+    }
+
+    /**
+     * Get a safe event permalink.
+     */
+    private static function permalink(int $eventId): string
+    {
+        $permalink = get_permalink($eventId);
+
+        return is_string($permalink) ? $permalink : '';
+    }
+
+    /**
+     * Get a safe featured image URL.
+     */
+    private static function featuredImage(int $eventId): string
+    {
+        $image = get_the_post_thumbnail_url($eventId, 'large');
+
+        return is_string($image) ? $image : '';
+    }
+
+    /**
+     * Build the event card excerpt.
+     */
+    private static function excerpt(Event $event): string
+    {
+        $excerpt = get_the_excerpt($event->id);
+
+        if (is_string($excerpt) && trim($excerpt) !== '') {
+            return $excerpt;
+        }
+
+        return wp_trim_words(
+            wp_strip_all_tags(strip_shortcodes($event->content)),
+            35
         );
     }
 }
