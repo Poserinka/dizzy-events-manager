@@ -36,12 +36,37 @@ final class FrontendServiceProvider
         );
 
 
+        $container->singleton(
+            SingleEvent::class,
+            static function () use ($container): SingleEvent {
+
+                return new SingleEvent(
+                    $container->get(
+                        EventService::class
+                    )
+                );
+            }
+        );
+
+
         add_action(
             'init',
             static function () use ($container): void {
 
                 $container
                     ->get(EventShortcode::class)
+                    ->register();
+
+            }
+        );
+
+
+        add_action(
+            'template_redirect',
+            static function () use ($container): void {
+
+                $container
+                    ->get(SingleEvent::class)
                     ->register();
 
             }
