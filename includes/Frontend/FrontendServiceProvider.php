@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Dizzy\Events\Frontend;
 
 use Dizzy\Events\Core\Container;
-use Dizzy\Events\Services\EventService;
 use Dizzy\Events\Repositories\OccurrenceRepository;
+use Dizzy\Events\Services\EventService;
 
 defined('ABSPATH') || exit;
 
@@ -25,6 +25,9 @@ final class FrontendServiceProvider
     ): void {
 
 
+        /**
+         * Event shortcode.
+         */
         $container->singleton(
             EventShortcode::class,
             static function () use ($container): EventShortcode {
@@ -35,7 +38,6 @@ final class FrontendServiceProvider
                         EventService::class
                     ),
 
-
                     $container->get(
                         OccurrenceRepository::class
                     )
@@ -45,6 +47,10 @@ final class FrontendServiceProvider
         );
 
 
+
+        /**
+         * Single event renderer.
+         */
         $container->singleton(
             SingleEvent::class,
             static function () use ($container): SingleEvent {
@@ -60,6 +66,29 @@ final class FrontendServiceProvider
         );
 
 
+
+        /**
+         * Event schema JSON-LD.
+         */
+        $container->singleton(
+            EventSchema::class,
+            static function () use ($container): EventSchema {
+
+                return new EventSchema(
+
+                    $container->get(
+                        EventService::class
+                    )
+
+                );
+            }
+        );
+
+
+
+        /**
+         * Register shortcode.
+         */
         add_action(
             'init',
             static function () use ($container): void {
@@ -72,6 +101,10 @@ final class FrontendServiceProvider
         );
 
 
+
+        /**
+         * Register single event template.
+         */
         add_action(
             'template_redirect',
             static function () use ($container): void {
@@ -82,5 +115,22 @@ final class FrontendServiceProvider
 
             }
         );
+
+
+
+        /**
+         * Register SEO schema.
+         */
+        add_action(
+            'wp',
+            static function () use ($container): void {
+
+                $container
+                    ->get(EventSchema::class)
+                    ->register();
+
+            }
+        );
+
     }
 }
