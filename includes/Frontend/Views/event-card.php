@@ -10,14 +10,8 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-$visibleDateLimit = (int) apply_filters(
-    'dizzy_events_card_date_limit',
-    3,
-    $event->id
-);
-$visibleDateLimit = min(max(1, $visibleDateLimit), 10);
-$visibleDates     = array_slice($event->dates, 0, $visibleDateLimit);
-$remainingDates   = max(0, count($event->dates) - count($visibleDates));
+$visibleDates   = $event->cardDates();
+$remainingDates = $event->remainingCardDateCount();
 ?>
 <article class="dizzy-event-card">
     <?php if ($event->featured) : ?>
