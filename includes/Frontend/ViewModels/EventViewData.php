@@ -20,7 +20,7 @@ readonly class EventViewData
     /**
      * Create event view data.
      *
-     * @param array<Occurrence> $occurrences Event occurrences.
+     * @param array<OccurrenceViewData> $dates Event occurrence view data.
      */
     public function __construct(
         public int $id,
@@ -31,10 +31,11 @@ readonly class EventViewData
         public ?string $artist,
         public ?string $genre,
         public ?string $venue,
+        public ?string $address,
+        public ?string $mapsUrl,
         public ?string $ticketUrl,
         public ?float $ticketPrice,
         public bool $featured,
-        /** @var array<OccurrenceViewData> */
         public array $dates,
     ) {
     }
@@ -65,6 +66,8 @@ readonly class EventViewData
             artist: $details->artist,
             genre: $details->genre,
             venue: $details->venue,
+            address: $details->address,
+            mapsUrl: $details->mapsUrl,
             ticketUrl: $details->ticketUrl,
             ticketPrice: $details->ticketPrice,
             featured: $details->featured,
