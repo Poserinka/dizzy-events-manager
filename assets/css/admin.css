@@ -93,3 +93,37 @@
     border: 2px dashed #999;
     margin-bottom: 15px;
 }
+
+.dizzy-occurrence-row {
+    position: relative;
+}
+
+
+.dizzy-sort-handle {
+
+    cursor: move;
+
+    display: inline-block;
+
+    font-size: 18px;
+
+    margin-right: 12px;
+
+    color: #646970;
+
+    vertical-align: middle;
+
+}
+
+
+.dizzy-sort-placeholder {
+
+    height: 120px;
+
+    border: 2px dashed #2271b1;
+
+    background: #f6f7f7;
+
+    margin-bottom: 15px;
+
+}
