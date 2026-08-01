@@ -23,6 +23,9 @@ final class OccurrenceMetaBox
 
 
 
+    /**
+     * Register hooks.
+     */
     public function register(): void
     {
         add_action(
@@ -45,6 +48,9 @@ final class OccurrenceMetaBox
 
 
 
+    /**
+     * Add occurrence meta box.
+     */
     public function addMetaBox(): void
     {
         add_meta_box(
@@ -62,6 +68,9 @@ final class OccurrenceMetaBox
 
 
 
+    /**
+     * Render meta box.
+     */
     public function render(
         \WP_Post $post
     ): void {
@@ -81,22 +90,19 @@ final class OccurrenceMetaBox
 
         ?>
 
+
         <div class="dizzy-occurrences-list">
 
 
-        <?php foreach ($occurrences as $occurrence): ?>
+            <?php foreach ($occurrences as $occurrence): ?>
 
+                <?php
+                $this->renderRow(
+                    $occurrence
+                );
+                ?>
 
-            <?php
-
-            $this->renderRow(
-                $occurrence
-            );
-
-            ?>
-
-
-        <?php endforeach; ?>
+            <?php endforeach; ?>
 
 
         </div>
@@ -124,10 +130,13 @@ final class OccurrenceMetaBox
         <script type="text/html" id="dizzy-occurrence-template">
 
             <?php
+
             $this->renderEmptyRow();
+
             ?>
 
         </script>
+
 
         <?php
     }
@@ -135,15 +144,22 @@ final class OccurrenceMetaBox
 
 
 
-
+    /**
+     * Render saved occurrence row.
+     */
     private function renderRow(
         object $occurrence
     ): void {
 
-
         ?>
 
         <div class="dizzy-occurrence-row">
+
+
+            <span class="dizzy-sort-handle">
+                ☰
+            </span>
+
 
 
             <p>
@@ -267,12 +283,17 @@ final class OccurrenceMetaBox
 
         </div>
 
+
         <?php
     }
 
 
 
 
+
+    /**
+     * Render empty row template.
+     */
     private function renderEmptyRow(): void
     {
 
@@ -281,6 +302,12 @@ final class OccurrenceMetaBox
         <div class="dizzy-occurrence-row">
 
 
+            <span class="dizzy-sort-handle">
+                ☰
+            </span>
+
+
+
             <p>
 
                 <label>
@@ -374,12 +401,17 @@ final class OccurrenceMetaBox
 
         </div>
 
+
         <?php
     }
 
 
 
 
+
+    /**
+     * Save occurrences.
+     */
     public function save(
         int $postId
     ): void {
@@ -394,6 +426,7 @@ final class OccurrenceMetaBox
         }
 
 
+
         if (
             ! wp_verify_nonce(
                 $_POST['dizzy_occurrence_nonce'],
@@ -404,6 +437,7 @@ final class OccurrenceMetaBox
         }
 
 
+
         if (
             defined('DOING_AUTOSAVE')
             &&
@@ -411,6 +445,7 @@ final class OccurrenceMetaBox
         ) {
             return;
         }
+
 
 
         if (
@@ -446,4 +481,5 @@ final class OccurrenceMetaBox
             );
 
     }
+
 }
