@@ -128,6 +128,7 @@ final class OccurrenceRepository
      *
      * IDs are ordered by their next relevant occurrence time. Ongoing
      * occurrences are ranked at the current time instead of by an old start.
+     * Equal relevance times are resolved by the actual start and event ID.
      *
      * @return array<int>
      */
@@ -144,12 +145,15 @@ final class OccurrenceRepository
                 ON events.ID = occurrences.event_id
             WHERE {$this->publishedUpcomingConditions()}
             GROUP BY occurrences.event_id
-            ORDER BY MIN(
-                CASE
-                    WHEN occurrences.start_datetime < %s THEN %s
-                    ELSE occurrences.start_datetime
-                END
-            ) ASC
+            ORDER BY
+                MIN(
+                    CASE
+                        WHEN occurrences.start_datetime < %s THEN %s
+                        ELSE occurrences.start_datetime
+                    END
+                ) ASC,
+                MIN(occurrences.start_datetime) ASC,
+                occurrences.event_id ASC
             LIMIT %d
             ",
             [
