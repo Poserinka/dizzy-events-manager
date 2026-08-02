@@ -13,9 +13,6 @@ defined('ABSPATH') || exit;
  */
 final class Schema
 {
-    /**
-     * Occurrence table schema.
-     */
     public static function occurrences(): string
     {
         return "
@@ -41,9 +38,6 @@ final class Schema
         ";
     }
 
-    /**
-     * Reservation table schema.
-     */
     public static function reservations(): string
     {
         return "
@@ -66,14 +60,12 @@ final class Schema
         ";
     }
 
-    /**
-     * Poster table schema.
-     */
     public static function posters(): string
     {
         return "
         id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         event_id bigint(20) unsigned NOT NULL,
+        attachment_id bigint(20) unsigned NULL,
         prompt text NULL,
         image_url text NULL,
         provider varchar(64) NOT NULL DEFAULT 'ai',
@@ -82,6 +74,7 @@ final class Schema
         updated_at datetime NOT NULL,
         PRIMARY KEY (id),
         KEY event_id (event_id),
+        KEY attachment_id (attachment_id),
         KEY status (status)
         ";
     }
