@@ -11,7 +11,6 @@ use Dizzy\Events\Providers\EventServiceProvider;
 use Dizzy\Events\Providers\MailServiceProvider;
 use Dizzy\Events\Providers\PostTypeServiceProvider;
 use Dizzy\Events\Providers\ReservationServiceProvider;
-use Dizzy\Events\Social\Providers\SocialServiceProvider;
 
 defined('ABSPATH') || exit;
 
@@ -47,7 +46,6 @@ final class Application
             EventServiceProvider::class,
             ReservationServiceProvider::class,
             PosterServiceProvider::class,
-            SocialServiceProvider::class,
             MailServiceProvider::class,
             AdminServiceProvider::class,
             PostTypeServiceProvider::class,
