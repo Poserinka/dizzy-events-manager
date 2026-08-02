@@ -87,6 +87,7 @@ final class OccurrenceService
         $endDates = $this->getArrayValue($data, 'end_date');
         $endTimes = $this->getArrayValue($data, 'end_time');
         $capacities = $this->getArrayValue($data, 'capacity');
+        $ids = $this->getArrayValue($data, 'id');
         $timezone = wp_timezone();
         $start = $this->createDateTime(
             $this->sanitizeValue($startDates[0] ?? ''),
@@ -113,6 +114,7 @@ final class OccurrenceService
             'end_time' => [],
             'sort_order' => [],
             'capacity' => [],
+            'id' => [],
         ];
 
         for ($index = 0; $index < $count; $index++) {
@@ -131,6 +133,7 @@ final class OccurrenceService
             $expanded['end_time'][] = $occurrenceEnd?->format('H:i') ?? '';
             $expanded['sort_order'][] = $index;
             $expanded['capacity'][] = absint($capacities[0] ?? 0);
+            $expanded['id'][] = absint($ids[$index] ?? 0);
         }
 
         return $expanded;
@@ -181,6 +184,7 @@ final class OccurrenceService
      * @return array{
      *     occurrences:array<int, array{
      *         start_datetime:string,
+     *         id:int,
      *         end_datetime:string|null,
      *         capacity:int|null,
      *         all_day:int,
@@ -199,13 +203,15 @@ final class OccurrenceService
         $endTimes   = $this->getArrayValue($data, 'end_time');
         $sortOrders = $this->getArrayValue($data, 'sort_order');
         $capacities = $this->getArrayValue($data, 'capacity');
+        $ids = $this->getArrayValue($data, 'id');
         $rowCount   = max(
             count($startDates),
             count($startTimes),
             count($endDates),
             count($endTimes),
             count($sortOrders),
-            count($capacities)
+            count($capacities),
+            count($ids)
         );
 
         if ($rowCount > self::MAX_OCCURRENCES_PER_EVENT) {
@@ -291,8 +297,10 @@ final class OccurrenceService
                 ? absint($sortOrders[$index])
                 : $index;
             $capacity = absint($capacities[$index] ?? 0);
+            $id = absint($ids[$index] ?? 0);
 
             $occurrences[] = [
+                'id'             => $id,
                 'start_datetime' => $startDateTime->format('Y-m-d H:i:s'),
                 'end_datetime'   => $endDateTime?->format('Y-m-d H:i:s'),
                 'capacity'       => $capacity > 0 ? $capacity : null,

@@ -184,6 +184,7 @@ final class OccurrenceRepository
      * The occurrence data must already be validated and normalized.
      *
      * @param array<int, array{
+     *     id: int,
      *     start_datetime: string,
      *     end_datetime: string|null,
      *     capacity: int|null,
@@ -220,55 +221,91 @@ final class OccurrenceRepository
         }
 
         try {
-            $deleted = $database->delete(
-                $this->table,
-                ['event_id' => $eventId],
-                ['%d']
-            );
-
-            if ($deleted === false) {
-                throw new RuntimeException(
-                    $this->getDatabaseError(
-                        'Could not delete existing event occurrences.'
+            $existingIds = array_map(
+                'intval',
+                $database->get_col(
+                    $database->prepare(
+                        "SELECT id FROM {$this->table} WHERE event_id = %d FOR UPDATE",
+                        $eventId
                     )
-                );
-            }
+                )
+            );
+            $keptIds = [];
 
             foreach ($occurrences as $occurrence) {
-                $inserted = $database->insert(
-                    $this->table,
-                    [
-                        'event_id'       => $eventId,
-                        'start_datetime' => $occurrence['start_datetime'],
-                        'end_datetime'   => $occurrence['end_datetime'],
-                        'capacity'       => $occurrence['capacity'],
-                        'all_day'        => $occurrence['all_day'],
-                        'timezone'       => $occurrence['timezone'],
-                        'sort_order'     => $occurrence['sort_order'],
-                        'status'         => $occurrence['status'],
-                        'created_at'     => $timestamp,
-                        'updated_at'     => $timestamp,
-                    ],
-                    [
-                        '%d',
-                        '%s',
-                        '%s',
-                        '%d',
-                        '%d',
-                        '%s',
-                        '%d',
-                        '%s',
-                        '%s',
-                        '%s',
-                    ]
-                );
+                $occurrenceId = (int) ($occurrence['id'] ?? 0);
+                $record = [
+                    'start_datetime' => $occurrence['start_datetime'],
+                    'end_datetime'   => $occurrence['end_datetime'],
+                    'capacity'       => $occurrence['capacity'],
+                    'all_day'        => $occurrence['all_day'],
+                    'timezone'       => $occurrence['timezone'],
+                    'sort_order'     => $occurrence['sort_order'],
+                    'status'         => $occurrence['status'],
+                    'updated_at'     => $timestamp,
+                ];
+                $formats = ['%s', '%s', '%d', '%d', '%s', '%d', '%s', '%s'];
 
-                if ($inserted === false) {
+                if ($occurrenceId > 0) {
+                    if (! in_array($occurrenceId, $existingIds, true) || in_array($occurrenceId, $keptIds, true)) {
+                        throw new InvalidArgumentException('Invalid occurrence ID submitted for this event.');
+                    }
+
+                    $saved = $database->update(
+                        $this->table,
+                        $record,
+                        ['id' => $occurrenceId, 'event_id' => $eventId],
+                        $formats,
+                        ['%d', '%d']
+                    );
+                    $keptIds[] = $occurrenceId;
+                } else {
+                    $saved = $database->insert(
+                        $this->table,
+                        ['event_id' => $eventId, ...$record, 'created_at' => $timestamp],
+                        ['%d', ...$formats, '%s']
+                    );
+
+                    if ($saved !== false) {
+                        $keptIds[] = (int) $database->insert_id;
+                    }
+                }
+
+                if ($saved === false) {
                     throw new RuntimeException(
                         $this->getDatabaseError(
-                            'Could not insert event occurrence.'
+                            'Could not save event occurrence.'
                         )
                     );
+                }
+            }
+
+            $removedIds = array_values(array_diff($existingIds, $keptIds));
+
+            if ($removedIds !== []) {
+                $placeholders = implode(', ', array_fill(0, count($removedIds), '%d'));
+                $reservationsTable = $database->prefix . 'dizzy_event_reservations';
+                $reservationCount = (int) $database->get_var(
+                    $database->prepare(
+                        "SELECT COUNT(*) FROM {$reservationsTable} WHERE occurrence_id IN ({$placeholders})",
+                        ...$removedIds
+                    )
+                );
+
+                if ($reservationCount > 0) {
+                    throw new RuntimeException('An occurrence with reservations cannot be removed.');
+                }
+
+                $deleted = $database->query(
+                    $database->prepare(
+                        "DELETE FROM {$this->table} WHERE event_id = %d AND id IN ({$placeholders})",
+                        $eventId,
+                        ...$removedIds
+                    )
+                );
+
+                if ($deleted === false) {
+                    throw new RuntimeException($this->getDatabaseError('Could not delete removed event occurrences.'));
                 }
             }
 

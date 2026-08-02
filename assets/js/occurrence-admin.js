@@ -180,6 +180,11 @@
                     this.createSortHandle(),
                     $('<input>', {
                         type: 'hidden',
+                        name: 'dizzy_occurrences[id][]',
+                        value: ''
+                    }),
+                    $('<input>', {
+                        type: 'hidden',
                         name: 'dizzy_occurrences[sort_order][]',
                         value: '0'
                     }),
