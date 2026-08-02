@@ -31,13 +31,8 @@ final class SocialServiceProvider
             }
         );
 
-        add_action(
-            'plugins_loaded',
-            static function () use ($container): void {
-                (new PosterCreatedListener(
-                    $container->get(SocialService::class)
-                ))->register();
-            }
-        );
+        (new PosterCreatedListener(
+            $container->get(SocialService::class)
+        ))->register();
     }
 }
