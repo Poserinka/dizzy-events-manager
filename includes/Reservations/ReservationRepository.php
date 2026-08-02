@@ -15,10 +15,13 @@ final class ReservationRepository
 
     private string $table;
 
+    private string $occurrencesTable;
+
     public function __construct(wpdb $wpdb)
     {
         $this->wpdb = $wpdb;
         $this->table = $wpdb->prefix . 'dizzy_event_reservations';
+        $this->occurrencesTable = $wpdb->prefix . 'dizzy_event_occurrences';
     }
 
     public function all(): array
@@ -45,6 +48,61 @@ final class ReservationRepository
     }
 
     public function save(array $data): int
+    {
+        $occurrenceId = (int) ($data['occurrence_id'] ?? 0);
+
+        if ($occurrenceId <= 0) {
+            return $this->insert($data);
+        }
+
+        if ($this->wpdb->query('START TRANSACTION') === false) {
+            throw new RuntimeException('Could not start reservation transaction.');
+        }
+
+        try {
+            $occurrence = $this->wpdb->get_row(
+                $this->wpdb->prepare(
+                    "SELECT event_id, capacity FROM {$this->occurrencesTable} WHERE id = %d FOR UPDATE",
+                    $occurrenceId
+                ),
+                ARRAY_A
+            );
+
+            if (! is_array($occurrence) || (int) $occurrence['event_id'] !== (int) ($data['event_id'] ?? 0)) {
+                throw new RuntimeException('The selected event date is not available.');
+            }
+
+            $capacity = (int) ($occurrence['capacity'] ?? 0);
+
+            if ($capacity > 0) {
+                $reserved = (int) $this->wpdb->get_var(
+                    $this->wpdb->prepare(
+                        "SELECT COALESCE(SUM(guests), 0) FROM {$this->table} WHERE occurrence_id = %d AND status IN (%s, %s)",
+                        $occurrenceId,
+                        'pending',
+                        'confirmed'
+                    )
+                );
+
+                if ($reserved + (int) ($data['guests'] ?? 1) > $capacity) {
+                    $data['status'] = 'waitlisted';
+                }
+            }
+
+            $reservationId = $this->insert($data);
+
+            if ($this->wpdb->query('COMMIT') === false) {
+                throw new RuntimeException('Could not commit reservation transaction.');
+            }
+
+            return $reservationId;
+        } catch (\Throwable $exception) {
+            $this->wpdb->query('ROLLBACK');
+            throw $exception;
+        }
+    }
+
+    private function insert(array $data): int
     {
         $now = current_time('mysql', true);
 
@@ -84,3 +142,4 @@ final class ReservationRepository
         return false !== $this->wpdb->delete($this->table, ['id' => $reservationId]);
     }
 }
+

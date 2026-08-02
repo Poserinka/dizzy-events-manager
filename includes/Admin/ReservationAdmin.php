@@ -61,7 +61,11 @@ final class ReservationAdmin
             echo '<input type="hidden" name="action" value="dizzy_update_reservation_status">';
             echo '<input type="hidden" name="reservation_id" value="' . esc_attr((string) $id) . '">';
             wp_nonce_field('dizzy_update_reservation_status_' . $id);
-            echo '<select name="status"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="cancelled">Cancelled</option></select>';
+            echo '<select name="status">';
+            foreach (['pending' => 'Pending', 'waitlisted' => 'Waitlisted', 'confirmed' => 'Confirmed', 'cancelled' => 'Cancelled'] as $value => $label) {
+                echo '<option value="' . esc_attr($value) . '" ' . selected($status, $value, false) . '>' . esc_html($label) . '</option>';
+            }
+            echo '</select>';
             echo '<button class="button">Update</button>';
             echo '</form>';
             echo '</td>';
@@ -85,7 +89,7 @@ final class ReservationAdmin
             ? sanitize_key(wp_unslash($_POST['status']))
             : 'pending';
 
-        if (in_array($status, ['pending', 'confirmed', 'cancelled'], true)) {
+        if (in_array($status, ['pending', 'waitlisted', 'confirmed', 'cancelled'], true)) {
             $this->repository->update($id, ['status' => $status]);
         }
 
@@ -109,3 +113,4 @@ final class ReservationAdmin
         exit;
     }
 }
+

@@ -20,6 +20,7 @@ final class Schema
         event_id bigint(20) unsigned NOT NULL,
         start_datetime datetime NOT NULL,
         end_datetime datetime NULL,
+        capacity int(11) unsigned NULL,
         all_day tinyint(1) NOT NULL DEFAULT 0,
         timezone varchar(64) NOT NULL DEFAULT 'Europe/Amsterdam',
         sort_order int(11) NOT NULL DEFAULT 0,
@@ -79,3 +80,4 @@ final class Schema
         ";
     }
 }
+

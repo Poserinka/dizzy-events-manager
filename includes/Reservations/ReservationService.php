@@ -63,12 +63,17 @@ final class ReservationService
         $data['status'] ??= ReservationStatus::Pending->value;
 
         $reservationId = $this->repository->save($data);
+        $reservation = $this->repository->find($reservationId);
+        $status = (string) ($reservation['status'] ?? ReservationStatus::Pending->value);
 
         if (! empty($data['email']) && is_string($data['email'])) {
+            $waitlisted = $status === ReservationStatus::Waitlisted->value;
             $this->mailer->send(
                 $data['email'],
-                'Reservation received',
-                'Your reservation request has been received.'
+                $waitlisted ? 'Added to the waiting list' : 'Reservation received',
+                $waitlisted
+                    ? 'The event is currently full. Your request has been added to the waiting list.'
+                    : 'Your reservation request has been received and is awaiting approval.'
             );
         }
 
@@ -104,3 +109,4 @@ final class ReservationService
         );
     }
 }
+

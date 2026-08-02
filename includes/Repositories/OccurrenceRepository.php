@@ -186,6 +186,7 @@ final class OccurrenceRepository
      * @param array<int, array{
      *     start_datetime: string,
      *     end_datetime: string|null,
+     *     capacity: int|null,
      *     all_day: int,
      *     timezone: string,
      *     sort_order: int,
@@ -240,6 +241,7 @@ final class OccurrenceRepository
                         'event_id'       => $eventId,
                         'start_datetime' => $occurrence['start_datetime'],
                         'end_datetime'   => $occurrence['end_datetime'],
+                        'capacity'       => $occurrence['capacity'],
                         'all_day'        => $occurrence['all_day'],
                         'timezone'       => $occurrence['timezone'],
                         'sort_order'     => $occurrence['sort_order'],
@@ -251,6 +253,7 @@ final class OccurrenceRepository
                         '%d',
                         '%s',
                         '%s',
+                        '%d',
                         '%d',
                         '%s',
                         '%d',
@@ -444,3 +447,4 @@ final class OccurrenceRepository
         return $error === '' ? $fallback : $fallback . ' ' . $error;
     }
 }
+
