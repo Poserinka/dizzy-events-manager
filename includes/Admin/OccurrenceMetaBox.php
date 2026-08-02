@@ -66,7 +66,6 @@ final class OccurrenceMetaBox
                         <th><?php esc_html_e('Start Time', 'dizzy-events-manager'); ?></th>
                         <th><?php esc_html_e('End Date', 'dizzy-events-manager'); ?></th>
                         <th><?php esc_html_e('End Time', 'dizzy-events-manager'); ?></th>
-                        <th><?php esc_html_e('Capacity', 'dizzy-events-manager'); ?></th>
                         <th>
                             <span class="screen-reader-text">
                                 <?php esc_html_e('Actions', 'dizzy-events-manager'); ?>
@@ -138,9 +137,6 @@ final class OccurrenceMetaBox
                 ?>
             </td>
             <td>
-                <input type="number" min="1" name="dizzy_occurrences[capacity][]" value="<?php echo esc_attr($occurrence->capacity !== null ? (string) $occurrence->capacity : ''); ?>" style="width: 80px;" placeholder="<?php esc_attr_e('Unlimited', 'dizzy-events-manager'); ?>">
-            </td>
-            <td>
                 <input type="hidden" name="dizzy_occurrences[id][]" value="<?php echo esc_attr((string) $occurrence->id); ?>">
                 <input
                     type="hidden"
@@ -190,9 +186,6 @@ final class OccurrenceMetaBox
                     ''
                 );
                 ?>
-            </td>
-            <td>
-                <input type="number" min="1" name="dizzy_occurrences[capacity][]" style="width: 80px;" placeholder="<?php esc_attr_e('Unlimited', 'dizzy-events-manager'); ?>">
             </td>
             <td>
                 <input

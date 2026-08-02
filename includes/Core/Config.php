@@ -71,7 +71,6 @@ final class Config
     public const META_EXTERNAL_URL = '_dizzy_external_url';
     public const META_FEATURED     = '_dizzy_featured';
     public const META_TIMEZONE     = '_dizzy_timezone';
-    public const META_CAPACITY     = '_dizzy_capacity';
     public const META_AGE_LIMIT    = '_dizzy_age_limit';
     public const META_STATUS       = '_dizzy_status';
 

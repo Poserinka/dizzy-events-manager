@@ -16,7 +16,7 @@ final class Migrations
     /**
      * Current database version.
      */
-    private const VERSION = '1.0.7';
+    private const VERSION = '2.0.0';
 
     /**
      * Option key.
@@ -38,7 +38,6 @@ final class Migrations
         }
 
         self::createOccurrencesTable();
-        self::createReservationsTable();
         self::createPostersTable();
 
         update_option(
@@ -54,16 +53,6 @@ final class Migrations
         self::createTable(
             $wpdb->prefix . 'dizzy_event_occurrences',
             Schema::occurrences()
-        );
-    }
-
-    private static function createReservationsTable(): void
-    {
-        global $wpdb;
-
-        self::createTable(
-            $wpdb->prefix . 'dizzy_event_reservations',
-            Schema::reservations()
         );
     }
 
@@ -95,4 +84,3 @@ final class Migrations
         dbDelta($sql);
     }
 }
-

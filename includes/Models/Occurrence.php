@@ -27,7 +27,6 @@ readonly class Occurrence
         public int $eventId,
         public DateTimeImmutable $startDateTime,
         public ?DateTimeImmutable $endDateTime,
-        public ?int $capacity = null,
     ) {
         if (
             $this->endDateTime !== null
@@ -66,10 +65,7 @@ readonly class Occurrence
             id: isset($row->id) ? (int) $row->id : 0,
             eventId: isset($row->event_id) ? (int) $row->event_id : 0,
             startDateTime: $start,
-            endDateTime: $end,
-            capacity: isset($row->capacity) && (int) $row->capacity > 0
-                ? (int) $row->capacity
-                : null
+            endDateTime: $end
         );
     }
 
@@ -137,4 +133,3 @@ readonly class Occurrence
         return wp_timezone();
     }
 }
-

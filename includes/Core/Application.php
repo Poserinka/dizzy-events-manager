@@ -8,9 +8,7 @@ use Dizzy\Events\Admin\AdminServiceProvider;
 use Dizzy\Events\Frontend\FrontendServiceProvider;
 use Dizzy\Events\Poster\Providers\PosterServiceProvider;
 use Dizzy\Events\Providers\EventServiceProvider;
-use Dizzy\Events\Providers\MailServiceProvider;
 use Dizzy\Events\Providers\PostTypeServiceProvider;
-use Dizzy\Events\Providers\ReservationServiceProvider;
 
 defined('ABSPATH') || exit;
 
@@ -44,9 +42,7 @@ final class Application
     {
         $providers = [
             EventServiceProvider::class,
-            ReservationServiceProvider::class,
             PosterServiceProvider::class,
-            MailServiceProvider::class,
             AdminServiceProvider::class,
             PostTypeServiceProvider::class,
             FrontendServiceProvider::class,

@@ -64,7 +64,7 @@ final class EventStatusMetaBox
             <?php endforeach; ?>
         </select>
         <p class="description">
-            <?php esc_html_e('Cancelled and archived events remain available in admin but are hidden from public event and reservation flows.', 'dizzy-events-manager'); ?>
+            <?php esc_html_e('Cancelled and archived events remain available in admin but are hidden from public event listings.', 'dizzy-events-manager'); ?>
         </p>
         <?php
     }
@@ -114,4 +114,3 @@ final class EventStatusMetaBox
         return $data;
     }
 }
-

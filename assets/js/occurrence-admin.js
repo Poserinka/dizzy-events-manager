@@ -166,14 +166,6 @@
                         'dizzy_occurrences[end_time][]'
                     )
                 ),
-                $('<td>').append(
-                    $('<input>', {
-                        type: 'number',
-                        min: '1',
-                        name: 'dizzy_occurrences[capacity][]',
-                        placeholder: 'Unlimited'
-                    })
-                ),
                 $('<td>', {
                     class: 'dizzy-occurrence-actions'
                 }).append(
@@ -270,4 +262,3 @@
         DizzyOccurrences.init();
     });
 })(jQuery);
-

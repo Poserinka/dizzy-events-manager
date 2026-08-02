@@ -187,7 +187,6 @@ final class OccurrenceRepository
      *     id: int,
      *     start_datetime: string,
      *     end_datetime: string|null,
-     *     capacity: int|null,
      *     all_day: int,
      *     timezone: string,
      *     sort_order: int,
@@ -237,14 +236,13 @@ final class OccurrenceRepository
                 $record = [
                     'start_datetime' => $occurrence['start_datetime'],
                     'end_datetime'   => $occurrence['end_datetime'],
-                    'capacity'       => $occurrence['capacity'],
                     'all_day'        => $occurrence['all_day'],
                     'timezone'       => $occurrence['timezone'],
                     'sort_order'     => $occurrence['sort_order'],
                     'status'         => $occurrence['status'],
                     'updated_at'     => $timestamp,
                 ];
-                $formats = ['%s', '%s', '%d', '%d', '%s', '%d', '%s', '%s'];
+                $formats = ['%s', '%s', '%d', '%s', '%d', '%s', '%s'];
 
                 if ($occurrenceId > 0) {
                     if (! in_array($occurrenceId, $existingIds, true) || in_array($occurrenceId, $keptIds, true)) {
@@ -284,18 +282,6 @@ final class OccurrenceRepository
 
             if ($removedIds !== []) {
                 $placeholders = implode(', ', array_fill(0, count($removedIds), '%d'));
-                $reservationsTable = $database->prefix . 'dizzy_event_reservations';
-                $reservationCount = (int) $database->get_var(
-                    $database->prepare(
-                        "SELECT COUNT(*) FROM {$reservationsTable} WHERE occurrence_id IN ({$placeholders})",
-                        ...$removedIds
-                    )
-                );
-
-                if ($reservationCount > 0) {
-                    throw new RuntimeException('An occurrence with reservations cannot be removed.');
-                }
-
                 $deleted = $database->query(
                     $database->prepare(
                         "DELETE FROM {$this->table} WHERE event_id = %d AND id IN ({$placeholders})",
@@ -484,4 +470,3 @@ final class OccurrenceRepository
         return $error === '' ? $fallback : $fallback . ' ' . $error;
     }
 }
-

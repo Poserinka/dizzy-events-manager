@@ -73,7 +73,6 @@ final class OccurrenceService
      *         start_datetime:string,
      *         id:int,
      *         end_datetime:string|null,
-     *         capacity:int|null,
      *         all_day:int,
      *         timezone:string,
      *         sort_order:int,
@@ -89,7 +88,6 @@ final class OccurrenceService
         $endDates   = $this->getArrayValue($data, 'end_date');
         $endTimes   = $this->getArrayValue($data, 'end_time');
         $sortOrders = $this->getArrayValue($data, 'sort_order');
-        $capacities = $this->getArrayValue($data, 'capacity');
         $ids = $this->getArrayValue($data, 'id');
         $rowCount   = max(
             count($startDates),
@@ -183,14 +181,12 @@ final class OccurrenceService
             $sortOrder = isset($sortOrders[$index])
                 ? absint($sortOrders[$index])
                 : $index;
-            $capacity = absint($capacities[$index] ?? 0);
             $id = absint($ids[$index] ?? 0);
 
             $occurrences[] = [
                 'id'             => $id,
                 'start_datetime' => $startDateTime->format('Y-m-d H:i:s'),
                 'end_datetime'   => $endDateTime?->format('Y-m-d H:i:s'),
-                'capacity'       => $capacity > 0 ? $capacity : null,
                 'all_day'        => 0,
                 'timezone'       => $timezoneName,
                 'sort_order'     => $sortOrder,
