@@ -105,7 +105,6 @@ final class OccurrenceService
         $duration = $end !== null && $end >= $start
             ? $end->getTimestamp() - $start->getTimestamp()
             : null;
-        $unit = ['daily' => 'day', 'weekly' => 'week', 'monthly' => 'month'][$frequency];
         $expanded = [
             'start_date' => [],
             'start_time' => [],
@@ -115,9 +114,11 @@ final class OccurrenceService
         ];
 
         for ($index = 0; $index < $count; $index++) {
-            $occurrenceStart = $index === 0
-                ? $start
-                : $start->modify(sprintf('+%d %s', $interval * $index, $unit));
+            $occurrenceStart = $this->recurringStart(
+                $start,
+                $frequency,
+                $interval * $index
+            );
             $occurrenceEnd = $duration !== null
                 ? $occurrenceStart->setTimestamp($occurrenceStart->getTimestamp() + $duration)
                 : null;
@@ -130,6 +131,43 @@ final class OccurrenceService
         }
 
         return $expanded;
+    }
+
+    /**
+     * Calculate one recurrence while clamping month-end dates safely.
+     */
+    private function recurringStart(
+        DateTimeImmutable $start,
+        string $frequency,
+        int $steps
+    ): DateTimeImmutable {
+        if ($steps === 0) {
+            return $start;
+        }
+
+        if ($frequency !== 'monthly') {
+            $unit = $frequency === 'daily' ? 'day' : 'week';
+
+            return $start->modify(sprintf('+%d %s', $steps, $unit));
+        }
+
+        $targetMonth = $start
+            ->modify('first day of this month')
+            ->modify(sprintf('+%d months', $steps));
+        $day = min(
+            (int) $start->format('j'),
+            (int) $targetMonth->format('t')
+        );
+
+        return $targetMonth->setDate(
+            (int) $targetMonth->format('Y'),
+            (int) $targetMonth->format('n'),
+            $day
+        )->setTime(
+            (int) $start->format('H'),
+            (int) $start->format('i'),
+            (int) $start->format('s')
+        );
     }
 
     /**

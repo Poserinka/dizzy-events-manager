@@ -34,7 +34,7 @@ final class EventStatusMetaBox
     public function register(): void
     {
         add_action('add_meta_boxes_' . Config::POST_TYPE_EVENT, [$this, 'addMetaBox']);
-        add_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'save'], 20, 2);
+        add_filter('wp_insert_post_data', [$this, 'filterStatus'], 20, 2);
     }
 
     public function addMetaBox(): void
@@ -69,37 +69,49 @@ final class EventStatusMetaBox
         <?php
     }
 
-    public function save(int $postId, WP_Post $post): void
+    /**
+     * Apply the selected status during the original post save operation.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $postarr
+     *
+     * @return array<string, mixed>
+     */
+    public function filterStatus(array $data, array $postarr): array
     {
+        if (($data['post_type'] ?? '') !== Config::POST_TYPE_EVENT) {
+            return $data;
+        }
+
         $nonce = isset($_POST[self::NONCE_NAME])
             ? sanitize_text_field(wp_unslash((string) $_POST[self::NONCE_NAME]))
             : '';
+
+        $postId = absint($postarr['ID'] ?? 0);
+        $canEdit = $postId > 0
+            ? current_user_can('edit_post', $postId)
+            : current_user_can('edit_posts');
 
         if (
             $nonce === ''
             || ! wp_verify_nonce($nonce, self::NONCE_ACTION)
             || (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-            || wp_is_post_revision($postId)
-            || ! current_user_can('edit_post', $postId)
+            || ! $canEdit
         ) {
-            return;
+            return $data;
         }
 
         $status = isset($_POST['dizzy_event_status'])
             ? sanitize_key(wp_unslash((string) $_POST['dizzy_event_status']))
             : '';
 
-        if (! isset($this->statuses[$status]) || $status === $post->post_status) {
-            return;
+        if (! isset($this->statuses[$status])) {
+            return $data;
         }
 
-        remove_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'save'], 20);
-        $result = wp_update_post(['ID' => $postId, 'post_status' => $status], true);
-        add_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'save'], 20, 2);
+        $data['post_status'] = $status;
 
-        if (is_wp_error($result)) {
-            error_log(sprintf('Dizzy Events: status update failed for event %d: %s', $postId, $result->get_error_message()));
-        }
+        return $data;
     }
 }
 
