@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Poster\Services\PosterService;
+use Dizzy\Events\Poster\Repositories\PosterRepository;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -13,6 +14,7 @@ final class PosterAdmin
 {
     public function __construct(
         private readonly PosterService $service,
+        private readonly PosterRepository $repository,
     ) {
     }
 
@@ -34,6 +36,8 @@ final class PosterAdmin
 
     public function render(WP_Post $post): void
     {
+        $poster = $this->repository->findByEvent($post->ID);
+
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
 
         wp_nonce_field(
@@ -45,6 +49,10 @@ final class PosterAdmin
         echo '<input type="hidden" name="post_id" value="' . esc_attr((string) $post->ID) . '">';
 
         echo '<p>' . esc_html__('Generate an AI poster for this event.', 'dizzy-events-manager') . '</p>';
+
+        if ($poster && $poster->imageUrl !== '') {
+            echo '<img src="' . esc_url($poster->imageUrl) . '" style="width:100%;height:auto;" alt="">';
+        }
 
         submit_button(
             esc_html__('Generate Poster', 'dizzy-events-manager'),
