@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Reservations;
 
 use Dizzy\Events\Enums\ReservationStatus;
-use Dizzy\Events\Mail\Mailer;
+use Dizzy\Events\Mail\Services\MailService;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -14,7 +14,7 @@ final class ReservationService
 {
     public function __construct(
         private readonly ReservationRepository $repository,
-        private readonly Mailer $mailer
+        private readonly MailService $mailer
     ) {
     }
 
