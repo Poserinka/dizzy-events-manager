@@ -205,5 +205,61 @@ final class ReservationRepository
     {
         return false !== $this->wpdb->delete($this->table, ['id' => $reservationId]);
     }
+
+    public function checkIn(int $reservationId, int $userId): string
+    {
+        $reservation = $this->find($reservationId);
+
+        if ($reservation === null || (string) ($reservation['status'] ?? '') !== 'confirmed') {
+            return 'invalid';
+        }
+
+        if (! empty($reservation['checked_in_at'])) {
+            return 'already_checked_in';
+        }
+
+        $updated = $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$this->table} SET checked_in_at = %s, checked_in_by = %d, updated_at = %s WHERE id = %d AND status = %s AND checked_in_at IS NULL",
+                current_time('mysql', true),
+                $userId,
+                current_time('mysql', true),
+                $reservationId,
+                'confirmed'
+            )
+        );
+
+        return $updated === 1 ? 'checked_in' : 'already_checked_in';
+    }
+
+    public function undoCheckIn(int $reservationId): bool
+    {
+        return false !== $this->wpdb->update(
+            $this->table,
+            ['checked_in_at' => null, 'checked_in_by' => null, 'updated_at' => current_time('mysql', true)],
+            ['id' => $reservationId]
+        );
+    }
+
+    /** @return array<string, int> */
+    public function attendanceTotals(): array
+    {
+        $row = $this->wpdb->get_row(
+            "SELECT
+                COUNT(CASE WHEN status = 'confirmed' THEN 1 END) AS confirmed_reservations,
+                COALESCE(SUM(CASE WHEN status = 'confirmed' THEN guests ELSE 0 END), 0) AS confirmed_guests,
+                COUNT(CASE WHEN checked_in_at IS NOT NULL THEN 1 END) AS checked_in_reservations,
+                COALESCE(SUM(CASE WHEN checked_in_at IS NOT NULL THEN guests ELSE 0 END), 0) AS checked_in_guests
+            FROM {$this->table}",
+            ARRAY_A
+        );
+
+        return [
+            'confirmed_reservations' => (int) ($row['confirmed_reservations'] ?? 0),
+            'confirmed_guests' => (int) ($row['confirmed_guests'] ?? 0),
+            'checked_in_reservations' => (int) ($row['checked_in_reservations'] ?? 0),
+            'checked_in_guests' => (int) ($row['checked_in_guests'] ?? 0),
+        ];
+    }
 }
 

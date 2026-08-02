@@ -50,6 +50,8 @@ final class Schema
         phone varchar(64) NULL,
         guests int(11) NOT NULL DEFAULT 1,
         status varchar(32) NOT NULL DEFAULT 'pending',
+        checked_in_at datetime NULL,
+        checked_in_by bigint(20) unsigned NULL,
         notes text NULL,
         created_at datetime NOT NULL,
         updated_at datetime NOT NULL,
@@ -57,6 +59,7 @@ final class Schema
         KEY event_id (event_id),
         KEY occurrence_id (occurrence_id),
         KEY status (status),
+        KEY checked_in_at (checked_in_at),
         KEY email (email)
         ";
     }

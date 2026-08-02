@@ -31,6 +31,9 @@ final class AdminServiceProvider
                 $container->get(ReservationService::class)
             );
         });
+        $container->singleton(CheckinAdmin::class, static function () use ($container): CheckinAdmin {
+            return new CheckinAdmin($container->get(ReservationRepository::class));
+        });
         $container->singleton(PosterAdmin::class, static function () use ($container): PosterAdmin {
             return new PosterAdmin(
                 $container->get(PosterService::class),
@@ -45,6 +48,7 @@ final class AdminServiceProvider
         $container->get(EventStatusMetaBox::class)->register();
         $container->get(AdminAssets::class)->register();
         $container->get(ReservationAdmin::class)->register();
+        $container->get(CheckinAdmin::class)->register();
         $container->get(PosterAdmin::class)->register();
         $container->get(PosterSettings::class)->register();
         $container->get(VenueTaxonomyFields::class)->register();

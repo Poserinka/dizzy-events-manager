@@ -16,7 +16,7 @@ final class Migrations
     /**
      * Current database version.
      */
-    private const VERSION = '1.0.6';
+    private const VERSION = '1.0.7';
 
     /**
      * Option key.

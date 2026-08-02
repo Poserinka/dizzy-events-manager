@@ -66,6 +66,20 @@ final class TicketService
         $eventId = (int) ($reservation['event_id'] ?? 0);
         $occurrenceId = (int) ($reservation['occurrence_id'] ?? 0);
         $date = '';
+        $checkInResult = '';
+
+        $checkInNonce = isset($_GET['checkin_nonce'])
+            ? sanitize_text_field(wp_unslash((string) $_GET['checkin_nonce']))
+            : '';
+
+        if (
+            is_user_logged_in()
+            && current_user_can('manage_options')
+            && wp_verify_nonce($checkInNonce, 'dizzy_qr_checkin')
+        ) {
+            $checkInResult = $this->reservations->checkIn($id, get_current_user_id());
+            $reservation = $this->reservations->find($id) ?? $reservation;
+        }
 
         foreach ($this->occurrences->findByEventId($eventId) as $occurrence) {
             if ($occurrence->id === $occurrenceId) {
@@ -91,6 +105,14 @@ final class TicketService
             <p><?php echo esc_html((string) ($reservation['name'] ?? '')); ?></p>
             <p><?php echo esc_html(sprintf(__('Guests: %d', 'dizzy-events-manager'), (int) ($reservation['guests'] ?? 1))); ?></p>
             <p style="color: #167c3a;"><strong><?php esc_html_e('Confirmed', 'dizzy-events-manager'); ?></strong></p>
+            <?php if ($checkInResult === 'checked_in') : ?>
+                <p style="padding: 16px; background: #dff3e5; color: #116b32;"><strong><?php esc_html_e('Check-in completed.', 'dizzy-events-manager'); ?></strong></p>
+            <?php elseif ($checkInResult === 'already_checked_in') : ?>
+                <p style="padding: 16px; background: #fff3cd; color: #7a5d00;"><strong><?php esc_html_e('This ticket was already checked in.', 'dizzy-events-manager'); ?></strong></p>
+            <?php endif; ?>
+            <?php if (! empty($reservation['checked_in_at'])) : ?>
+                <p><?php echo esc_html(sprintf(__('Checked in: %s UTC', 'dizzy-events-manager'), (string) $reservation['checked_in_at'])); ?></p>
+            <?php endif; ?>
         </body>
         </html>
         <?php
