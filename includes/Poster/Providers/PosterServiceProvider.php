@@ -45,7 +45,7 @@ final class PosterServiceProvider
 
         $container->singleton(
             PosterService::class,
-            static function (Container $container): PosterService {
+            static function () use ($container): PosterService {
                 return new PosterService(
                     $container->get(PosterRepository::class),
                     $container->get(PosterGenerator::class),
