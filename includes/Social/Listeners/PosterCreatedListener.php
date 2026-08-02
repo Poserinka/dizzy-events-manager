@@ -27,9 +27,11 @@ final class PosterCreatedListener
     public function handle(Poster $poster): void
     {
         $this->service->create([
-            'title' => 'Generated Event Poster',
+            'event_id' => $poster->eventId,
+            'platform' => 'draft',
             'content' => $poster->prompt,
             'image_url' => $poster->imageUrl,
+            'status' => 'draft',
         ]);
     }
 }
