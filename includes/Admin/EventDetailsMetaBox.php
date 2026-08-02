@@ -74,7 +74,6 @@ final class EventDetailsMetaBox
 
         $fields = [
             'artist'       => '',
-            'genre'        => '',
             'venue'        => self::DEFAULT_VENUE,
             'address'      => self::DEFAULT_ADDRESS,
             'maps_url'     => self::DEFAULT_MAPS_URL,
@@ -169,7 +168,6 @@ final class EventDetailsMetaBox
 
         $fields = [
             'artist',
-            'genre',
             'venue',
             'address',
             'maps_url',

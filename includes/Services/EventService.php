@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Services;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Enums\EventStatus;
 use Dizzy\Events\Models\Event;
 use Dizzy\Events\Models\EventDetails;
@@ -63,7 +64,19 @@ final class EventService
      */
     public function getEventDetails(int $eventId): EventDetails
     {
-        return EventDetails::fromMeta(get_post_meta($eventId));
+        $genreNames = wp_get_post_terms(
+            $eventId,
+            Config::TAX_GENRE,
+            ['fields' => 'names']
+        );
+        $genre = is_wp_error($genreNames)
+            ? null
+            : implode(', ', array_map('strval', $genreNames));
+
+        return EventDetails::fromMeta(
+            get_post_meta($eventId),
+            $genre !== '' ? $genre : null
+        );
     }
 
     /**

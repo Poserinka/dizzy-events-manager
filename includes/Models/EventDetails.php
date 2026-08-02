@@ -43,13 +43,13 @@ readonly class EventDetails
      *
      * @param array<string, mixed> $meta Event metadata.
      */
-    public static function fromMeta(array $meta): self
+    public static function fromMeta(array $meta, ?string $genre = null): self
     {
         return new self(
             artist: self::stringValue(
                 self::metaValue($meta, 'artist')
             ),
-            genre: self::stringValue(
+            genre: $genre ?? self::stringValue(
                 self::metaValue($meta, 'genre')
             ),
             venue: self::stringValue(
