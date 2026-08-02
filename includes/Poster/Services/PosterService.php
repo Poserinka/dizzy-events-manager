@@ -26,6 +26,13 @@ final class PosterService
             );
         }
 
+        if (! empty($data['image_url'])) {
+            $data['attachment_id'] = $this->importMedia(
+                (string) $data['image_url'],
+                (int) ($data['event_id'] ?? 0)
+            );
+        }
+
         $poster = $this->repository->create($data);
 
         do_action(
@@ -34,5 +41,23 @@ final class PosterService
         );
 
         return $poster;
+    }
+
+    private function importMedia(string $url, int $postId): int
+    {
+        if (! function_exists('media_sideload_image')) {
+            require_once ABSPATH . 'wp-admin/includes/media.php';
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            require_once ABSPATH . 'wp-admin/includes/image.php';
+        }
+
+        $attachmentId = media_sideload_image(
+            $url,
+            $postId,
+            null,
+            'id'
+        );
+
+        return is_wp_error($attachmentId) ? 0 : (int) $attachmentId;
     }
 }
