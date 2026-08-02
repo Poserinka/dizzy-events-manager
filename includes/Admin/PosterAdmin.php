@@ -44,6 +44,8 @@ final class PosterAdmin
         echo '<input type="hidden" name="action" value="dizzy_generate_poster">';
         echo '<input type="hidden" name="post_id" value="' . esc_attr((string) $post->ID) . '">';
 
+        echo '<p>' . esc_html__('Generate an AI poster for this event.', 'dizzy-events-manager') . '</p>';
+
         submit_button(
             esc_html__('Generate Poster', 'dizzy-events-manager'),
             'primary',
