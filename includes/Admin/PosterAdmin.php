@@ -97,15 +97,17 @@ final class PosterAdmin
             echo '<img src="' . esc_url($poster->imageUrl) . '" style="width:100%;height:auto;" alt="">';
             echo '<p><a class="button button-secondary" href="' . esc_url($poster->imageUrl) . '" download>' . esc_html__('Download latest poster', 'dizzy-events-manager') . '</a></p>';
 
-            $formatKey = $poster->attachmentId ? (string) get_post_meta($poster->attachmentId, '_dizzy_poster_format', true) : '';
-            $platform = str_starts_with($formatKey, 'instagram_') ? 'instagram' : (str_starts_with($formatKey, 'facebook_') ? 'facebook' : '');
+            $storedFormat = $poster->attachmentId ? (string) get_post_meta($poster->attachmentId, '_dizzy_poster_format', true) : '';
+            $formatKey = $this->socialFormatKey($storedFormat);
 
-            if ($platform !== '') {
-                $exportUrl = wp_nonce_url(
-                    admin_url('admin-post.php?action=dizzy_export_poster&post_id=' . $post->ID . '&platform=' . $platform),
-                    'dizzy_export_poster_' . $post->ID
-                );
-                echo '<p><a class="button button-primary" href="' . esc_url($exportUrl) . '">' . esc_html(sprintf(__('Export for %s', 'dizzy-events-manager'), ucfirst($platform))) . '</a></p>';
+            if (str_starts_with($formatKey, 'social_')) {
+                foreach (['instagram' => 'Instagram', 'facebook' => 'Facebook'] as $platform => $platformLabel) {
+                    $exportUrl = wp_nonce_url(
+                        admin_url('admin-post.php?action=dizzy_export_poster&post_id=' . $post->ID . '&platform=' . $platform),
+                        'dizzy_export_poster_' . $post->ID
+                    );
+                    echo '<p><a class="button button-primary" href="' . esc_url($exportUrl) . '">' . esc_html(sprintf(__('Export for %s', 'dizzy-events-manager'), $platformLabel)) . '</a></p>';
+                }
             }
         }
 
@@ -147,7 +149,7 @@ final class PosterAdmin
 
         try {
             $templateKey = PosterTemplates::sanitize(isset($_POST['template']) && is_string($_POST['template']) ? sanitize_key(wp_unslash($_POST['template'])) : 'classic');
-            $formatKey = PosterFormats::sanitize(isset($_POST['format']) && is_string($_POST['format']) ? sanitize_key(wp_unslash($_POST['format'])) : 'instagram_square');
+            $formatKey = PosterFormats::sanitize(isset($_POST['format']) && is_string($_POST['format']) ? sanitize_key(wp_unslash($_POST['format'])) : 'social_square');
             $direction = isset($_POST['direction']) && is_string($_POST['direction'])
                 ? sanitize_textarea_field(wp_unslash($_POST['direction']))
                 : '';
@@ -190,10 +192,11 @@ final class PosterAdmin
 
         $poster = $this->repository->findByEvent($postId);
         $attachmentId = $poster?->attachmentId ?? 0;
-        $formatKey = $attachmentId > 0 ? (string) get_post_meta($attachmentId, '_dizzy_poster_format', true) : '';
+        $storedFormat = $attachmentId > 0 ? (string) get_post_meta($attachmentId, '_dizzy_poster_format', true) : '';
+        $formatKey = $this->socialFormatKey($storedFormat);
         $path = $attachmentId > 0 ? get_attached_file($attachmentId) : '';
 
-        if (! str_starts_with($formatKey, $platform . '_') || ! is_string($path) || ! is_readable($path)) {
+        if (! str_starts_with($formatKey, 'social_') || ! is_string($path) || ! is_readable($path)) {
             wp_die(esc_html__('No matching social poster is available for export.', 'dizzy-events-manager'));
         }
 
@@ -236,6 +239,23 @@ final class PosterAdmin
             : '#JazzcafeDizzy #Rotterdam #LiveMusic';
 
         return trim($title . "\n\n" . $description . "\n\n" . $url . "\n\n" . $tags) . "\n";
+    }
+
+    private function socialFormatKey(string $key): string
+    {
+        $compatible = [
+            'social_square',
+            'social_portrait',
+            'social_story',
+            'instagram_square',
+            'instagram_portrait',
+            'instagram_story',
+            'facebook_square',
+            'facebook_portrait',
+            'facebook_story',
+        ];
+
+        return in_array($key, $compatible, true) ? PosterFormats::sanitize($key) : '';
     }
 
     private function sendDownload(string $path, string $name, string $mime, bool $deleteAfter = false): never
