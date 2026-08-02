@@ -7,6 +7,9 @@ namespace Dizzy\Events\Poster\Services;
 use Dizzy\Events\Poster\Contracts\PosterGenerator;
 use Dizzy\Events\Poster\Models\Poster;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
+use Dizzy\Events\Poster\Renderers\PosterRenderer;
+use Dizzy\Events\Poster\Support\PosterFormats;
+use Dizzy\Events\Poster\Support\PosterTemplates;
 use RuntimeException;
 use Throwable;
 
@@ -17,19 +20,22 @@ final class PosterService
     public function __construct(
         private readonly PosterRepository $repository,
         private readonly PosterGenerator $generator,
+        private readonly PosterRenderer $renderer,
     ) {
     }
 
     public function create(array $data): Poster
     {
+        $formatKey = PosterFormats::sanitize((string) ($data['format'] ?? 'social_square'));
+        $templateKey = PosterTemplates::sanitize((string) ($data['template'] ?? 'classic'));
+        $format = PosterFormats::get($formatKey);
+        $template = PosterTemplates::get($templateKey);
         $imageUrl = isset($data['image_url']) && is_string($data['image_url'])
             ? trim($data['image_url'])
             : '';
 
         if ($imageUrl === '') {
-            $data['image_url'] = $this->generator->generate(
-                (string) ($data['prompt'] ?? '')
-            );
+            $data['image_url'] = $this->generator->generate((string) ($data['prompt'] ?? ''), ['size' => $format['ai_size']]);
 
             $imageUrl = trim((string) $data['image_url']);
         }
@@ -46,6 +52,21 @@ final class PosterService
         if ($attachmentId === 0) {
             throw new RuntimeException('Generated poster could not be imported into the media library.');
         }
+
+        try {
+            $this->renderer->render($attachmentId, $format, $template, [
+                'title' => (string) ($data['title'] ?? ''),
+                'date' => (string) ($data['date'] ?? ''),
+                'venue' => (string) ($data['venue'] ?? ''),
+            ]);
+        } catch (Throwable $exception) {
+            wp_delete_attachment($attachmentId, true);
+            throw $exception;
+        }
+
+        update_post_meta($attachmentId, '_dizzy_poster_format', $formatKey);
+        update_post_meta($attachmentId, '_dizzy_poster_template', $templateKey);
+        update_post_meta($attachmentId, '_dizzy_poster_dpi', (int) $format['dpi']);
 
         $localUrl = wp_get_attachment_url($attachmentId);
 

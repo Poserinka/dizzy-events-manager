@@ -8,5 +8,6 @@ defined('ABSPATH') || exit;
 
 interface PosterGenerator
 {
-    public function generate(string $prompt): string;
+    /** @param array{size?:string} $options */
+    public function generate(string $prompt, array $options = []): string;
 }

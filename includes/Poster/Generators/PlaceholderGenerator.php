@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 
 final class PlaceholderGenerator implements PosterGenerator
 {
-    public function generate(string $prompt): string
+    public function generate(string $prompt, array $options = []): string
     {
         return '';
     }

@@ -15,7 +15,7 @@ final class OpenAIImageGenerator implements PosterGenerator
     ) {
     }
 
-    public function generate(string $prompt): string
+    public function generate(string $prompt, array $options = []): string
     {
         if ($this->apiKey === '' || trim($prompt) === '') {
             return '';
@@ -31,7 +31,9 @@ final class OpenAIImageGenerator implements PosterGenerator
                 'body' => wp_json_encode([
                     'model'  => 'gpt-image-1',
                     'prompt' => $prompt,
-                    'size'   => '1024x1024',
+                    'size'   => in_array(($options['size'] ?? ''), ['1024x1024', '1024x1536', '1536x1024'], true)
+                        ? $options['size']
+                        : '1024x1024',
                 ]),
                 'timeout' => 60,
             ]

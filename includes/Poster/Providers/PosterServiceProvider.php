@@ -9,6 +9,7 @@ use Dizzy\Events\Poster\Contracts\PosterGenerator;
 use Dizzy\Events\Poster\Generators\OpenAIImageGenerator;
 use Dizzy\Events\Poster\Generators\PlaceholderGenerator;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
+use Dizzy\Events\Poster\Renderers\PosterRenderer;
 use Dizzy\Events\Poster\Services\PosterService;
 
 defined('ABSPATH') || exit;
@@ -38,11 +39,17 @@ final class PosterServiceProvider
         );
 
         $container->singleton(
+            PosterRenderer::class,
+            static fn (): PosterRenderer => new PosterRenderer()
+        );
+
+        $container->singleton(
             PosterService::class,
             static function (Container $container): PosterService {
                 return new PosterService(
                     $container->get(PosterRepository::class),
-                    $container->get(PosterGenerator::class)
+                    $container->get(PosterGenerator::class),
+                    $container->get(PosterRenderer::class)
                 );
             }
         );
