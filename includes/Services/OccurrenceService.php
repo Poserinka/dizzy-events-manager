@@ -64,6 +64,75 @@ final class OccurrenceService
     }
 
     /**
+     * Expand the first submitted date into a recurring series.
+     *
+     * @param array<string, mixed> $data Submitted occurrence data.
+     *
+     * @return array<string, array<int, string|int>>
+     */
+    public function expandRecurrence(
+        array $data,
+        string $frequency,
+        int $interval,
+        int $count
+    ): array {
+        if (! in_array($frequency, ['daily', 'weekly', 'monthly'], true)) {
+            return $data;
+        }
+
+        $interval = min(max(1, $interval), 52);
+        $count = min(max(1, $count), self::MAX_OCCURRENCES_PER_EVENT);
+        $startDates = $this->getArrayValue($data, 'start_date');
+        $startTimes = $this->getArrayValue($data, 'start_time');
+        $endDates = $this->getArrayValue($data, 'end_date');
+        $endTimes = $this->getArrayValue($data, 'end_time');
+        $timezone = wp_timezone();
+        $start = $this->createDateTime(
+            $this->sanitizeValue($startDates[0] ?? ''),
+            $this->sanitizeValue($startTimes[0] ?? ''),
+            $timezone
+        );
+
+        if ($start === null) {
+            return $data;
+        }
+
+        $endDate = $this->sanitizeValue($endDates[0] ?? '');
+        $endTime = $this->sanitizeValue($endTimes[0] ?? '');
+        $end = ($endDate !== '' && $endTime !== '')
+            ? $this->createDateTime($endDate, $endTime, $timezone)
+            : null;
+        $duration = $end !== null && $end >= $start
+            ? $end->getTimestamp() - $start->getTimestamp()
+            : null;
+        $unit = ['daily' => 'day', 'weekly' => 'week', 'monthly' => 'month'][$frequency];
+        $expanded = [
+            'start_date' => [],
+            'start_time' => [],
+            'end_date' => [],
+            'end_time' => [],
+            'sort_order' => [],
+        ];
+
+        for ($index = 0; $index < $count; $index++) {
+            $occurrenceStart = $index === 0
+                ? $start
+                : $start->modify(sprintf('+%d %s', $interval * $index, $unit));
+            $occurrenceEnd = $duration !== null
+                ? $occurrenceStart->setTimestamp($occurrenceStart->getTimestamp() + $duration)
+                : null;
+
+            $expanded['start_date'][] = $occurrenceStart->format('Y-m-d');
+            $expanded['start_time'][] = $occurrenceStart->format('H:i');
+            $expanded['end_date'][] = $occurrenceEnd?->format('Y-m-d') ?? '';
+            $expanded['end_time'][] = $occurrenceEnd?->format('H:i') ?? '';
+            $expanded['sort_order'][] = $index;
+        }
+
+        return $expanded;
+    }
+
+    /**
      * Normalize submitted occurrence rows.
      *
      * @param array<string, mixed> $data Submitted occurrence data.
@@ -280,3 +349,4 @@ final class OccurrenceService
         return array_values($data[$key]);
     }
 }
+
