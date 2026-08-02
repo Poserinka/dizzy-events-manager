@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Core\DB;
 use Dizzy\Events\Models\Occurrence;
 use InvalidArgumentException;
@@ -21,7 +22,7 @@ final class OccurrenceRepository
 {
     private const OCCURRENCE_STATUS = 'publish';
 
-    private const EVENT_POST_TYPE = 'event';
+    private const EVENT_POST_TYPE = Config::POST_TYPE_EVENT;
 
     private const EVENT_POST_STATUS = 'publish';
 

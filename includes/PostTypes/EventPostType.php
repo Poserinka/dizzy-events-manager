@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\PostTypes;
 
+use Dizzy\Events\Core\Config;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -19,7 +21,7 @@ final class EventPostType
     public function register(): void
     {
         register_post_type(
-            'event',
+            Config::POST_TYPE_EVENT,
             [
                 'labels' => [
                     'name' =>

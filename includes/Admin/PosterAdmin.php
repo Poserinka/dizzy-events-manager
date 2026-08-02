@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Admin;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
 use Dizzy\Events\Poster\Services\PosterService;
 use WP_Post;
@@ -24,7 +25,7 @@ final class PosterAdmin
             'dizzy_event_poster_generator',
             esc_html__('AI Poster Generator', 'dizzy-events-manager'),
             [$this, 'render'],
-            'event',
+            Config::POST_TYPE_EVENT,
             'side'
         );
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Providers;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Repositories\EventRepository;
 use Dizzy\Events\Repositories\OccurrenceRepository;
@@ -66,7 +67,7 @@ final class EventServiceProvider
         add_action(
             'before_delete_post',
             static function (int $postId) use ($container): void {
-                if (get_post_type($postId) !== 'event') {
+                if (get_post_type($postId) !== Config::POST_TYPE_EVENT) {
                     return;
                 }
 

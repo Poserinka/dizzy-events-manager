@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Admin;
 
+use Dizzy\Events\Core\Config;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -27,7 +28,7 @@ final class EventDetailsMetaBox
     public function register(): void
     {
         add_action(
-            'add_meta_boxes_event',
+            'add_meta_boxes_' . Config::POST_TYPE_EVENT,
             [
                 $this,
                 'addMetaBox',
@@ -35,7 +36,7 @@ final class EventDetailsMetaBox
         );
 
         add_action(
-            'save_post_event',
+            'save_post_' . Config::POST_TYPE_EVENT,
             [
                 $this,
                 'save',
@@ -55,7 +56,7 @@ final class EventDetailsMetaBox
                 $this,
                 'render',
             ],
-            'event',
+            Config::POST_TYPE_EVENT,
             'side',
             'default'
         );

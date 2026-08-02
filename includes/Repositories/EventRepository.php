@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Repositories;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Models\Event;
 use Throwable;
 use WP_Post;
@@ -23,7 +24,7 @@ final class EventRepository extends AbstractRepository
     /**
      * Event post type.
      */
-    private const POST_TYPE = 'event';
+    private const POST_TYPE = Config::POST_TYPE_EVENT;
 
     /**
      * Model handled by repository.

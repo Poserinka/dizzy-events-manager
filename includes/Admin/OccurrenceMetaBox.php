@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Admin;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Models\Occurrence;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Services\OccurrenceService;
@@ -31,8 +32,8 @@ final class OccurrenceMetaBox
 
     public function register(): void
     {
-        add_action('add_meta_boxes_event', [$this, 'add']);
-        add_action('save_post_event', [$this, 'save']);
+        add_action('add_meta_boxes_' . Config::POST_TYPE_EVENT, [$this, 'add']);
+        add_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'save']);
         add_action('admin_notices', [$this, 'renderAdminNotices']);
     }
 
@@ -42,7 +43,7 @@ final class OccurrenceMetaBox
             'dizzy_event_occurrences',
             esc_html__('Event Dates', 'dizzy-events-manager'),
             [$this, 'render'],
-            'event',
+            Config::POST_TYPE_EVENT,
             'normal',
             'high'
         );

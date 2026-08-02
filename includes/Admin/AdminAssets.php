@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Admin;
 
+use Dizzy\Events\Core\Config;
 defined('ABSPATH') || exit;
 
 /**
@@ -40,7 +41,7 @@ final class AdminAssets
 
         $screen = get_current_screen();
 
-        if (! $screen || $screen->post_type !== 'event') {
+        if (! $screen || $screen->post_type !== Config::POST_TYPE_EVENT) {
             return;
         }
 
