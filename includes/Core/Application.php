@@ -6,6 +6,7 @@ namespace Dizzy\Events\Core;
 
 use Dizzy\Events\Admin\AdminServiceProvider;
 use Dizzy\Events\Frontend\FrontendServiceProvider;
+use Dizzy\Events\Poster\Providers\PosterServiceProvider;
 use Dizzy\Events\Providers\EventServiceProvider;
 use Dizzy\Events\Providers\MailServiceProvider;
 use Dizzy\Events\Providers\PostTypeServiceProvider;
@@ -44,6 +45,7 @@ final class Application
         $providers = [
             EventServiceProvider::class,
             ReservationServiceProvider::class,
+            PosterServiceProvider::class,
             MailServiceProvider::class,
             AdminServiceProvider::class,
             PostTypeServiceProvider::class,
