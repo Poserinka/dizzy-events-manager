@@ -13,14 +13,12 @@ if (! $details instanceof EventDetails) {
 }
 
 $artist  = $details->artist !== null ? trim($details->artist) : '';
-$genre   = $details->genre !== null ? trim($details->genre) : '';
 $venue   = trim($details->venue);
 $address = trim($details->address);
 $mapsUrl = esc_url(trim($details->mapsUrl));
 
 if (
     $artist === ''
-    && $genre === ''
     && $venue === ''
     && $address === ''
 ) {
@@ -34,15 +32,6 @@ if (
                 <?php esc_html_e('Artist:', 'dizzy-events-manager'); ?>
             </strong>
             <?php echo esc_html($artist); ?>
-        </p>
-    <?php endif; ?>
-
-    <?php if ($genre !== '') : ?>
-        <p>
-            <strong>
-                <?php esc_html_e('Genre:', 'dizzy-events-manager'); ?>
-            </strong>
-            <?php echo esc_html($genre); ?>
         </p>
     <?php endif; ?>
 

@@ -57,36 +57,8 @@ final class OccurrenceMetaBox
         );
 
         $occurrences = $this->repository->findByEventId((int) $post->ID);
-        $recurrence = get_post_meta((int) $post->ID, '_dizzy_recurrence_rule', true);
-        $recurrence = is_array($recurrence) ? $recurrence : [];
         ?>
         <div class="dizzy-occurrences-wrapper">
-            <fieldset style="margin-bottom: 16px; padding: 12px; border: 1px solid #ccd0d4;">
-                <legend><strong><?php esc_html_e('Recurring Event', 'dizzy-events-manager'); ?></strong></legend>
-                <label>
-                    <input type="checkbox" name="dizzy_recurrence[enabled]" value="1" <?php checked(($recurrence['enabled'] ?? '') === '1'); ?>>
-                    <?php esc_html_e('Generate dates automatically from the first date below', 'dizzy-events-manager'); ?>
-                </label>
-                <p>
-                    <label>
-                        <?php esc_html_e('Frequency', 'dizzy-events-manager'); ?>
-                        <select name="dizzy_recurrence[frequency]">
-                            <?php foreach (['daily' => __('Daily', 'dizzy-events-manager'), 'weekly' => __('Weekly', 'dizzy-events-manager'), 'monthly' => __('Monthly', 'dizzy-events-manager')] as $value => $label) : ?>
-                                <option value="<?php echo esc_attr($value); ?>" <?php selected(($recurrence['frequency'] ?? 'weekly'), $value); ?>><?php echo esc_html($label); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                    <label style="margin-left: 12px;">
-                        <?php esc_html_e('Every', 'dizzy-events-manager'); ?>
-                        <input type="number" min="1" max="52" name="dizzy_recurrence[interval]" value="<?php echo esc_attr((string) ($recurrence['interval'] ?? 1)); ?>" style="width: 64px;">
-                    </label>
-                    <label style="margin-left: 12px;">
-                        <?php esc_html_e('Number of dates', 'dizzy-events-manager'); ?>
-                        <input type="number" min="1" max="100" name="dizzy_recurrence[count]" value="<?php echo esc_attr((string) ($recurrence['count'] ?? 4)); ?>" style="width: 72px;">
-                    </label>
-                </p>
-                <p class="description"><?php esc_html_e('Saving regenerates the date list. The first date, time, and duration are used as the template.', 'dizzy-events-manager'); ?></p>
-            </fieldset>
             <table class="widefat dizzy-occurrences-table">
                 <thead>
                     <tr>
@@ -300,30 +272,11 @@ final class OccurrenceMetaBox
             $data = wp_unslash($_POST['dizzy_occurrences']);
         }
 
-        $recurrence = $this->sanitizeRecurrence(
-            isset($_POST['dizzy_recurrence']) && is_array($_POST['dizzy_recurrence'])
-                ? wp_unslash($_POST['dizzy_recurrence'])
-                : []
-        );
-
-        if ($recurrence['enabled'] === '1') {
-            $data = $this->service->expandRecurrence(
-                $data,
-                $recurrence['frequency'],
-                (int) $recurrence['interval'],
-                (int) $recurrence['count']
-            );
-        }
-
         try {
             $errors = $this->service->replaceForEvent($postId, $data);
 
             if ($errors === []) {
-                if ($recurrence['enabled'] === '1') {
-                    update_post_meta($postId, '_dizzy_recurrence_rule', $recurrence);
-                } else {
-                    delete_post_meta($postId, '_dizzy_recurrence_rule');
-                }
+                delete_post_meta($postId, '_dizzy_recurrence_rule');
             }
 
             if ($errors !== []) {
@@ -524,27 +477,4 @@ final class OccurrenceMetaBox
         return current_user_can('edit_post', $postId);
     }
 
-    /**
-     * @param array<string, mixed> $data
-     *
-     * @return array{enabled:string, frequency:string, interval:int, count:int}
-     */
-    private function sanitizeRecurrence(array $data): array
-    {
-        $frequency = isset($data['frequency'])
-            ? sanitize_key((string) $data['frequency'])
-            : 'weekly';
-
-        if (! in_array($frequency, ['daily', 'weekly', 'monthly'], true)) {
-            $frequency = 'weekly';
-        }
-
-        return [
-            'enabled' => isset($data['enabled']) && (string) $data['enabled'] === '1' ? '1' : '0',
-            'frequency' => $frequency,
-            'interval' => min(max(1, absint($data['interval'] ?? 1)), 52),
-            'count' => min(max(1, absint($data['count'] ?? 4)), 100),
-        ];
-    }
 }
-

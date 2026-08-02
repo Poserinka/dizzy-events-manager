@@ -64,14 +64,6 @@ final class EventService
      */
     public function getEventDetails(int $eventId): EventDetails
     {
-        $genreNames = wp_get_post_terms(
-            $eventId,
-            Config::TAX_GENRE,
-            ['fields' => 'names']
-        );
-        $genre = is_wp_error($genreNames)
-            ? null
-            : implode(', ', array_map('strval', $genreNames));
         $artistNames = wp_get_post_terms($eventId, Config::TAX_ARTIST, ['fields' => 'names']);
         $artist = is_wp_error($artistNames)
             ? null
@@ -88,7 +80,7 @@ final class EventService
 
         return EventDetails::fromMeta(
             get_post_meta($eventId),
-            $genre !== '' ? $genre : null,
+            null,
             $artist !== '' ? $artist : null,
             $venue,
             $address !== '' ? $address : null,

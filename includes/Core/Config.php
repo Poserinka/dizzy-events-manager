@@ -53,7 +53,6 @@ final class Config
     */
 
     public const TAX_CATEGORY = 'dizzy_event_category';
-    public const TAX_GENRE    = 'dizzy_event_genre';
     public const TAX_ARTIST   = 'dizzy_event_artist';
     public const TAX_VENUE    = 'dizzy_event_venue';
     public const TAX_TAG      = 'dizzy_event_tag';

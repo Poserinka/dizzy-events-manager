@@ -16,7 +16,6 @@ $remainingDates   = $datePresentation['remaining'];
 $eventUrl         = esc_url(trim($event->url));
 $imageUrl         = esc_url(trim($event->image));
 $artist           = $event->artist !== null ? trim($event->artist) : '';
-$genre            = $event->genre !== null ? trim($event->genre) : '';
 $venue            = $event->venue !== null ? trim($event->venue) : '';
 $address          = $event->address !== null ? trim($event->address) : '';
 $excerpt          = trim($event->excerpt);
@@ -68,12 +67,6 @@ $hasEventUrl      = $eventUrl !== '';
     <?php if ($artist !== '') : ?>
         <p class="dizzy-event-artist">
             <?php echo esc_html($artist); ?>
-        </p>
-    <?php endif; ?>
-
-    <?php if ($genre !== '') : ?>
-        <p class="dizzy-event-genre">
-            <?php echo esc_html($genre); ?>
         </p>
     <?php endif; ?>
 
