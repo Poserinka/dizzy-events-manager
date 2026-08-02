@@ -6,6 +6,7 @@ namespace Dizzy\Events\Poster\Providers;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Poster\Contracts\PosterGenerator;
+use Dizzy\Events\Poster\Generators\OpenAIImageGenerator;
 use Dizzy\Events\Poster\Generators\PlaceholderGenerator;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
 use Dizzy\Events\Poster\Services\PosterService;
@@ -26,6 +27,12 @@ final class PosterServiceProvider
         $container->singleton(
             PosterGenerator::class,
             static function (): PosterGenerator {
+                $apiKey = (string) get_option('dizzy_events_openai_api_key', '');
+
+                if ($apiKey !== '') {
+                    return new OpenAIImageGenerator($apiKey);
+                }
+
                 return new PlaceholderGenerator();
             }
         );
