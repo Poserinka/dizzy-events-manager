@@ -52,7 +52,7 @@ final class PosterRenderer
         $muted = imagecolorallocate($canvas, 224, 224, 224);
         $margin = (int) round($width * 0.075);
         imagefilledrectangle($canvas, $margin, $panelTop + (int) ($panelHeight * 0.09), $margin + (int) ($width * 0.16), $panelTop + max(8, (int) ($height * 0.006)), $accent);
-        $this->drawLogo($canvas, $margin, $margin, (int) round($width * 0.22));
+        $this->drawWatermark($canvas, $width, $height, (int) $format['dpi'] >= 300);
 
         $font = $this->fontPath();
         $title = trim((string) ($content['title'] ?? ''));
@@ -160,9 +160,23 @@ final class PosterRenderer
         return (int) round(strlen($text) * imagefontwidth(5) * max(1, $size / imagefontheight(5)));
     }
 
-    private function drawLogo($canvas, int $x, int $y, int $maxWidth): void
+    private function drawWatermark($canvas, int $canvasWidth, int $canvasHeight, bool $isPrint): void
     {
-        $logoId = (int) get_theme_mod('custom_logo', 0);
+        $enabled = (bool) get_option(
+            $isPrint ? 'dizzy_events_watermark_print' : 'dizzy_events_watermark_social',
+            ! $isPrint
+        );
+
+        if (! $enabled) {
+            return;
+        }
+
+        $logoId = (int) get_option('dizzy_events_watermark_image_id', 0);
+
+        if ($logoId <= 0) {
+            $logoId = (int) get_theme_mod('custom_logo', 0);
+        }
+
         $path = $logoId > 0 ? get_attached_file($logoId) : '';
 
         if (! is_string($path) || $path === '' || ! is_readable($path)) {
@@ -178,9 +192,69 @@ final class PosterRenderer
 
         $logoWidth = imagesx($logo);
         $logoHeight = imagesy($logo);
-        $targetWidth = min($maxWidth, $logoWidth);
+        $sizeMode = (string) get_option('dizzy_events_watermark_size_mode', 'scaled');
+        $targetWidth = match ($sizeMode) {
+            'original' => $logoWidth,
+            'custom' => (int) get_option('dizzy_events_watermark_custom_width', 400),
+            default => (int) round($canvasWidth * ((int) get_option('dizzy_events_watermark_scale', 35) / 100)),
+        };
+        $targetWidth = max(1, min($canvasWidth, $targetWidth));
         $targetHeight = max(1, (int) round($logoHeight * ($targetWidth / $logoWidth)));
-        imagecopyresampled($canvas, $logo, $x, $y, 0, 0, $targetWidth, $targetHeight, $logoWidth, $logoHeight);
+        $targetHeight = min($canvasHeight, $targetHeight);
+        $scaled = imagecreatetruecolor($targetWidth, $targetHeight);
+        imagealphablending($scaled, false);
+        imagesavealpha($scaled, true);
+        imagefill($scaled, 0, 0, imagecolorallocatealpha($scaled, 0, 0, 0, 127));
+        imagecopyresampled($scaled, $logo, 0, 0, 0, 0, $targetWidth, $targetHeight, $logoWidth, $logoHeight);
         imagedestroy($logo);
+
+        $opacity = max(0, min(100, (int) get_option('dizzy_events_watermark_opacity', 85)));
+        $this->applyOpacity($scaled, $opacity);
+
+        $alignment = (string) get_option('dizzy_events_watermark_alignment', 'top_center');
+        [$vertical, $horizontal] = array_pad(explode('_', $alignment, 2), 2, 'center');
+        $x = match ($horizontal) {
+            'left' => 0,
+            'right' => $canvasWidth - $targetWidth,
+            default => (int) round(($canvasWidth - $targetWidth) / 2),
+        };
+        $y = match ($vertical) {
+            'top' => 0,
+            'bottom' => $canvasHeight - $targetHeight,
+            default => (int) round(($canvasHeight - $targetHeight) / 2),
+        };
+        $offsetX = (float) get_option('dizzy_events_watermark_offset_x', 0);
+        $offsetY = (float) get_option('dizzy_events_watermark_offset_y', 0);
+
+        if ((string) get_option('dizzy_events_watermark_offset_unit', 'percentages') === 'percentages') {
+            $offsetX = $canvasWidth * ($offsetX / 100);
+            $offsetY = $canvasHeight * ($offsetY / 100);
+        }
+
+        $x = max(0, min($canvasWidth - $targetWidth, $x + (int) round($offsetX)));
+        $y = max(0, min($canvasHeight - $targetHeight, $y + (int) round($offsetY)));
+        imagealphablending($canvas, true);
+        imagecopy($canvas, $scaled, $x, $y, 0, 0, $targetWidth, $targetHeight);
+        imagedestroy($scaled);
+    }
+
+    private function applyOpacity($image, int $opacity): void
+    {
+        if ($opacity >= 100) {
+            return;
+        }
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $rgba = imagecolorat($image, $x, $y);
+                $alpha = ($rgba >> 24) & 0x7F;
+                $visible = (127 - $alpha) * ($opacity / 100);
+                $newAlpha = 127 - (int) round($visible);
+                imagesetpixel($image, $x, $y, ($rgba & 0xFFFFFF) | ($newAlpha << 24));
+            }
+        }
     }
 }
