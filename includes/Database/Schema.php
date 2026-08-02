@@ -65,4 +65,24 @@ final class Schema
         KEY email (email)
         ";
     }
+
+    /**
+     * Poster table schema.
+     */
+    public static function posters(): string
+    {
+        return "
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        event_id bigint(20) unsigned NOT NULL,
+        prompt text NULL,
+        image_url text NULL,
+        provider varchar(64) NOT NULL DEFAULT 'ai',
+        status varchar(32) NOT NULL DEFAULT 'draft',
+        created_at datetime NOT NULL,
+        updated_at datetime NOT NULL,
+        PRIMARY KEY (id),
+        KEY event_id (event_id),
+        KEY status (status)
+        ";
+    }
 }
