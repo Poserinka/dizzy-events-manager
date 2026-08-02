@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Dizzy\Events\Poster\Providers;
 
 use Dizzy\Events\Core\Container;
+use Dizzy\Events\Poster\Contracts\PosterGenerator;
+use Dizzy\Events\Poster\Generators\PlaceholderGenerator;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
 use Dizzy\Events\Poster\Services\PosterService;
 
@@ -22,10 +24,18 @@ final class PosterServiceProvider
         );
 
         $container->singleton(
+            PosterGenerator::class,
+            static function (): PosterGenerator {
+                return new PlaceholderGenerator();
+            }
+        );
+
+        $container->singleton(
             PosterService::class,
             static function (Container $container): PosterService {
                 return new PosterService(
-                    $container->get(PosterRepository::class)
+                    $container->get(PosterRepository::class),
+                    $container->get(PosterGenerator::class)
                 );
             }
         );
