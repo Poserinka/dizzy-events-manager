@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Core\Container;
+use Dizzy\Events\Poster\Services\PosterService;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Reservations\ReservationRepository;
 use Dizzy\Events\Services\OccurrenceService;
 
 defined('ABSPATH') || exit;
 
-/**
- * Registers admin services.
- *
- * @package Dizzy\Events\Admin
- */
 final class AdminServiceProvider
 {
     public function register(Container $container): void
@@ -53,6 +49,15 @@ final class AdminServiceProvider
             }
         );
 
+        $container->singleton(
+            PosterAdmin::class,
+            static function () use ($container): PosterAdmin {
+                return new PosterAdmin(
+                    $container->get(PosterService::class)
+                );
+            }
+        );
+
         add_action(
             'admin_init',
             static function () use ($container): void {
@@ -60,6 +65,7 @@ final class AdminServiceProvider
                 $container->get(EventDetailsMetaBox::class)->register();
                 $container->get(AdminAssets::class)->register();
                 $container->get(ReservationAdmin::class)->register();
+                $container->get(PosterAdmin::class)->register();
             }
         );
     }
