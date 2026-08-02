@@ -28,6 +28,16 @@ final class ReservationService
             throw new RuntimeException('Invalid occurrence ID.');
         }
 
+        if (trim((string) ($data['name'] ?? '')) === '') {
+            throw new RuntimeException('Name is required.');
+        }
+
+        $email = (string) ($data['email'] ?? '');
+
+        if ($email === '' || ! is_email($email)) {
+            throw new RuntimeException('A valid email address is required.');
+        }
+
         $data['status'] ??= ReservationStatus::Pending->value;
 
         $reservationId = $this->repository->save($data);
