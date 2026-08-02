@@ -16,57 +16,27 @@ final class AdminServiceProvider
 {
     public function register(Container $container): void
     {
-        $container->singleton(
-            OccurrenceMetaBox::class,
-            static function () use ($container): OccurrenceMetaBox {
-                return new OccurrenceMetaBox(
-                    $container->get(OccurrenceRepository::class),
-                    $container->get(OccurrenceService::class)
-                );
-            }
-        );
+        $container->singleton(OccurrenceMetaBox::class, static function () use ($container): OccurrenceMetaBox {
+            return new OccurrenceMetaBox($container->get(OccurrenceRepository::class), $container->get(OccurrenceService::class));
+        });
 
-        $container->singleton(
-            EventDetailsMetaBox::class,
-            static function (): EventDetailsMetaBox {
-                return new EventDetailsMetaBox();
-            }
-        );
+        $container->singleton(EventDetailsMetaBox::class, static fn (): EventDetailsMetaBox => new EventDetailsMetaBox());
+        $container->singleton(AdminAssets::class, static fn (): AdminAssets => new AdminAssets());
+        $container->singleton(ReservationAdmin::class, static function () use ($container): ReservationAdmin {
+            return new ReservationAdmin($container->get(ReservationRepository::class));
+        });
+        $container->singleton(PosterAdmin::class, static function () use ($container): PosterAdmin {
+            return new PosterAdmin($container->get(PosterService::class));
+        });
+        $container->singleton(PosterSettings::class, static fn (): PosterSettings => new PosterSettings());
 
-        $container->singleton(
-            AdminAssets::class,
-            static function (): AdminAssets {
-                return new AdminAssets();
-            }
-        );
-
-        $container->singleton(
-            ReservationAdmin::class,
-            static function () use ($container): ReservationAdmin {
-                return new ReservationAdmin(
-                    $container->get(ReservationRepository::class)
-                );
-            }
-        );
-
-        $container->singleton(
-            PosterAdmin::class,
-            static function () use ($container): PosterAdmin {
-                return new PosterAdmin(
-                    $container->get(PosterService::class)
-                );
-            }
-        );
-
-        add_action(
-            'admin_init',
-            static function () use ($container): void {
-                $container->get(OccurrenceMetaBox::class)->register();
-                $container->get(EventDetailsMetaBox::class)->register();
-                $container->get(AdminAssets::class)->register();
-                $container->get(ReservationAdmin::class)->register();
-                $container->get(PosterAdmin::class)->register();
-            }
-        );
+        add_action('admin_init', static function () use ($container): void {
+            $container->get(OccurrenceMetaBox::class)->register();
+            $container->get(EventDetailsMetaBox::class)->register();
+            $container->get(AdminAssets::class)->register();
+            $container->get(ReservationAdmin::class)->register();
+            $container->get(PosterAdmin::class)->register();
+            $container->get(PosterSettings::class)->register();
+        });
     }
 }
