@@ -11,6 +11,7 @@ use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Reservations\ReservationRepository;
 use Dizzy\Events\Reservations\ReservationService;
 use Dizzy\Events\Services\OccurrenceService;
+use Dizzy\Events\Reports\ReportRepository;
 
 defined('ABSPATH') || exit;
 
@@ -34,6 +35,13 @@ final class AdminServiceProvider
         $container->singleton(CheckinAdmin::class, static function () use ($container): CheckinAdmin {
             return new CheckinAdmin($container->get(ReservationRepository::class));
         });
+        $container->singleton(ReportRepository::class, static function (): ReportRepository {
+            global $wpdb;
+            return new ReportRepository($wpdb);
+        });
+        $container->singleton(ReportsAdmin::class, static function () use ($container): ReportsAdmin {
+            return new ReportsAdmin($container->get(ReportRepository::class));
+        });
         $container->singleton(PosterAdmin::class, static function () use ($container): PosterAdmin {
             return new PosterAdmin(
                 $container->get(PosterService::class),
@@ -49,6 +57,7 @@ final class AdminServiceProvider
         $container->get(AdminAssets::class)->register();
         $container->get(ReservationAdmin::class)->register();
         $container->get(CheckinAdmin::class)->register();
+        $container->get(ReportsAdmin::class)->register();
         $container->get(PosterAdmin::class)->register();
         $container->get(PosterSettings::class)->register();
         $container->get(VenueTaxonomyFields::class)->register();
