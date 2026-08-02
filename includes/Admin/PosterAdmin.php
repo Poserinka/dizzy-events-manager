@@ -33,6 +33,11 @@ final class PosterAdmin
             'admin_post_dizzy_generate_poster',
             [$this, 'generate']
         );
+
+        add_action(
+            'admin_post_dizzy_export_poster',
+            [$this, 'export']
+        );
     }
 
     public function addMetaBox(): void
@@ -91,6 +96,17 @@ final class PosterAdmin
         if ($poster && $poster->imageUrl !== '') {
             echo '<img src="' . esc_url($poster->imageUrl) . '" style="width:100%;height:auto;" alt="">';
             echo '<p><a class="button button-secondary" href="' . esc_url($poster->imageUrl) . '" download>' . esc_html__('Download latest poster', 'dizzy-events-manager') . '</a></p>';
+
+            $formatKey = $poster->attachmentId ? (string) get_post_meta($poster->attachmentId, '_dizzy_poster_format', true) : '';
+            $platform = str_starts_with($formatKey, 'instagram_') ? 'instagram' : (str_starts_with($formatKey, 'facebook_') ? 'facebook' : '');
+
+            if ($platform !== '') {
+                $exportUrl = wp_nonce_url(
+                    admin_url('admin-post.php?action=dizzy_export_poster&post_id=' . $post->ID . '&platform=' . $platform),
+                    'dizzy_export_poster_' . $post->ID
+                );
+                echo '<p><a class="button button-primary" href="' . esc_url($exportUrl) . '">' . esc_html(sprintf(__('Export for %s', 'dizzy-events-manager'), ucfirst($platform))) . '</a></p>';
+            }
         }
 
         submit_button(
@@ -131,7 +147,7 @@ final class PosterAdmin
 
         try {
             $templateKey = PosterTemplates::sanitize(isset($_POST['template']) && is_string($_POST['template']) ? sanitize_key(wp_unslash($_POST['template'])) : 'classic');
-            $formatKey = PosterFormats::sanitize(isset($_POST['format']) && is_string($_POST['format']) ? sanitize_key(wp_unslash($_POST['format'])) : 'social_square');
+            $formatKey = PosterFormats::sanitize(isset($_POST['format']) && is_string($_POST['format']) ? sanitize_key(wp_unslash($_POST['format'])) : 'instagram_square');
             $direction = isset($_POST['direction']) && is_string($_POST['direction'])
                 ? sanitize_textarea_field(wp_unslash($_POST['direction']))
                 : '';
@@ -152,6 +168,88 @@ final class PosterAdmin
         }
 
         wp_safe_redirect(add_query_arg('dizzy_poster_status', 'success', $redirectUrl));
+        exit;
+    }
+
+    public function export(): void
+    {
+        $postId = isset($_GET['post_id']) ? absint($_GET['post_id']) : 0;
+        $platform = isset($_GET['platform']) && is_string($_GET['platform'])
+            ? sanitize_key(wp_unslash($_GET['platform']))
+            : '';
+
+        if ($postId <= 0 || ! in_array($platform, ['instagram', 'facebook'], true)) {
+            wp_die(esc_html__('Invalid poster export request.', 'dizzy-events-manager'));
+        }
+
+        check_admin_referer('dizzy_export_poster_' . $postId);
+
+        if (! current_user_can('edit_post', $postId)) {
+            wp_die(esc_html__('Permission denied.', 'dizzy-events-manager'));
+        }
+
+        $poster = $this->repository->findByEvent($postId);
+        $attachmentId = $poster?->attachmentId ?? 0;
+        $formatKey = $attachmentId > 0 ? (string) get_post_meta($attachmentId, '_dizzy_poster_format', true) : '';
+        $path = $attachmentId > 0 ? get_attached_file($attachmentId) : '';
+
+        if (! str_starts_with($formatKey, $platform . '_') || ! is_string($path) || ! is_readable($path)) {
+            wp_die(esc_html__('No matching social poster is available for export.', 'dizzy-events-manager'));
+        }
+
+        $slug = sanitize_title(get_the_title($postId)) ?: 'event';
+        $baseName = 'dizzy-' . $slug . '-' . $formatKey;
+        $caption = $this->socialCaption($postId, $platform);
+
+        if (class_exists(\ZipArchive::class)) {
+            if (! function_exists('wp_tempnam')) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+            }
+
+            $temporary = wp_tempnam($baseName . '.zip');
+            $zip = is_string($temporary) ? new \ZipArchive() : null;
+
+            if ($zip && $zip->open($temporary, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+                $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION)) ?: 'png';
+                $zip->addFile($path, $baseName . '.' . $extension);
+                $zip->addFromString($baseName . '-caption.txt', $caption);
+                $zip->close();
+                $this->sendDownload($temporary, $baseName . '.zip', 'application/zip', true);
+            }
+
+            if (is_string($temporary) && is_file($temporary)) {
+                wp_delete_file($temporary);
+            }
+        }
+
+        $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION)) ?: 'png';
+        $this->sendDownload($path, $baseName . '.' . $extension, 'image/png');
+    }
+
+    private function socialCaption(int $postId, string $platform): string
+    {
+        $title = get_the_title($postId);
+        $description = wp_trim_words(wp_strip_all_tags((string) get_post_field('post_content', $postId)), 45, '...');
+        $url = get_permalink($postId);
+        $tags = $platform === 'instagram'
+            ? '#JazzcafeDizzy #Rotterdam #LiveMusic #Jazz'
+            : '#JazzcafeDizzy #Rotterdam #LiveMusic';
+
+        return trim($title . "\n\n" . $description . "\n\n" . $url . "\n\n" . $tags) . "\n";
+    }
+
+    private function sendDownload(string $path, string $name, string $mime, bool $deleteAfter = false): never
+    {
+        nocache_headers();
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . sanitize_file_name($name) . '"');
+        header('Content-Length: ' . (string) filesize($path));
+        readfile($path);
+
+        if ($deleteAfter) {
+            wp_delete_file($path);
+        }
+
         exit;
     }
 

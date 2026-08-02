@@ -26,7 +26,7 @@ final class PosterService
 
     public function create(array $data): Poster
     {
-        $formatKey = PosterFormats::sanitize((string) ($data['format'] ?? 'social_square'));
+        $formatKey = PosterFormats::sanitize((string) ($data['format'] ?? 'instagram_square'));
         $templateKey = PosterTemplates::sanitize((string) ($data['template'] ?? 'classic'));
         $format = PosterFormats::get($formatKey);
         $template = PosterTemplates::get($templateKey);

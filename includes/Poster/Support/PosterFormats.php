@@ -12,9 +12,12 @@ final class PosterFormats
     public static function all(): array
     {
         return [
-            'social_square' => ['label' => __('Social square (1080 × 1080)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1080, 'dpi' => 72, 'ai_size' => '1024x1024'],
-            'social_portrait' => ['label' => __('Social portrait (1080 × 1350)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1350, 'dpi' => 72, 'ai_size' => '1024x1536'],
-            'social_story' => ['label' => __('Story / Reel (1080 × 1920)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1920, 'dpi' => 72, 'ai_size' => '1024x1536'],
+            'instagram_square' => ['label' => __('Instagram square (1080 × 1080)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1080, 'dpi' => 72, 'ai_size' => '1024x1024'],
+            'instagram_portrait' => ['label' => __('Instagram portrait (1080 × 1350)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1350, 'dpi' => 72, 'ai_size' => '1024x1536'],
+            'instagram_story' => ['label' => __('Instagram Story / Reel (1080 × 1920)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1920, 'dpi' => 72, 'ai_size' => '1024x1536'],
+            'facebook_square' => ['label' => __('Facebook square (1080 × 1080)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1080, 'dpi' => 72, 'ai_size' => '1024x1024'],
+            'facebook_landscape' => ['label' => __('Facebook landscape / link (1200 × 630)', 'dizzy-events-manager'), 'width' => 1200, 'height' => 630, 'dpi' => 72, 'ai_size' => '1536x1024'],
+            'facebook_story' => ['label' => __('Facebook Story (1080 × 1920)', 'dizzy-events-manager'), 'width' => 1080, 'height' => 1920, 'dpi' => 72, 'ai_size' => '1024x1536'],
             'print_a4' => ['label' => __('Print A4 portrait (300 DPI)', 'dizzy-events-manager'), 'width' => 2480, 'height' => 3508, 'dpi' => 300, 'ai_size' => '1024x1536'],
         ];
     }
@@ -24,11 +27,18 @@ final class PosterFormats
     {
         $formats = self::all();
 
-        return $formats[$key] ?? $formats['social_square'];
+        return $formats[$key] ?? $formats['instagram_square'];
     }
 
     public static function sanitize(string $key): string
     {
-        return isset(self::all()[$key]) ? $key : 'social_square';
+        $legacy = [
+            'social_square' => 'instagram_square',
+            'social_portrait' => 'instagram_portrait',
+            'social_story' => 'instagram_story',
+        ];
+        $key = $legacy[$key] ?? $key;
+
+        return isset(self::all()[$key]) ? $key : 'instagram_square';
     }
 }
