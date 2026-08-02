@@ -18,6 +18,13 @@ final class PosterService
 
     public function create(array $data): Poster
     {
-        return $this->repository->create($data);
+        $poster = $this->repository->create($data);
+
+        do_action(
+            'dizzy_events_poster_created',
+            $poster
+        );
+
+        return $poster;
     }
 }
