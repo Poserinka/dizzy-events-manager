@@ -25,10 +25,11 @@ final class ReservationController
             [$this, 'render']
         );
 
-        add_action(
-            'init',
-            [$this, 'handle']
-        );
+        if (doing_action('init') || did_action('init')) {
+            $this->handle();
+        } else {
+            add_action('init', [$this, 'handle']);
+        }
     }
 
     public function render(): string

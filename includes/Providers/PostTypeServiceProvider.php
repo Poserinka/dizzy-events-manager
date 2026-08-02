@@ -31,15 +31,8 @@ final class PostTypeServiceProvider
             }
         );
 
-        add_action(
-            'init',
-            static function () use ($container): void {
-
-                $container
-                    ->get(EventPostType::class)
-                    ->register();
-
-            }
-        );
+        $container
+            ->get(EventPostType::class)
+            ->register();
     }
 }

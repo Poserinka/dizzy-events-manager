@@ -66,13 +66,8 @@ final class FrontendServiceProvider
             }
         );
 
-        add_action(
-            'init',
-            static function () use ($container): void {
-                $container->get(EventShortcode::class)->register();
-                $container->get(ReservationController::class)->register();
-            }
-        );
+        $container->get(EventShortcode::class)->register();
+        $container->get(ReservationController::class)->register();
 
         add_action(
             'wp',
