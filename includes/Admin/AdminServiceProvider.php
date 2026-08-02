@@ -34,13 +34,11 @@ final class AdminServiceProvider
         });
         $container->singleton(PosterSettings::class, static fn (): PosterSettings => new PosterSettings());
 
-        add_action('admin_init', static function () use ($container): void {
-            $container->get(OccurrenceMetaBox::class)->register();
-            $container->get(EventDetailsMetaBox::class)->register();
-            $container->get(AdminAssets::class)->register();
-            $container->get(ReservationAdmin::class)->register();
-            $container->get(PosterAdmin::class)->register();
-            $container->get(PosterSettings::class)->register();
-        });
+        $container->get(OccurrenceMetaBox::class)->register();
+        $container->get(EventDetailsMetaBox::class)->register();
+        $container->get(AdminAssets::class)->register();
+        $container->get(ReservationAdmin::class)->register();
+        $container->get(PosterAdmin::class)->register();
+        $container->get(PosterSettings::class)->register();
     }
 }

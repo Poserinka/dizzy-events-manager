@@ -22,17 +22,25 @@ final class PosterAdmin
 
     public function register(): void
     {
+        add_action(
+            'add_meta_boxes_' . Config::POST_TYPE_EVENT,
+            [$this, 'addMetaBox']
+        );
+
+        add_action(
+            'admin_post_dizzy_generate_poster',
+            [$this, 'generate']
+        );
+    }
+
+    public function addMetaBox(): void
+    {
         add_meta_box(
             'dizzy_event_poster_generator',
             esc_html__('AI Poster Generator', 'dizzy-events-manager'),
             [$this, 'render'],
             Config::POST_TYPE_EVENT,
             'side'
-        );
-
-        add_action(
-            'admin_post_dizzy_generate_poster',
-            [$this, 'generate']
         );
     }
 
