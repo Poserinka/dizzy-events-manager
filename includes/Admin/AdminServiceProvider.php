@@ -9,6 +9,7 @@ use Dizzy\Events\Poster\Services\PosterService;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Reservations\ReservationRepository;
+use Dizzy\Events\Reservations\ReservationService;
 use Dizzy\Events\Services\OccurrenceService;
 
 defined('ABSPATH') || exit;
@@ -25,7 +26,10 @@ final class AdminServiceProvider
         $container->singleton(EventStatusMetaBox::class, static fn (): EventStatusMetaBox => new EventStatusMetaBox());
         $container->singleton(AdminAssets::class, static fn (): AdminAssets => new AdminAssets());
         $container->singleton(ReservationAdmin::class, static function () use ($container): ReservationAdmin {
-            return new ReservationAdmin($container->get(ReservationRepository::class));
+            return new ReservationAdmin(
+                $container->get(ReservationRepository::class),
+                $container->get(ReservationService::class)
+            );
         });
         $container->singleton(PosterAdmin::class, static function () use ($container): PosterAdmin {
             return new PosterAdmin(

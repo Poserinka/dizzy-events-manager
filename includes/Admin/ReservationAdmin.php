@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Reservations\ReservationRepository;
+use Dizzy\Events\Reservations\ReservationService;
+use Dizzy\Events\Enums\ReservationStatus;
+use Throwable;
 
 defined('ABSPATH') || exit;
 
 final class ReservationAdmin
 {
     public function __construct(
-        private readonly ReservationRepository $repository
+        private readonly ReservationRepository $repository,
+        private readonly ReservationService $service
     ) {
     }
 
@@ -43,6 +47,15 @@ final class ReservationAdmin
         $reservations = $this->repository->all();
 
         echo '<div class="wrap"><h1>Reservations</h1>';
+        $error = isset($_GET['reservation_error'])
+            ? sanitize_key(wp_unslash((string) $_GET['reservation_error']))
+            : '';
+
+        if ($error === 'capacity') {
+            echo '<div class="notice notice-error"><p>' . esc_html__('This reservation cannot be approved because the occurrence capacity would be exceeded.', 'dizzy-events-manager') . '</p></div>';
+        } elseif ($error === 'save') {
+            echo '<div class="notice notice-error"><p>' . esc_html__('The reservation status could not be updated.', 'dizzy-events-manager') . '</p></div>';
+        }
         echo '<table class="widefat fixed striped">';
         echo '<thead><tr><th>Name</th><th>Email</th><th>Event</th><th>Guests</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
 
@@ -89,8 +102,19 @@ final class ReservationAdmin
             ? sanitize_key(wp_unslash($_POST['status']))
             : 'pending';
 
-        if (in_array($status, ['pending', 'waitlisted', 'confirmed', 'cancelled'], true)) {
-            $this->repository->update($id, ['status' => $status]);
+        $newStatus = ReservationStatus::tryFrom($status);
+
+        if ($newStatus !== null) {
+            try {
+                if (! $this->service->changeStatus($id, $newStatus)) {
+                    wp_safe_redirect(add_query_arg('reservation_error', 'capacity', admin_url('edit.php?post_type=dizzy_event&page=dizzy-reservations')));
+                    exit;
+                }
+            } catch (Throwable $exception) {
+                error_log('Dizzy Events reservation status update failed: ' . $exception->getMessage());
+                wp_safe_redirect(add_query_arg('reservation_error', 'save', admin_url('edit.php?post_type=dizzy_event&page=dizzy-reservations')));
+                exit;
+            }
         }
 
         wp_safe_redirect(admin_url('edit.php?post_type=dizzy_event&page=dizzy-reservations'));

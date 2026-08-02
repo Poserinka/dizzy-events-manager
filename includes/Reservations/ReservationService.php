@@ -95,18 +95,58 @@ final class ReservationService
 
     public function confirm(int $reservationId): bool
     {
-        return $this->repository->update(
-            $reservationId,
-            ['status' => ReservationStatus::Confirmed->value]
-        );
+        return $this->changeStatus($reservationId, ReservationStatus::Confirmed);
     }
 
     public function cancel(int $reservationId): bool
     {
-        return $this->repository->update(
-            $reservationId,
-            ['status' => ReservationStatus::Cancelled->value]
-        );
+        return $this->changeStatus($reservationId, ReservationStatus::Cancelled);
+    }
+
+    public function changeStatus(int $reservationId, ReservationStatus $status): bool
+    {
+        $reservation = $this->repository->find($reservationId);
+
+        if ($reservation === null) {
+            return false;
+        }
+
+        $previous = (string) ($reservation['status'] ?? '');
+
+        if ($previous === $status->value) {
+            return true;
+        }
+
+        if (! $this->repository->updateStatus($reservationId, $status->value)) {
+            return false;
+        }
+
+        $email = (string) ($reservation['email'] ?? '');
+
+        if ($email !== '' && is_email($email)) {
+            [$subject, $message] = match ($status) {
+                ReservationStatus::Confirmed => [
+                    'Reservation confirmed',
+                    'Your reservation has been confirmed.',
+                ],
+                ReservationStatus::Cancelled => [
+                    'Reservation cancelled',
+                    'Your reservation has been cancelled.',
+                ],
+                ReservationStatus::Waitlisted => [
+                    'Added to the waiting list',
+                    'Your reservation has been moved to the waiting list.',
+                ],
+                ReservationStatus::Pending => [
+                    'Reservation awaiting approval',
+                    'Your reservation is awaiting approval.',
+                ],
+            };
+
+            $this->mailer->send($email, $subject, $message);
+        }
+
+        return true;
     }
 }
 

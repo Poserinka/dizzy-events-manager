@@ -137,6 +137,70 @@ final class ReservationRepository
         return false !== $this->wpdb->update($this->table, $data, ['id' => $reservationId]);
     }
 
+    public function updateStatus(int $reservationId, string $status): bool
+    {
+        $reservation = $this->find($reservationId);
+
+        if ($reservation === null) {
+            return false;
+        }
+
+        $occurrenceId = (int) ($reservation['occurrence_id'] ?? 0);
+
+        if ($occurrenceId <= 0 || ! in_array($status, ['pending', 'confirmed'], true)) {
+            return $this->update($reservationId, ['status' => $status]);
+        }
+
+        if ($this->wpdb->query('START TRANSACTION') === false) {
+            throw new RuntimeException('Could not start reservation status transaction.');
+        }
+
+        try {
+            $occurrence = $this->wpdb->get_row(
+                $this->wpdb->prepare(
+                    "SELECT capacity FROM {$this->occurrencesTable} WHERE id = %d FOR UPDATE",
+                    $occurrenceId
+                ),
+                ARRAY_A
+            );
+
+            if (! is_array($occurrence)) {
+                $this->wpdb->query('ROLLBACK');
+                return false;
+            }
+
+            $capacity = (int) ($occurrence['capacity'] ?? 0);
+
+            if ($capacity > 0) {
+                $reserved = (int) $this->wpdb->get_var(
+                    $this->wpdb->prepare(
+                        "SELECT COALESCE(SUM(guests), 0) FROM {$this->table} WHERE occurrence_id = %d AND id <> %d AND status IN (%s, %s)",
+                        $occurrenceId,
+                        $reservationId,
+                        'pending',
+                        'confirmed'
+                    )
+                );
+
+                if ($reserved + (int) ($reservation['guests'] ?? 1) > $capacity) {
+                    $this->wpdb->query('ROLLBACK');
+                    return false;
+                }
+            }
+
+            $updated = $this->update($reservationId, ['status' => $status]);
+
+            if (! $updated || $this->wpdb->query('COMMIT') === false) {
+                throw new RuntimeException('Could not commit reservation status transaction.');
+            }
+
+            return true;
+        } catch (\Throwable $exception) {
+            $this->wpdb->query('ROLLBACK');
+            throw $exception;
+        }
+    }
+
     public function delete(int $reservationId): bool
     {
         return false !== $this->wpdb->delete($this->table, ['id' => $reservationId]);
