@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Frontend;
 
+use Dizzy\Events\Core\Config;
 use Dizzy\Events\Reservations\ReservationService;
+use Throwable;
 
 
 defined('ABSPATH') || exit;
@@ -33,9 +35,17 @@ final class ReservationController
     {
         $message = '';
 
-        if (isset($_GET['reservation'])) {
+        $reservationStatus = isset($_GET['reservation']) && is_string($_GET['reservation'])
+            ? sanitize_key(wp_unslash($_GET['reservation']))
+            : '';
+
+        if ($reservationStatus === 'success') {
             $message = 'Reservation request received.';
+        } elseif ($reservationStatus === 'error') {
+            $message = 'The reservation request could not be processed.';
         }
+
+        $occurrenceId = isset($_GET['occurrence_id']) ? absint($_GET['occurrence_id']) : 0;
 
         ob_start();
         ?>
@@ -49,7 +59,7 @@ final class ReservationController
             <?php wp_nonce_field('dizzy_reservation_submit', 'dizzy_reservation_nonce'); ?>
 
             <input type="hidden" name="event_id" value="<?php echo esc_attr((string) get_the_ID()); ?>">
-            <input type="hidden" name="occurrence_id" value="<?php echo esc_attr((string) ($_GET['occurrence_id'] ?? 0)); ?>">
+            <input type="hidden" name="occurrence_id" value="<?php echo esc_attr((string) $occurrenceId); ?>">
 
             <input type="text" name="name" required placeholder="Name">
             <input type="email" name="email" required placeholder="Email">
@@ -66,26 +76,48 @@ final class ReservationController
 
     public function handle(): void
     {
-        if (! isset($_POST['dizzy_reservation_submit'])) {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || ! isset($_POST['dizzy_reservation_submit'])) {
             return;
         }
 
-        if (! isset($_POST['dizzy_reservation_nonce']) || ! wp_verify_nonce(
-            sanitize_text_field(wp_unslash($_POST['dizzy_reservation_nonce'])),
-            'dizzy_reservation_submit'
-        )) {
+        if (
+            ! isset($_POST['dizzy_reservation_nonce'])
+            || ! is_string($_POST['dizzy_reservation_nonce'])
+            || ! wp_verify_nonce(
+                sanitize_text_field(wp_unslash($_POST['dizzy_reservation_nonce'])),
+                'dizzy_reservation_submit'
+            )
+        ) {
             return;
         }
 
-        $this->service->create([
-            'event_id' => absint($_POST['event_id'] ?? 0),
-            'occurrence_id' => absint($_POST['occurrence_id'] ?? 0),
-            'name' => sanitize_text_field(wp_unslash($_POST['name'] ?? '')),
-            'email' => sanitize_email(wp_unslash($_POST['email'] ?? '')),
-            'guests' => absint($_POST['guests'] ?? 1),
-        ]);
+        $eventId = isset($_POST['event_id']) ? absint($_POST['event_id']) : 0;
+        $event = get_post($eventId);
 
-        wp_safe_redirect(add_query_arg('reservation', 'success'));
+        if (! $event || $event->post_type !== Config::POST_TYPE_EVENT || $event->post_status !== 'publish') {
+            return;
+        }
+
+        $redirectUrl = get_permalink($eventId) ?: home_url('/');
+
+        try {
+            $this->service->create([
+                'event_id' => $eventId,
+                'occurrence_id' => absint($_POST['occurrence_id'] ?? 0),
+                'name' => isset($_POST['name']) && is_string($_POST['name'])
+                    ? sanitize_text_field(wp_unslash($_POST['name']))
+                    : '',
+                'email' => isset($_POST['email']) && is_string($_POST['email'])
+                    ? sanitize_email(wp_unslash($_POST['email']))
+                    : '',
+                'guests' => absint($_POST['guests'] ?? 1),
+            ]);
+        } catch (Throwable) {
+            wp_safe_redirect(add_query_arg('reservation', 'error', $redirectUrl));
+            exit;
+        }
+
+        wp_safe_redirect(add_query_arg('reservation', 'success', $redirectUrl));
         exit;
     }
 }

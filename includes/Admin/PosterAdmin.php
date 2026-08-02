@@ -67,15 +67,20 @@ final class PosterAdmin
 
     public function generate(): void
     {
-        if (! current_user_can('edit_posts')) {
-            wp_die(esc_html__('Permission denied.', 'dizzy-events-manager'));
-        }
-
         $postId = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
 
-        if (! $postId || ! isset($_POST['dizzy_poster_nonce'])) {
+        if (
+            ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST'
+            || ! $postId
+            || ! isset($_POST['dizzy_poster_nonce'])
+            || ! is_string($_POST['dizzy_poster_nonce'])
+        ) {
             wp_safe_redirect(admin_url());
             exit;
+        }
+
+        if (! current_user_can('edit_post', $postId)) {
+            wp_die(esc_html__('Permission denied.', 'dizzy-events-manager'));
         }
 
         check_admin_referer(

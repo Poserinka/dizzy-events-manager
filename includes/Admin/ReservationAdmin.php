@@ -73,15 +73,17 @@ final class ReservationAdmin
 
     public function updateStatus(): void
     {
-        if (! current_user_can('manage_options')) {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || ! current_user_can('manage_options')) {
             wp_die('Unauthorized');
         }
 
-        $id = (int) ($_POST['reservation_id'] ?? 0);
+        $id = isset($_POST['reservation_id']) ? absint($_POST['reservation_id']) : 0;
 
         check_admin_referer('dizzy_update_reservation_status_' . $id);
 
-        $status = sanitize_key((string) ($_POST['status'] ?? 'pending'));
+        $status = isset($_POST['status']) && is_string($_POST['status'])
+            ? sanitize_key(wp_unslash($_POST['status']))
+            : 'pending';
 
         if (in_array($status, ['pending', 'confirmed', 'cancelled'], true)) {
             $this->repository->update($id, ['status' => $status]);
@@ -93,11 +95,11 @@ final class ReservationAdmin
 
     public function deleteReservation(): void
     {
-        if (! current_user_can('manage_options')) {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || ! current_user_can('manage_options')) {
             wp_die('Unauthorized');
         }
 
-        $id = (int) ($_GET['reservation_id'] ?? 0);
+        $id = isset($_POST['reservation_id']) ? absint($_POST['reservation_id']) : 0;
 
         check_admin_referer('dizzy_delete_reservation_' . $id);
 
