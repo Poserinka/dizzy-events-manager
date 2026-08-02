@@ -10,18 +10,38 @@ final class MailService
 {
     public function send(string $to, string $subject, string $message, array $headers = []): bool
     {
-        return wp_mail($to, $subject, $message, $headers);
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+        return wp_mail(
+            $to,
+            $subject,
+            wpautop($message),
+            $headers
+        );
     }
 
     public function sendTemplate(string $to, string $subject, string $template, array $data = []): bool
     {
-        $message = $this->renderTemplate($template, $data);
-
-        return $this->send($to, $subject, $message);
+        return $this->send(
+            $to,
+            $subject,
+            $this->renderTemplate($template, $data)
+        );
     }
 
     private function renderTemplate(string $template, array $data): string
     {
-        return '';
+        $path = dirname(__DIR__) . '/Templates/' . $template . '.php';
+
+        if (! file_exists($path)) {
+            return '';
+        }
+
+        extract($data, EXTR_SKIP);
+
+        ob_start();
+        include $path;
+
+        return (string) ob_get_clean();
     }
 }
