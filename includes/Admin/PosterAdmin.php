@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Poster\Services\PosterService;
-
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -35,21 +34,24 @@ final class PosterAdmin
 
     public function render(WP_Post $post): void
     {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+
         wp_nonce_field(
             'dizzy_generate_poster_' . $post->ID,
             'dizzy_poster_nonce'
         );
 
-        echo '<p><button class="button button-primary" name="action" value="dizzy_generate_poster">';
-        echo esc_html__('Generate Poster', 'dizzy-events-manager');
-        echo '</button></p>';
+        echo '<input type="hidden" name="action" value="dizzy_generate_poster">';
+        echo '<input type="hidden" name="post_id" value="' . esc_attr((string) $post->ID) . '">';
 
         submit_button(
             esc_html__('Generate Poster', 'dizzy-events-manager'),
             'primary',
-            'dizzy_generate_poster',
+            'submit',
             false
         );
+
+        echo '</form>';
     }
 
     public function generate(): void
