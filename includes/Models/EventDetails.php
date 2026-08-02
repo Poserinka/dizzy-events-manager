@@ -43,22 +43,29 @@ readonly class EventDetails
      *
      * @param array<string, mixed> $meta Event metadata.
      */
-    public static function fromMeta(array $meta, ?string $genre = null): self
+    public static function fromMeta(
+        array $meta,
+        ?string $genre = null,
+        ?string $artist = null,
+        ?string $venue = null,
+        ?string $address = null,
+        ?string $mapsUrl = null,
+    ): self
     {
         return new self(
-            artist: self::stringValue(
+            artist: $artist ?? self::stringValue(
                 self::metaValue($meta, 'artist')
             ),
             genre: $genre ?? self::stringValue(
                 self::metaValue($meta, 'genre')
             ),
-            venue: self::stringValue(
+            venue: $venue ?? self::stringValue(
                 self::metaValue($meta, 'venue')
             ) ?? self::DEFAULT_VENUE,
-            address: self::stringValue(
+            address: $address ?? self::stringValue(
                 self::metaValue($meta, 'address')
             ) ?? self::DEFAULT_ADDRESS,
-            mapsUrl: self::urlValue(
+            mapsUrl: $mapsUrl ?? self::urlValue(
                 self::metaValue($meta, 'maps_url')
             ) ?? self::DEFAULT_MAPS_URL,
             ticketUrl: self::urlValue(

@@ -72,10 +72,27 @@ final class EventService
         $genre = is_wp_error($genreNames)
             ? null
             : implode(', ', array_map('strval', $genreNames));
+        $artistNames = wp_get_post_terms($eventId, Config::TAX_ARTIST, ['fields' => 'names']);
+        $artist = is_wp_error($artistNames)
+            ? null
+            : implode(', ', array_map('strval', $artistNames));
+        $venueTerms = wp_get_post_terms($eventId, Config::TAX_VENUE);
+        $venueTerm = ! is_wp_error($venueTerms) ? ($venueTerms[0] ?? null) : null;
+        $venue = $venueTerm instanceof \WP_Term ? $venueTerm->name : null;
+        $address = $venueTerm instanceof \WP_Term
+            ? trim((string) get_term_meta($venueTerm->term_id, '_dizzy_address', true))
+            : null;
+        $mapsUrl = $venueTerm instanceof \WP_Term
+            ? esc_url_raw((string) get_term_meta($venueTerm->term_id, '_dizzy_maps_url', true))
+            : null;
 
         return EventDetails::fromMeta(
             get_post_meta($eventId),
-            $genre !== '' ? $genre : null
+            $genre !== '' ? $genre : null,
+            $artist !== '' ? $artist : null,
+            $venue,
+            $address !== '' ? $address : null,
+            $mapsUrl !== '' ? $mapsUrl : null,
         );
     }
 

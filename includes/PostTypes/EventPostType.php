@@ -17,6 +17,8 @@ final class EventPostType
 {
     private const GENRE_MIGRATION_OPTION = 'dizzy_events_genre_taxonomy_migrated';
 
+    private const RELATION_MIGRATION_OPTION = 'dizzy_events_artist_venue_taxonomy_migrated';
+
     /**
      * Register post type.
      */
@@ -67,6 +69,7 @@ final class EventPostType
 
         $this->registerTaxonomies();
         $this->migrateLegacyGenres();
+        $this->migrateLegacyRelations();
     }
 
     private function registerTaxonomies(): void
@@ -108,6 +111,46 @@ final class EventPostType
                 'show_admin_column' => true,
                 'show_in_rest' => true,
                 'rewrite' => ['slug' => 'event-genre'],
+            ]
+        );
+
+        register_taxonomy(
+            Config::TAX_ARTIST,
+            [Config::POST_TYPE_EVENT],
+            [
+                'labels' => [
+                    'name' => __('Artists', 'dizzy-events-manager'),
+                    'singular_name' => __('Artist', 'dizzy-events-manager'),
+                    'search_items' => __('Search Artists', 'dizzy-events-manager'),
+                    'all_items' => __('All Artists', 'dizzy-events-manager'),
+                    'edit_item' => __('Edit Artist', 'dizzy-events-manager'),
+                    'add_new_item' => __('Add Artist', 'dizzy-events-manager'),
+                ],
+                'public' => true,
+                'hierarchical' => false,
+                'show_admin_column' => true,
+                'show_in_rest' => true,
+                'rewrite' => ['slug' => 'event-artist'],
+            ]
+        );
+
+        register_taxonomy(
+            Config::TAX_VENUE,
+            [Config::POST_TYPE_EVENT],
+            [
+                'labels' => [
+                    'name' => __('Venues', 'dizzy-events-manager'),
+                    'singular_name' => __('Venue', 'dizzy-events-manager'),
+                    'search_items' => __('Search Venues', 'dizzy-events-manager'),
+                    'all_items' => __('All Venues', 'dizzy-events-manager'),
+                    'edit_item' => __('Edit Venue', 'dizzy-events-manager'),
+                    'add_new_item' => __('Add Venue', 'dizzy-events-manager'),
+                ],
+                'public' => true,
+                'hierarchical' => true,
+                'show_admin_column' => true,
+                'show_in_rest' => true,
+                'rewrite' => ['slug' => 'event-venue'],
             ]
         );
     }
@@ -153,6 +196,63 @@ final class EventPostType
         if ($migrationSucceeded) {
             flush_rewrite_rules(false);
             update_option(self::GENRE_MIGRATION_OPTION, '1', false);
+        }
+    }
+
+    private function migrateLegacyRelations(): void
+    {
+        if (get_option(self::RELATION_MIGRATION_OPTION, '') === '1') {
+            return;
+        }
+
+        $eventIds = get_posts([
+            'post_type' => Config::POST_TYPE_EVENT,
+            'post_status' => 'any',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+        ]);
+        $succeeded = true;
+
+        foreach ($eventIds as $eventId) {
+            $eventId = (int) $eventId;
+            $artist = trim((string) get_post_meta($eventId, '_dizzy_artist', true));
+            $venue = trim((string) get_post_meta($eventId, '_dizzy_venue', true));
+
+            if ($artist !== '' && ! has_term('', Config::TAX_ARTIST, $eventId)) {
+                $artists = array_values(array_filter(array_map('trim', explode(',', $artist))));
+                $result = wp_set_object_terms($eventId, $artists, Config::TAX_ARTIST);
+                $succeeded = $succeeded && ! is_wp_error($result);
+            }
+
+            if ($venue !== '' && ! has_term('', Config::TAX_VENUE, $eventId)) {
+                $result = wp_set_object_terms($eventId, [$venue], Config::TAX_VENUE);
+
+                if (is_wp_error($result)) {
+                    $succeeded = false;
+                    continue;
+                }
+
+                $termId = (int) ($result[0] ?? 0);
+
+                if ($termId > 0) {
+                    $address = trim((string) get_post_meta($eventId, '_dizzy_address', true));
+                    $mapsUrl = trim((string) get_post_meta($eventId, '_dizzy_maps_url', true));
+
+                    if ($address !== '' && get_term_meta($termId, '_dizzy_address', true) === '') {
+                        update_term_meta($termId, '_dizzy_address', $address);
+                    }
+
+                    if ($mapsUrl !== '' && get_term_meta($termId, '_dizzy_maps_url', true) === '') {
+                        update_term_meta($termId, '_dizzy_maps_url', $mapsUrl);
+                    }
+                }
+            }
+        }
+
+        if ($succeeded) {
+            flush_rewrite_rules(false);
+            update_option(self::RELATION_MIGRATION_OPTION, '1', false);
         }
     }
 }

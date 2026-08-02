@@ -16,12 +16,6 @@ defined('ABSPATH') || exit;
  */
 final class EventDetailsMetaBox
 {
-    private const DEFAULT_VENUE = 'Jazzcafé Dizzy';
-
-    private const DEFAULT_ADDRESS = "'s-Gravendijkwal 127, 3021 EK Rotterdam";
-
-    private const DEFAULT_MAPS_URL = 'https://maps.app.goo.gl/t73PkgDRtb6RvKFMA';
-
     /**
      * Register hooks.
      */
@@ -73,10 +67,6 @@ final class EventDetailsMetaBox
         );
 
         $fields = [
-            'artist'       => '',
-            'venue'        => self::DEFAULT_VENUE,
-            'address'      => self::DEFAULT_ADDRESS,
-            'maps_url'     => self::DEFAULT_MAPS_URL,
             'ticket_url'   => '',
             'ticket_price' => '',
         ];
@@ -167,10 +157,6 @@ final class EventDetailsMetaBox
         }
 
         $fields = [
-            'artist',
-            'venue',
-            'address',
-            'maps_url',
             'ticket_url',
             'ticket_price',
         ];
