@@ -22,6 +22,7 @@ final class AdminServiceProvider
         });
 
         $container->singleton(EventDetailsMetaBox::class, static fn (): EventDetailsMetaBox => new EventDetailsMetaBox());
+        $container->singleton(EventStatusMetaBox::class, static fn (): EventStatusMetaBox => new EventStatusMetaBox());
         $container->singleton(AdminAssets::class, static fn (): AdminAssets => new AdminAssets());
         $container->singleton(ReservationAdmin::class, static function () use ($container): ReservationAdmin {
             return new ReservationAdmin($container->get(ReservationRepository::class));
@@ -37,6 +38,7 @@ final class AdminServiceProvider
 
         $container->get(OccurrenceMetaBox::class)->register();
         $container->get(EventDetailsMetaBox::class)->register();
+        $container->get(EventStatusMetaBox::class)->register();
         $container->get(AdminAssets::class)->register();
         $container->get(ReservationAdmin::class)->register();
         $container->get(PosterAdmin::class)->register();
@@ -44,3 +46,4 @@ final class AdminServiceProvider
         $container->get(VenueTaxonomyFields::class)->register();
     }
 }
+

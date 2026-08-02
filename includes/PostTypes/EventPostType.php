@@ -24,6 +24,8 @@ final class EventPostType
      */
     public function register(): void
     {
+        $this->registerStatuses();
+
         register_post_type(
             Config::POST_TYPE_EVENT,
             [
@@ -70,6 +72,45 @@ final class EventPostType
         $this->registerTaxonomies();
         $this->migrateLegacyGenres();
         $this->migrateLegacyRelations();
+    }
+
+    private function registerStatuses(): void
+    {
+        register_post_status(
+            'cancelled',
+            [
+                'label' => __('Cancelled', 'dizzy-events-manager'),
+                'public' => false,
+                'internal' => false,
+                'protected' => true,
+                'exclude_from_search' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'label_count' => _n_noop(
+                    'Cancelled <span class="count">(%s)</span>',
+                    'Cancelled <span class="count">(%s)</span>',
+                    'dizzy-events-manager'
+                ),
+            ]
+        );
+
+        register_post_status(
+            'archived',
+            [
+                'label' => __('Archived', 'dizzy-events-manager'),
+                'public' => false,
+                'internal' => false,
+                'protected' => true,
+                'exclude_from_search' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'label_count' => _n_noop(
+                    'Archived <span class="count">(%s)</span>',
+                    'Archived <span class="count">(%s)</span>',
+                    'dizzy-events-manager'
+                ),
+            ]
+        );
     }
 
     private function registerTaxonomies(): void
@@ -256,3 +297,4 @@ final class EventPostType
         }
     }
 }
+
