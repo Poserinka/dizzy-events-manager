@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dizzy\Events\Social\Providers;
 
 use Dizzy\Events\Core\Container;
+use Dizzy\Events\Social\Listeners\PosterCreatedListener;
 use Dizzy\Events\Social\Repositories\SocialRepository;
 use Dizzy\Events\Social\Services\SocialService;
 
@@ -27,6 +28,15 @@ final class SocialServiceProvider
                 return new SocialService(
                     $container->get(SocialRepository::class)
                 );
+            }
+        );
+
+        add_action(
+            'plugins_loaded',
+            static function () use ($container): void {
+                (new PosterCreatedListener(
+                    $container->get(SocialService::class)
+                ))->register();
             }
         );
     }
