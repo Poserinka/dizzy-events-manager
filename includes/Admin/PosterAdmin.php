@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Dizzy\Events\Admin;
 
-use Dizzy\Events\Poster\Services\PosterService;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
+use Dizzy\Events\Poster\Services\PosterService;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -84,10 +84,22 @@ final class PosterAdmin
 
         $this->service->create([
             'event_id' => $postId,
-            'prompt' => get_the_title($postId),
+            'prompt' => $this->buildPrompt($postId),
         ]);
 
         wp_safe_redirect(get_edit_post_link($postId, ''));
         exit;
+    }
+
+    private function buildPrompt(int $postId): string
+    {
+        $title = get_the_title($postId);
+        $content = wp_strip_all_tags((string) get_post_field('post_content', $postId));
+
+        return sprintf(
+            'Create a professional event poster for Jazzcafé Dizzy Rotterdam. Event: %s. Details: %s. Style: modern jazz club, premium atmosphere, live music promotion.',
+            $title,
+            $content
+        );
     }
 }
