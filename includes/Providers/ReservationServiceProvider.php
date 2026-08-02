@@ -6,6 +6,7 @@ namespace Dizzy\Events\Providers;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Mail\Services\MailService;
+use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Reservations\ReservationRepository;
 use Dizzy\Events\Reservations\ReservationService;
 
@@ -29,7 +30,8 @@ final class ReservationServiceProvider
             static function () use ($container): ReservationService {
                 return new ReservationService(
                     $container->get(ReservationRepository::class),
-                    $container->get(MailService::class)
+                    $container->get(MailService::class),
+                    $container->get(OccurrenceRepository::class)
                 );
             }
         );
