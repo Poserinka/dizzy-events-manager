@@ -7,6 +7,7 @@ namespace Dizzy\Events\Admin;
 use Dizzy\Events\Core\Config;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
 use Dizzy\Events\Poster\Services\PosterService;
+use Throwable;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -38,6 +39,9 @@ final class PosterAdmin
     public function render(WP_Post $post): void
     {
         $poster = $this->repository->findByEvent($post->ID);
+        $status = isset($_GET['dizzy_poster_status']) && is_string($_GET['dizzy_poster_status'])
+            ? sanitize_key(wp_unslash($_GET['dizzy_poster_status']))
+            : '';
 
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
 
@@ -50,6 +54,12 @@ final class PosterAdmin
         echo '<input type="hidden" name="post_id" value="' . esc_attr((string) $post->ID) . '">';
 
         echo '<p>' . esc_html__('Generate an AI poster for this event.', 'dizzy-events-manager') . '</p>';
+
+        if ($status === 'success') {
+            echo '<div class="notice notice-success inline"><p>' . esc_html__('Poster generated successfully.', 'dizzy-events-manager') . '</p></div>';
+        } elseif ($status === 'error') {
+            echo '<div class="notice notice-error inline"><p>' . esc_html__('Poster generation failed. Check the API configuration and try again.', 'dizzy-events-manager') . '</p></div>';
+        }
 
         if ($poster && $poster->imageUrl !== '') {
             echo '<img src="' . esc_url($poster->imageUrl) . '" style="width:100%;height:auto;" alt="">';
@@ -88,12 +98,20 @@ final class PosterAdmin
             'dizzy_poster_nonce'
         );
 
-        $this->service->create([
-            'event_id' => $postId,
-            'prompt' => $this->buildPrompt($postId),
-        ]);
+        $redirectUrl = get_edit_post_link($postId, '')
+            ?: admin_url('post.php?post=' . $postId . '&action=edit');
 
-        wp_safe_redirect(get_edit_post_link($postId, ''));
+        try {
+            $this->service->create([
+                'event_id' => $postId,
+                'prompt' => $this->buildPrompt($postId),
+            ]);
+        } catch (Throwable) {
+            wp_safe_redirect(add_query_arg('dizzy_poster_status', 'error', $redirectUrl));
+            exit;
+        }
+
+        wp_safe_redirect(add_query_arg('dizzy_poster_status', 'success', $redirectUrl));
         exit;
     }
 

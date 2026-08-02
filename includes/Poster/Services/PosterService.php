@@ -7,6 +7,7 @@ namespace Dizzy\Events\Poster\Services;
 use Dizzy\Events\Poster\Contracts\PosterGenerator;
 use Dizzy\Events\Poster\Models\Poster;
 use Dizzy\Events\Poster\Repositories\PosterRepository;
+use RuntimeException;
 
 defined('ABSPATH') || exit;
 
@@ -20,18 +21,27 @@ final class PosterService
 
     public function create(array $data): Poster
     {
-        if (empty($data['image_url'])) {
+        $imageUrl = isset($data['image_url']) && is_string($data['image_url'])
+            ? trim($data['image_url'])
+            : '';
+
+        if ($imageUrl === '') {
             $data['image_url'] = $this->generator->generate(
                 (string) ($data['prompt'] ?? '')
             );
+
+            $imageUrl = trim((string) $data['image_url']);
         }
 
-        if (! empty($data['image_url'])) {
-            $data['attachment_id'] = $this->importMedia(
-                (string) $data['image_url'],
-                (int) ($data['event_id'] ?? 0)
-            );
+        if ($imageUrl === '') {
+            throw new RuntimeException('Poster generation returned no image.');
         }
+
+        $data['image_url'] = $imageUrl;
+        $data['attachment_id'] = $this->importMedia(
+            $imageUrl,
+            (int) ($data['event_id'] ?? 0)
+        );
 
         $poster = $this->repository->create($data);
 
