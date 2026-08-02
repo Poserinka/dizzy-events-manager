@@ -19,6 +19,7 @@ final class ReservationService
         private readonly ReservationRepository $repository,
         private readonly MailService $mailer,
         private readonly OccurrenceRepository $occurrences,
+        private readonly TicketService $tickets,
     ) {
     }
 
@@ -124,10 +125,17 @@ final class ReservationService
         $email = (string) ($reservation['email'] ?? '');
 
         if ($email !== '' && is_email($email)) {
+            $ticketUrl = $status === ReservationStatus::Confirmed
+                ? $this->tickets->ticketUrl($reservation)
+                : '';
             [$subject, $message] = match ($status) {
                 ReservationStatus::Confirmed => [
                     'Reservation confirmed',
-                    'Your reservation has been confirmed.',
+                    sprintf(
+                        'Your reservation has been confirmed.<br><br><a href="%1$s">Open your ticket</a><br><br><img src="%2$s" width="240" height="240" alt="QR ticket">',
+                        esc_url($ticketUrl),
+                        esc_url($this->tickets->qrImageUrl($ticketUrl))
+                    ),
                 ],
                 ReservationStatus::Cancelled => [
                     'Reservation cancelled',
