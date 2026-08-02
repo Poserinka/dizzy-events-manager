@@ -6,6 +6,7 @@ namespace Dizzy\Events\Admin;
 
 use Dizzy\Events\Core\Container;
 use Dizzy\Events\Poster\Services\PosterService;
+use Dizzy\Events\Reports\Admin\ReportsAdmin;
 use Dizzy\Events\Repositories\OccurrenceRepository;
 use Dizzy\Events\Reservations\ReservationRepository;
 use Dizzy\Events\Services\OccurrenceService;
@@ -29,6 +30,9 @@ final class AdminServiceProvider
             return new PosterAdmin($container->get(PosterService::class));
         });
         $container->singleton(PosterSettings::class, static fn (): PosterSettings => new PosterSettings());
+        $container->singleton(ReportsAdmin::class, static function () use ($container): ReportsAdmin {
+            return new ReportsAdmin($container->get(\Dizzy\Events\Reports\Services\ReportService::class));
+        });
 
         add_action('admin_init', static function () use ($container): void {
             $container->get(OccurrenceMetaBox::class)->register();
@@ -37,6 +41,7 @@ final class AdminServiceProvider
             $container->get(ReservationAdmin::class)->register();
             $container->get(PosterAdmin::class)->register();
             $container->get(PosterSettings::class)->register();
+            $container->get(ReportsAdmin::class)->register();
         });
     }
 }
