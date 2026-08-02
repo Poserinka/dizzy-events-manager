@@ -26,11 +26,6 @@ final class EventRepository extends AbstractRepository
     private const POST_TYPE = 'event';
 
     /**
-     * Table is not used for WordPress posts.
-     */
-    protected string $table = 'posts';
-
-    /**
      * Model handled by repository.
      *
      * @return class-string<Event>
