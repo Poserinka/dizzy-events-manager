@@ -73,7 +73,7 @@ final class CheckinAdmin
                         <td><?php echo esc_html((string) ($reservation['name'] ?? '')); ?></td>
                         <td><?php echo esc_html((string) ($reservation['guests'] ?? 1)); ?></td>
                         <td><?php echo esc_html((string) ($reservation['status'] ?? '')); ?></td>
-                        <td><?php echo esc_html((string) ($reservation['checked_in_at'] ?? 'â€”')); ?></td>
+                        <td><?php echo esc_html((string) ($reservation['checked_in_at'] ?? '-')); ?></td>
                         <td>
                             <?php if ((string) ($reservation['status'] ?? '') === 'confirmed') : ?>
                                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -112,6 +112,16 @@ final class CheckinAdmin
                 event.preventDefault();
                 if (input.value) openTicket(input.value);
             });
+            setInterval(async () => {
+                try {
+                    const html = await fetch(window.location.href, {credentials:'same-origin'}).then(response => response.text());
+                    const next = new DOMParser().parseFromString(html, 'text/html');
+                    const values = next.querySelectorAll('[data-stat-value]');
+                    document.querySelectorAll('[data-stat-value]').forEach((element, index) => {
+                        if (values[index]) element.textContent = values[index].textContent;
+                    });
+                } catch (error) {}
+            }, 10000);
             if (!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) {
                 message.textContent = <?php echo wp_json_encode(__('Camera QR scanning is not supported by this browser. Paste the ticket URL instead.', 'dizzy-events-manager')); ?>;
                 return;
@@ -134,16 +144,6 @@ final class CheckinAdmin
                 };
                 scan();
             }).catch(() => { message.textContent = <?php echo wp_json_encode(__('Camera access was denied. Paste the ticket URL instead.', 'dizzy-events-manager')); ?>; });
-            setInterval(async () => {
-                try {
-                    const html = await fetch(window.location.href, {credentials:'same-origin'}).then(response => response.text());
-                    const next = new DOMParser().parseFromString(html, 'text/html');
-                    const values = next.querySelectorAll('[data-stat-value]');
-                    document.querySelectorAll('[data-stat-value]').forEach((element, index) => {
-                        if (values[index]) element.textContent = values[index].textContent;
-                    });
-                } catch (error) {}
-            }, 10000);
         })();
         </script>
         <?php
