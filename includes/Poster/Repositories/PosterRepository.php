@@ -15,29 +15,21 @@ final class PosterRepository
         global $wpdb;
 
         $table = $wpdb->prefix . 'dizzy_event_posters';
-
         $now = current_time('mysql');
 
         $wpdb->insert(
             $table,
             [
-                'event_id'   => $data['event_id'] ?? null,
-                'prompt'     => $data['prompt'] ?? '',
-                'image_url'  => $data['image_url'] ?? '',
-                'provider'   => $data['provider'] ?? '',
-                'status'     => $data['status'] ?? 'draft',
+                'event_id' => $data['event_id'] ?? null,
+                'attachment_id' => $data['attachment_id'] ?? null,
+                'prompt' => $data['prompt'] ?? '',
+                'image_url' => $data['image_url'] ?? '',
+                'provider' => $data['provider'] ?? '',
+                'status' => $data['status'] ?? 'draft',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
-            [
-                '%d',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-                '%s',
-            ]
+            ['%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
         );
 
         return $this->find((int) $wpdb->insert_id);
@@ -50,16 +42,14 @@ final class PosterRepository
         $table = $wpdb->prefix . 'dizzy_event_posters';
 
         $row = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE id = %d",
-                $id
-            ),
+            $wpdb->prepare("SELECT * FROM {$table} WHERE id = %d", $id),
             ARRAY_A
         );
 
         return new Poster(
             (int) ($row['id'] ?? 0),
             isset($row['event_id']) ? (int) $row['event_id'] : null,
+            isset($row['attachment_id']) ? (int) $row['attachment_id'] : null,
             (string) ($row['prompt'] ?? ''),
             (string) ($row['image_url'] ?? ''),
             (string) ($row['status'] ?? 'draft'),
