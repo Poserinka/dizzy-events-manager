@@ -17,6 +17,9 @@ final class OccurrenceMetaBox
 {
     private const ERROR_QUERY_ARG = 'dizzy_occurrence_error';
     private const VALIDATION_QUERY_ARG = 'dizzy_occurrence_validation';
+    private const SUCCESS_QUERY_ARG = 'dizzy_occurrence_saved';
+
+    private bool $savedThisRequest = false;
 
     public function __construct(
         private OccurrenceRepository $repository,
@@ -27,6 +30,7 @@ final class OccurrenceMetaBox
     public function register(): void
     {
         add_action('add_meta_boxes_' . Config::POST_TYPE_EVENT, [$this, 'add']);
+        add_action('admin_init', [$this, 'saveFromAdminRequest'], 20);
         add_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'save'], 20);
         add_action('admin_notices', [$this, 'renderAdminNotices']);
     }
@@ -119,11 +123,31 @@ final class OccurrenceMetaBox
         return $options;
     }
 
-    public function save(int $postId): void
+    public function saveFromAdminRequest(): void
     {
-        if (! $this->canSave($postId)) {
+        if (
+            ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST'
+            || ! isset($_POST['post_ID'], $_POST['dizzy_event_date'])
+        ) {
             return;
         }
+
+        $postId = absint($_POST['post_ID']);
+
+        if ($postId <= 0 || get_post_type($postId) !== Config::POST_TYPE_EVENT) {
+            return;
+        }
+
+        $this->save($postId);
+    }
+
+    public function save(int $postId): void
+    {
+        if ($this->savedThisRequest || ! $this->canSave($postId)) {
+            return;
+        }
+
+        $this->savedThisRequest = true;
 
         $submitted = isset($_POST['dizzy_event_date']) && is_array($_POST['dizzy_event_date'])
             ? wp_unslash($_POST['dizzy_event_date'])
@@ -148,6 +172,8 @@ final class OccurrenceMetaBox
             }
 
             delete_post_meta($postId, '_dizzy_recurrence_rule');
+            set_transient($this->successTransientKey($postId), '1', 5 * MINUTE_IN_SECONDS);
+            $this->addRedirectFlag(self::SUCCESS_QUERY_ARG);
         } catch (Throwable $exception) {
             set_transient($this->persistenceTransientKey($postId), $exception->getMessage(), 5 * MINUTE_IN_SECONDS);
             error_log(sprintf('Dizzy Events date save failed for event %d: %s', $postId, $exception->getMessage()));
@@ -161,6 +187,18 @@ final class OccurrenceMetaBox
 
         if ($postId <= 0) {
             return;
+        }
+
+        $successKey = $this->successTransientKey($postId);
+        $saved = get_transient($successKey);
+
+        if ($this->queryFlagIsSet(self::SUCCESS_QUERY_ARG) || $saved === '1') {
+            delete_transient($successKey);
+            ?>
+            <div class="notice notice-success is-dismissible">
+                <p><?php esc_html_e('Event date saved successfully.', 'dizzy-events-manager'); ?></p>
+            </div>
+            <?php
         }
 
         $persistenceKey = $this->persistenceTransientKey($postId);
@@ -252,6 +290,11 @@ final class OccurrenceMetaBox
             'redirect_post_location',
             static fn (string $location): string => add_query_arg($flag, '1', $location)
         );
+    }
+
+    private function successTransientKey(int $postId): string
+    {
+        return sprintf('dizzy_occurrence_success_%d_%d', get_current_user_id(), $postId);
     }
 
     private function persistenceTransientKey(int $postId): string
