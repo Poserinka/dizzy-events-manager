@@ -488,15 +488,7 @@ final class OccurrenceMetaBox
             return false;
         }
 
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return false;
-        }
-
         if (wp_is_post_revision($postId) !== false) {
-            return false;
-        }
-
-        if (wp_is_post_autosave($postId) !== false) {
             return false;
         }
 
