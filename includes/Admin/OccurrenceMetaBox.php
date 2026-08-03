@@ -24,6 +24,8 @@ final class OccurrenceMetaBox
 
     private const VALIDATION_QUERY_ARG = 'dizzy_occurrence_validation';
 
+    private const PERSISTENCE_TRANSIENT_PREFIX = 'dizzy_occurrence_persistence_';
+
     public function __construct(
         private OccurrenceRepository $repository,
         private OccurrenceService $service
@@ -291,6 +293,12 @@ final class OccurrenceMetaBox
                 );
             }
         } catch (Throwable $exception) {
+            set_transient(
+                $this->persistenceTransientKey($postId),
+                $exception->getMessage(),
+                5 * MINUTE_IN_SECONDS
+            );
+
             error_log(
                 sprintf(
                     'Dizzy Events occurrence save failed for event %d: %s',
@@ -325,16 +333,31 @@ final class OccurrenceMetaBox
 
     private function renderPersistenceErrorNotice(): void
     {
+        $postId = isset($_GET['post']) ? absint($_GET['post']) : 0;
+        $details = '';
+
+        if ($postId > 0) {
+            $key = $this->persistenceTransientKey($postId);
+            $stored = get_transient($key);
+            delete_transient($key);
+
+            if (is_string($stored)) {
+                $details = $stored;
+            }
+        }
         ?>
-        <div class="notice notice-error is-dismissible">
+        <div class="notice notice-error">
             <p>
-                <?php
-                esc_html_e(
-                    'The event was saved, but its dates could not be updated. Please try again and check the error log if the problem continues.',
-                    'dizzy-events-manager'
-                );
-                ?>
+                <strong><?php esc_html_e('The event was saved, but its dates could not be updated.', 'dizzy-events-manager'); ?></strong>
             </p>
+            <?php if ($details !== '') : ?>
+                <p>
+                    <?php esc_html_e('Technical details:', 'dizzy-events-manager'); ?>
+                    <code><?php echo esc_html($details); ?></code>
+                </p>
+            <?php else : ?>
+                <p><?php esc_html_e('Please try again and check the WordPress debug log if the problem continues.', 'dizzy-events-manager'); ?></p>
+            <?php endif; ?>
         </div>
         <?php
     }
@@ -420,6 +443,16 @@ final class OccurrenceMetaBox
             __('Row %1$d: %2$s', 'dizzy-events-manager'),
             $row,
             $message
+        );
+    }
+
+    private function persistenceTransientKey(int $postId): string
+    {
+        return sprintf(
+            '%s%d_%d',
+            self::PERSISTENCE_TRANSIENT_PREFIX,
+            get_current_user_id(),
+            $postId
         );
     }
 
