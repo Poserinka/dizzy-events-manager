@@ -31,6 +31,7 @@ final class AdminServiceProvider
         });
         $container->singleton(PosterSettings::class, static fn (): PosterSettings => new PosterSettings());
         $container->singleton(VenueTaxonomyFields::class, static fn (): VenueTaxonomyFields => new VenueTaxonomyFields());
+        $container->singleton(EventListColumns::class, static fn (): EventListColumns => new EventListColumns());
 
         $container->get(OccurrenceMetaBox::class)->register();
         $container->get(EventDetailsMetaBox::class)->register();
@@ -39,5 +40,6 @@ final class AdminServiceProvider
         $container->get(PosterAdmin::class)->register();
         $container->get(PosterSettings::class)->register();
         $container->get(VenueTaxonomyFields::class)->register();
+        $container->get(EventListColumns::class)->register();
     }
 }
