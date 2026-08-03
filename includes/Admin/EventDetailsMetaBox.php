@@ -16,6 +16,7 @@ defined('ABSPATH') || exit;
  */
 final class EventDetailsMetaBox
 {
+    private bool $savedThisRequest = false;
     /**
      * Register hooks.
      */
@@ -29,12 +30,15 @@ final class EventDetailsMetaBox
             ]
         );
 
+        add_action('admin_init', [$this, 'saveFromAdminRequest'], 20);
+
         add_action(
             'save_post_' . Config::POST_TYPE_EVENT,
             [
                 $this,
                 'save',
-            ]
+            ],
+            20
         );
     }
 
@@ -52,7 +56,8 @@ final class EventDetailsMetaBox
             ],
             Config::POST_TYPE_EVENT,
             'side',
-            'default'
+            'default',
+            ['__block_editor_compatible_meta_box' => true]
         );
     }
 
@@ -84,7 +89,7 @@ final class EventDetailsMetaBox
 
             $inputType = match ($field) {
                 'maps_url', 'ticket_url' => 'url',
-                'ticket_price'           => 'number',
+                'ticket_price'           => 'text',
                 default                  => 'text',
             };
             ?>
@@ -150,11 +155,31 @@ final class EventDetailsMetaBox
     /**
      * Save fields.
      */
-    public function save(int $postId): void
+    public function saveFromAdminRequest(): void
     {
-        if (! $this->canSave($postId)) {
+        if (
+            ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST'
+            || ! isset($_POST['post_ID'], $_POST['dizzy_event_details_nonce'])
+        ) {
             return;
         }
+
+        $postId = absint($_POST['post_ID']);
+
+        if ($postId <= 0 || get_post_type($postId) !== Config::POST_TYPE_EVENT) {
+            return;
+        }
+
+        $this->save($postId);
+    }
+
+    public function save(int $postId): void
+    {
+        if ($this->savedThisRequest || ! $this->canSave($postId)) {
+            return;
+        }
+
+        $this->savedThisRequest = true;
 
         $fields = [
             'ticket_url',
@@ -178,11 +203,15 @@ final class EventDetailsMetaBox
                 $value = sanitize_text_field($value);
             }
 
-            update_post_meta(
-                $postId,
-                '_dizzy_' . $field,
-                $value
-            );
+            if ($value === '') {
+                delete_post_meta($postId, '_dizzy_' . $field);
+            } else {
+                update_post_meta(
+                    $postId,
+                    '_dizzy_' . $field,
+                    $value
+                );
+            }
         }
 
         update_post_meta(
@@ -228,15 +257,7 @@ final class EventDetailsMetaBox
             return false;
         }
 
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return false;
-        }
-
         if (wp_is_post_revision($postId) !== false) {
-            return false;
-        }
-
-        if (wp_is_post_autosave($postId) !== false) {
             return false;
         }
 
