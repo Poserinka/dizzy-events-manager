@@ -74,6 +74,7 @@ final class EventDetailsMetaBox
         $fields = [
             'ticket_url'   => '',
             'ticket_price' => '',
+            'capacity'     => '',
         ];
 
         foreach ($fields as $field => $defaultValue) {
@@ -90,6 +91,7 @@ final class EventDetailsMetaBox
             $inputType = match ($field) {
                 'maps_url', 'ticket_url' => 'url',
                 'ticket_price'           => 'text',
+                'capacity'               => 'number',
                 default                  => 'text',
             };
             ?>
@@ -111,15 +113,21 @@ final class EventDetailsMetaBox
                     name="dizzy_<?php echo esc_attr($field); ?>"
                     value="<?php echo esc_attr((string) $value); ?>"
                     <?php if ($field === 'ticket_price') : ?>
-                        min="0"
-                        step="0.01"
                         inputmode="decimal"
+                    <?php elseif ($field === 'capacity') : ?>
+                        min="0"
+                        step="1"
+                        inputmode="numeric"
                     <?php endif; ?>
                 >
 
                 <?php if ($field === 'ticket_price') : ?>
                     <span class="description">
-                        <?php esc_html_e('Price in euros.', 'dizzy-events-manager'); ?>
+                        <?php esc_html_e('Price in euros. Leave empty for a free event.', 'dizzy-events-manager'); ?>
+                    </span>
+                <?php elseif ($field === 'capacity') : ?>
+                    <span class="description">
+                        <?php esc_html_e('Maximum number of guests or tickets. Leave empty or use 0 for unlimited.', 'dizzy-events-manager'); ?>
                     </span>
                 <?php endif; ?>
             </p>
@@ -184,6 +192,7 @@ final class EventDetailsMetaBox
         $fields = [
             'ticket_url',
             'ticket_price',
+            'capacity',
         ];
 
         foreach ($fields as $field) {
@@ -199,6 +208,9 @@ final class EventDetailsMetaBox
                 $value = esc_url_raw($value);
             } elseif ($field === 'ticket_price') {
                 $value = $this->sanitizeTicketPrice($value);
+            } elseif ($field === 'capacity') {
+                $value = absint($value);
+                $value = $value > 0 ? (string) $value : '';
             } else {
                 $value = sanitize_text_field($value);
             }
