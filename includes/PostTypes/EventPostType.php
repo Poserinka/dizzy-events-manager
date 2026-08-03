@@ -34,8 +34,20 @@ final class EventPostType
                     'singular_name' =>
                         __('Event', 'dizzy-events-manager'),
 
+                    'menu_name' =>
+                        __('Events', 'dizzy-events-manager'),
+
+                    'all_items' =>
+                        __('All Events', 'dizzy-events-manager'),
+
                     'add_new' =>
-                        __('Add New Event', 'dizzy-events-manager'),
+                        __('Add Event', 'dizzy-events-manager'),
+
+                    'add_new_item' =>
+                        __('Add Event', 'dizzy-events-manager'),
+
+                    'new_item' =>
+                        __('New Event', 'dizzy-events-manager'),
 
                     'edit_item' =>
                         __('Edit Event', 'dizzy-events-manager'),
