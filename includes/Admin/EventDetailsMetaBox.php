@@ -72,9 +72,10 @@ final class EventDetailsMetaBox
         );
 
         $fields = [
-            'ticket_url'   => '',
-            'ticket_price' => '',
-            'capacity'     => '',
+            'ticket_url'            => '',
+            'standard_ticket_price' => '',
+            'student_ticket_price'  => '',
+            'capacity'              => '',
         ];
 
         foreach ($fields as $field => $defaultValue) {
@@ -84,14 +85,18 @@ final class EventDetailsMetaBox
                 true
             );
 
+            if ($value === '' && $field === 'standard_ticket_price') {
+                $value = get_post_meta($post->ID, '_dizzy_ticket_price', true);
+            }
+
             if ($value === '') {
                 $value = $defaultValue;
             }
 
             $inputType = match ($field) {
                 'maps_url', 'ticket_url' => 'url',
-                'ticket_price'           => 'text',
-                'capacity'               => 'number',
+                'standard_ticket_price', 'student_ticket_price' => 'text',
+                'capacity' => 'number',
                 default                  => 'text',
             };
             ?>
@@ -112,7 +117,7 @@ final class EventDetailsMetaBox
                     class="widefat"
                     name="dizzy_<?php echo esc_attr($field); ?>"
                     value="<?php echo esc_attr((string) $value); ?>"
-                    <?php if ($field === 'ticket_price') : ?>
+                    <?php if (str_ends_with($field, 'ticket_price')) : ?>
                         inputmode="decimal"
                     <?php elseif ($field === 'capacity') : ?>
                         min="0"
@@ -121,7 +126,7 @@ final class EventDetailsMetaBox
                     <?php endif; ?>
                 >
 
-                <?php if ($field === 'ticket_price') : ?>
+                <?php if (str_ends_with($field, 'ticket_price')) : ?>
                     <span class="description">
                         <?php esc_html_e('Price in euros. Leave empty for a free event.', 'dizzy-events-manager'); ?>
                     </span>
@@ -191,7 +196,8 @@ final class EventDetailsMetaBox
 
         $fields = [
             'ticket_url',
-            'ticket_price',
+            'standard_ticket_price',
+            'student_ticket_price',
             'capacity',
         ];
 
@@ -206,7 +212,7 @@ final class EventDetailsMetaBox
 
             if (in_array($field, ['maps_url', 'ticket_url'], true)) {
                 $value = esc_url_raw($value);
-            } elseif ($field === 'ticket_price') {
+            } elseif (str_ends_with($field, 'ticket_price')) {
                 $value = $this->sanitizeTicketPrice($value);
             } elseif ($field === 'capacity') {
                 $value = absint($value);
@@ -223,6 +229,14 @@ final class EventDetailsMetaBox
                     '_dizzy_' . $field,
                     $value
                 );
+            }
+
+            if ($field === 'standard_ticket_price') {
+                if ($value === '') {
+                    delete_post_meta($postId, '_dizzy_ticket_price');
+                } else {
+                    update_post_meta($postId, '_dizzy_ticket_price', $value);
+                }
             }
         }
 
