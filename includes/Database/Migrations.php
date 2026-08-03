@@ -33,7 +33,11 @@ final class Migrations
             '0.0.0'
         );
 
-        if (version_compare($installed, self::VERSION, '>=')) {
+        if (
+            version_compare($installed, self::VERSION, '>=')
+            && self::tableExists('dizzy_event_occurrences')
+            && self::tableExists('dizzy_event_posters')
+        ) {
             return;
         }
 
@@ -44,6 +48,18 @@ final class Migrations
             self::OPTION,
             self::VERSION
         );
+    }
+
+    private static function tableExists(string $suffix): bool
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . $suffix;
+        $found = $wpdb->get_var(
+            $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table))
+        );
+
+        return is_string($found) && $found === $table;
     }
 
     private static function createOccurrencesTable(): void
