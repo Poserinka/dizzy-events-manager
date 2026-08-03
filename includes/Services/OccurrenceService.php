@@ -95,7 +95,6 @@ final class OccurrenceService
             count($endDates),
             count($endTimes),
             count($sortOrders),
-            count($capacities),
             count($ids)
         );
 
