@@ -22,12 +22,16 @@ final class VenueTaxonomyFields
     public function renderAddFields(): void
     {
         $this->renderField('Address', 'dizzy_venue_address', 'text', '');
+        $this->renderField('Phone', 'dizzy_venue_phone', 'text', '');
+        $this->renderField('Social Media', 'dizzy_venue_social_media', 'text', '');
         $this->renderField('Maps URL', 'dizzy_venue_maps_url', 'url', '');
     }
 
     public function renderEditFields(WP_Term $term): void
     {
         $this->renderField('Address', 'dizzy_venue_address', 'text', (string) get_term_meta($term->term_id, '_dizzy_address', true), true);
+        $this->renderField('Phone', 'dizzy_venue_phone', 'text', (string) get_term_meta($term->term_id, '_dizzy_phone', true), true);
+        $this->renderField('Social Media', 'dizzy_venue_social_media', 'text', (string) get_term_meta($term->term_id, '_dizzy_social_media', true), true);
         $this->renderField('Maps URL', 'dizzy_venue_maps_url', 'url', (string) get_term_meta($term->term_id, '_dizzy_maps_url', true), true);
     }
 
@@ -37,13 +41,34 @@ final class VenueTaxonomyFields
             return;
         }
 
-        if (isset($_POST['dizzy_venue_address']) && is_string($_POST['dizzy_venue_address'])) {
-            update_term_meta($termId, '_dizzy_address', sanitize_text_field(wp_unslash($_POST['dizzy_venue_address'])));
-        }
+        $this->saveTextField($termId, 'dizzy_venue_address', '_dizzy_address');
+        $this->saveTextField($termId, 'dizzy_venue_phone', '_dizzy_phone');
+        $this->saveTextField($termId, 'dizzy_venue_social_media', '_dizzy_social_media');
 
         if (isset($_POST['dizzy_venue_maps_url']) && is_string($_POST['dizzy_venue_maps_url'])) {
-            update_term_meta($termId, '_dizzy_maps_url', esc_url_raw(wp_unslash($_POST['dizzy_venue_maps_url'])));
+            $value = esc_url_raw(wp_unslash($_POST['dizzy_venue_maps_url']));
+            $this->updateOrDelete($termId, '_dizzy_maps_url', $value);
         }
+    }
+
+    private function saveTextField(int $termId, string $field, string $metaKey): void
+    {
+        if (! isset($_POST[$field]) || ! is_string($_POST[$field])) {
+            return;
+        }
+
+        $value = sanitize_text_field(wp_unslash($_POST[$field]));
+        $this->updateOrDelete($termId, $metaKey, $value);
+    }
+
+    private function updateOrDelete(int $termId, string $metaKey, string $value): void
+    {
+        if ($value === '') {
+            delete_term_meta($termId, $metaKey);
+            return;
+        }
+
+        update_term_meta($termId, $metaKey, $value);
     }
 
     private function renderField(string $label, string $name, string $type, string $value, bool $tableRow = false): void
@@ -53,7 +78,7 @@ final class VenueTaxonomyFields
 
         echo '<' . esc_attr($tag) . ' class="' . esc_attr($class) . '">';
         echo $tableRow ? '<th scope="row">' : '';
-        echo '<label for="' . esc_attr($name) . '">' . esc_html($label) . '</label>';
+        echo '<label for="' . esc_attr($name) . '">' . esc_html__($label, 'dizzy-events-manager') . '</label>';
         echo $tableRow ? '</th><td>' : '';
         echo '<input type="' . esc_attr($type) . '" id="' . esc_attr($name) . '" name="' . esc_attr($name) . '" value="' . esc_attr($value) . '">';
         echo $tableRow ? '</td>' : '';
