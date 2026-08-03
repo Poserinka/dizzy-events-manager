@@ -165,7 +165,7 @@ final class EventPostType
                     'add_new_item' => __('Add Venue', 'dizzy-events-manager'),
                 ],
                 'public' => true,
-                'hierarchical' => true,
+                'hierarchical' => false,
                 'show_admin_column' => true,
                 'show_in_rest' => true,
                 'rewrite' => ['slug' => 'event-venue'],
