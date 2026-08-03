@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
  */
 final class OccurrenceService
 {
-    private const MAX_OCCURRENCES_PER_EVENT = 100;
+    private const MAX_OCCURRENCES_PER_EVENT = 1;
 
     /**
      * Occurrence service constructor.
