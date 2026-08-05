@@ -37,20 +37,19 @@
         mostUsedTab?.remove();
         find('#dizzy_event_category-pop')?.remove();
 
-        const relationFields = document.createElement('div');
-        relationFields.className = 'dizzy-relation-fields';
         const relationData = window.dizzyEventEditorData || { nonce: '', taxonomies: [] };
         const nonce = document.createElement('input');
         nonce.type = 'hidden';
         nonce.name = 'dizzy_event_relations_nonce';
         nonce.value = relationData.nonce || '';
-        relationFields.appendChild(nonce);
+        const relationSections = {};
 
-        relationData.taxonomies.forEach((item) => {
+        relationData.taxonomies.forEach((item, itemIndex) => {
             const field = document.createElement('div');
             field.className = 'dizzy-relation-field';
+            if (itemIndex === 0) field.appendChild(nonce);
             const label = document.createElement('label');
-            label.textContent = item.label;
+            label.textContent = item.taxonomy === 'dizzy_event_venue' ? 'Venue Name' : item.label;
             const dropdown = document.createElement('details');
             dropdown.className = 'dizzy-multi-dropdown';
             const summary = document.createElement('summary');
@@ -60,6 +59,7 @@
                 const names = [...choices.querySelectorAll('input:checked')].map((input) => input.dataset.name);
                 summary.textContent = names.length ? names.join(', ') : `Select ${item.label.toLowerCase()}`;
                 summary.title = summary.textContent;
+                if (item.taxonomy === 'dizzy_event_artist') renderArtistProfiles();
             };
             item.terms.forEach((term) => {
                 const choice = document.createElement('label');
@@ -76,19 +76,82 @@
                 choices.appendChild(choice);
             });
             dropdown.append(summary, choices);
-            updateSummary();
             const help = document.createElement('p');
             help.className = 'description';
             help.textContent = item.terms.length ? 'You can select more than one item.' : 'No existing items are available yet.';
             field.append(label, dropdown, help);
-            relationFields.appendChild(field);
+            const profiles = document.createElement('div');
+            profiles.className = 'dizzy-artist-profiles';
+            field.appendChild(profiles);
+
+            const renderArtistProfiles = () => {
+                if (item.taxonomy !== 'dizzy_event_artist') return;
+                profiles.innerHTML = '';
+                item.terms.filter((term) => choices.querySelector(`input[value="${term.id}"]`)?.checked).forEach((term) => {
+                    const profile = document.createElement('div');
+                    profile.className = 'dizzy-artist-profile';
+                    const textField = (fieldName, fieldLabel, value) => {
+                        const wrap = document.createElement('label');
+                        const caption = document.createElement('span');
+                        const input = document.createElement('input');
+                        caption.textContent = fieldLabel;
+                        input.type = 'text';
+                        input.name = `dizzy_artist_profiles[${term.id}][${fieldName}]`;
+                        input.value = value || '';
+                        wrap.append(caption, input);
+                        return wrap;
+                    };
+                    profile.append(
+                        textField('name', 'Name', term.name),
+                        textField('role', 'Role', term.role),
+                        textField('contact', 'Contact', term.contact)
+                    );
+                    const photo = document.createElement('div');
+                    photo.className = 'dizzy-artist-profile-photo';
+                    const photoLabel = document.createElement('strong');
+                    photoLabel.textContent = 'Artist Photo';
+                    const image = document.createElement('img');
+                    image.alt = '';
+                    if (term.imageUrl) image.src = term.imageUrl;
+                    const imageId = document.createElement('input');
+                    imageId.type = 'hidden';
+                    imageId.name = `dizzy_artist_profiles[${term.id}][image_id]`;
+                    imageId.value = String(term.imageId || 0);
+                    const selectImage = document.createElement('button');
+                    selectImage.type = 'button';
+                    selectImage.className = 'button';
+                    selectImage.textContent = 'Select image';
+                    const removeImage = document.createElement('button');
+                    removeImage.type = 'button';
+                    removeImage.className = 'button';
+                    removeImage.textContent = 'Remove image';
+                    selectImage.addEventListener('click', () => {
+                        const frame = wp.media({title: 'Select Artist Photo', button: {text: 'Use this image'}, library: {type: 'image'}, multiple: false});
+                        frame.on('select', () => {
+                            const selected = frame.state().get('selection').first().toJSON();
+                            imageId.value = String(selected.id);
+                            image.src = selected.sizes?.medium?.url || selected.url;
+                        });
+                        frame.open();
+                    });
+                    removeImage.addEventListener('click', () => { imageId.value = '0'; image.removeAttribute('src'); });
+                    photo.append(photoLabel, image, imageId, selectImage, removeImage);
+                    profile.appendChild(photo);
+                    profiles.appendChild(profile);
+                });
+            };
+            renderArtistProfiles();
+            updateSummary();
+            relationSections[item.taxonomy] = field;
         });
 
         ['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue', '#tagsdiv-dizzy_event_tag'].forEach((selector) => find(selector)?.remove());
 
         section('Event information', 'Public title, description and category.', elements(['#titlediv', '#postdivrich', '#postexcerpt', '#dizzy_event_categorydiv']));
         section('Date and time', 'Set the event start and optional end.', elements(['#dizzy_event_occurrences']));
-        section('Artists, venue and tags', 'Select one or more existing items from each list.', [relationFields]);
+        section('Artist', 'Select one or more artists and edit their profile information.', relationSections.dizzy_event_artist ? [relationSections.dizzy_event_artist] : []);
+        section('Venue', 'Select one or more venues. Jazzcafe Dizzy is selected by default for new events.', relationSections.dizzy_event_venue ? [relationSections.dizzy_event_venue] : []);
+        section('Tags', 'Select one or more existing event tags.', relationSections.dizzy_event_tag ? [relationSections.dizzy_event_tag] : []);
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
         section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']));
         section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']));

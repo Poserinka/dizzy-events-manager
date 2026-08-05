@@ -41,6 +41,7 @@ final class AdminAssets
             DIZZY_EVENTS_VERSION,
             true
         );
+        wp_enqueue_media();
 
         $postId = isset($_GET['post']) ? absint($_GET['post']) : 0;
         wp_localize_script(
@@ -57,24 +58,43 @@ final class AdminAssets
         );
     }
 
-    /** @return array{taxonomy:string,label:string,terms:array<int,array{id:int,name:string,selected:bool}>} */
+    /** @return array{taxonomy:string,label:string,terms:array<int,array<string,mixed>>} */
     private function taxonomyData(string $taxonomy, string $label, int $postId): array
     {
         $selected = $postId > 0 ? wp_get_object_terms($postId, $taxonomy, ['fields' => 'ids']) : [];
         $selectedIds = is_wp_error($selected) ? [] : array_map('intval', $selected);
         $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
 
+        $termData = is_wp_error($terms) ? [] : array_map(
+            static function (\WP_Term $term) use ($taxonomy, $selectedIds, $postId): array {
+                $selected = in_array($term->term_id, $selectedIds, true);
+                if ($postId === 0 && $taxonomy === Config::TAX_VENUE && sanitize_title($term->name) === 'jazzcafe-dizzy') {
+                    $selected = true;
+                }
+
+                $imageId = $taxonomy === Config::TAX_ARTIST
+                    ? absint(get_term_meta($term->term_id, '_dizzy_artist_image_id', true))
+                    : 0;
+
+                return [
+                    'id' => $term->term_id,
+                    'name' => $term->name,
+                    'selected' => $selected,
+                    'role' => $taxonomy === Config::TAX_ARTIST ? $term->description : '',
+                    'contact' => $taxonomy === Config::TAX_ARTIST
+                        ? (string) get_term_meta($term->term_id, '_dizzy_artist_contact', true)
+                        : '',
+                    'imageId' => $imageId,
+                    'imageUrl' => $imageId > 0 ? (string) wp_get_attachment_image_url($imageId, 'medium') : '',
+                ];
+            },
+            $terms
+        );
+
         return [
             'taxonomy' => $taxonomy,
             'label' => $label,
-            'terms' => is_wp_error($terms) ? [] : array_map(
-                static fn (\WP_Term $term): array => [
-                    'id' => $term->term_id,
-                    'name' => $term->name,
-                    'selected' => in_array($term->term_id, $selectedIds, true),
-                ],
-                $terms
-            ),
+            'terms' => $termData,
         ];
     }
 }

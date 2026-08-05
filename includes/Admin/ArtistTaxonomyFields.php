@@ -139,6 +139,22 @@ final class ArtistTaxonomyFields
         (() => {
             let frame;
 
+            const description = document.querySelector('textarea[name="description"]');
+            if (description) {
+                const wrapper = description.closest('.form-field');
+                const label = wrapper?.querySelector('label');
+                const help = wrapper?.querySelector('.description, p');
+                const role = document.createElement('input');
+                role.type = 'text';
+                role.value = description.value;
+                role.id = 'dizzy_artist_role';
+                role.addEventListener('input', () => { description.value = role.value; });
+                description.hidden = true;
+                description.insertAdjacentElement('beforebegin', role);
+                if (label) { label.textContent = 'Role'; label.htmlFor = role.id; }
+                if (help) help.textContent = 'Enter an artist role (Group, Band, Guitarist etc.).';
+            }
+
             document.addEventListener('click', (event) => {
                 const select = event.target.closest('.dizzy-select-artist-image');
                 const remove = event.target.closest('.dizzy-remove-artist-image');

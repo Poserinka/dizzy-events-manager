@@ -115,7 +115,6 @@
 .dizzy-editor-section .dizzy-occurrences-table { min-width: 0; width: 100%; }
 .dizzy-editor-section #postimagediv,
 .dizzy-editor-section #dizzy_event_poster_generator { display: block; width: 100%; }
-.dizzy-relation-fields { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .dizzy-relation-field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
 .dizzy-multi-dropdown { position: relative; }
 .dizzy-multi-dropdown summary {
@@ -149,6 +148,14 @@
 }
 .dizzy-multi-dropdown-choices label { align-items: center; border-radius: 5px; display: flex; font-weight: 400; gap: 8px; margin: 0; padding: 7px; }
 .dizzy-multi-dropdown-choices label:hover { background: #f0f2f5; }
+.dizzy-artist-profiles { display: grid; gap: 16px; margin-top: 18px; }
+.dizzy-artist-profile { background: #f6f7f9; border: 1px solid #dce1e7; border-radius: 8px; display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)) 180px; padding: 16px; }
+.dizzy-artist-profile label span,
+.dizzy-artist-profile-photo strong { display: block; font-size: 13px; margin-bottom: 7px; }
+.dizzy-artist-profile input[type="text"] { width: 100%; }
+.dizzy-artist-profile-photo img { border-radius: 6px; display: block; height: 110px; margin-bottom: 8px; object-fit: cover; width: 110px; }
+.dizzy-artist-profile-photo img:not([src]) { display: none; }
+.dizzy-artist-profile-photo .button { margin: 0 5px 5px 0; }
 
 @media (max-width: 1100px) {
     .dizzy-editor-columns { grid-template-columns: 1fr; }
@@ -160,5 +167,5 @@
     .dizzy-editor-header { align-items: flex-start; flex-direction: column; gap: 14px; }
     .dizzy-editor-columns { padding-top: 14px; }
     .dizzy-editor-side { display: block; width: 100%; }
-    .dizzy-relation-fields { grid-template-columns: 1fr; }
+    .dizzy-artist-profile { grid-template-columns: 1fr; }
 }

@@ -83,6 +83,34 @@ final class EventEditor
                 : [];
             wp_set_object_terms($postId, $values, $taxonomy, false);
         }
+
+        if (! current_user_can('manage_categories')) {
+            return;
+        }
+
+        $profiles = isset($_POST['dizzy_artist_profiles']) && is_array($_POST['dizzy_artist_profiles'])
+            ? wp_unslash($_POST['dizzy_artist_profiles'])
+            : [];
+        foreach ($profiles as $termId => $profile) {
+            $termId = absint($termId);
+            if ($termId <= 0 || ! is_array($profile) || ! term_exists($termId, Config::TAX_ARTIST)) {
+                continue;
+            }
+
+            $name = isset($profile['name']) ? sanitize_text_field((string) $profile['name']) : '';
+            $role = isset($profile['role']) ? sanitize_text_field((string) $profile['role']) : '';
+            if ($name !== '') {
+                wp_update_term($termId, Config::TAX_ARTIST, ['name' => $name, 'description' => $role]);
+            }
+
+            $contact = isset($profile['contact']) ? sanitize_text_field((string) $profile['contact']) : '';
+            if ($contact === '') delete_term_meta($termId, '_dizzy_artist_contact');
+            else update_term_meta($termId, '_dizzy_artist_contact', $contact);
+
+            $imageId = isset($profile['image_id']) ? absint($profile['image_id']) : 0;
+            if ($imageId > 0 && wp_attachment_is_image($imageId)) update_term_meta($termId, '_dizzy_artist_image_id', $imageId);
+            else delete_term_meta($termId, '_dizzy_artist_image_id');
+        }
     }
 
     private function findEventFullWidthTemplate(): string
