@@ -107,16 +107,27 @@
 .dizzy-editor-section #major-publishing-actions { background: transparent; border: 0; padding: 12px 0 0; }
 .dizzy-editor-section #minor-publishing { padding: 0; }
 .dizzy-editor-side .dizzy-editor-section-body { padding: 15px; }
-.dizzy-editor-side #submitdiv,
-.dizzy-editor-side #dizzy-event-status { background: transparent; }
+.dizzy-editor-side #submitdiv { background: transparent; }
 .dizzy-editor-success,
 .dizzy-readiness p { color: #168654; }
 .dizzy-template-summary strong { display: block; font-size: 14px; }
 .dizzy-occurrences-wrapper,
 .dizzy-editor-section .dizzy-occurrences-table { min-width: 0; width: 100%; }
 .dizzy-editor-section #postimagediv,
-.dizzy-editor-section #dizzy_event_poster_generator { display: inline-block; vertical-align: top; width: calc(50% - 10px); }
-.dizzy-editor-section #dizzy_event_poster_generator { margin-left: 16px; }
+.dizzy-editor-section #dizzy_event_poster_generator { display: block; width: 100%; }
+.dizzy-editor-section .dizzy-assigned-terms {
+    background: #f6f7f9;
+    border: 1px solid #dce1e7;
+    border-radius: 7px;
+    display: block !important;
+    margin: 0 0 12px;
+    min-height: 20px;
+    padding: 8px;
+}
+.dizzy-editor-section .dizzy-assigned-terms:empty::before {
+    color: #727984;
+    content: 'No artist or venue selected yet.';
+}
 
 @media (max-width: 1100px) {
     .dizzy-editor-columns { grid-template-columns: 1fr; }
@@ -127,8 +138,5 @@
     #dizzy-event-workspace { margin-right: 10px; }
     .dizzy-editor-header { align-items: flex-start; flex-direction: column; gap: 14px; }
     .dizzy-editor-columns { padding-top: 14px; }
-    .dizzy-editor-side,
-    .dizzy-editor-section #postimagediv,
-    .dizzy-editor-section #dizzy_event_poster_generator { display: block; width: 100%; }
-    .dizzy-editor-section #dizzy_event_poster_generator { margin-left: 0; }
+    .dizzy-editor-side { display: block; width: 100%; }
 }

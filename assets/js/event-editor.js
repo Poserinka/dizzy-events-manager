@@ -33,13 +33,28 @@
             target.appendChild(wrapper);
         };
 
+        const mostUsedTab = find('#dizzy_event_category-tabs a[href="#dizzy_event_category-pop"]')?.closest('li');
+        mostUsedTab?.remove();
+        find('#dizzy_event_category-pop')?.remove();
+
+        const artistBox = find('#tagsdiv-dizzy_event_artist');
+        const venueBox = find('#tagsdiv-dizzy_event_venue');
+        [artistBox, venueBox].filter(Boolean).forEach((box) => {
+            box.classList.add('dizzy-taxonomy-box-visible');
+            box.querySelector('.tagchecklist')?.classList.add('dizzy-assigned-terms');
+        });
+
         section('Event information', 'Public title, description and category.', elements(['#titlediv', '#postdivrich', '#postexcerpt', '#dizzy_event_categorydiv']));
         section('Date and time', 'Set the event start and optional end.', elements(['#dizzy_event_occurrences']));
-        section('Artists and venue', 'Connect artists and a venue to this event.', elements(['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue']));
+        section('Artists and venue', 'Assigned artists are listed above each search field.', [artistBox, venueBox].filter(Boolean));
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
-        section('Featured image and Poster Generator', 'The featured image can be used as the poster background.', elements(['#postimagediv', '#dizzy_event_poster_generator']));
+        section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']));
+        section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']));
         section('Publish', '', elements(['#submitdiv']), side);
-        section('Event status', '', elements(['#dizzy-event-status']), side);
+        const statusBox = find('#dizzy-event-status');
+        const statusContent = statusBox?.querySelector('.inside');
+        section('Event status', 'Control whether the event is public, scheduled or archived.', statusContent ? [statusContent] : [], side);
+        statusBox?.remove();
 
         const template = document.createElement('section');
         template.className = 'dizzy-editor-section dizzy-template-summary';
