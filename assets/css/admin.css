@@ -67,3 +67,68 @@
 #dizzy_event_occurrences .inside {
     padding: 15px;
 }
+
+/* Single-page Event Editor */
+.dizzy-event-editor-screen.dizzy-custom-event-editor-ready #wpcontent { background: #f0f2f5; }
+.dizzy-custom-event-editor-ready .wrap > .wp-heading-inline,
+.dizzy-custom-event-editor-ready .wrap > .page-title-action,
+.dizzy-custom-event-editor-ready #screen-meta-links,
+.dizzy-custom-event-editor-ready #poststuff > h2,
+.dizzy-original-editor-hidden { display: none !important; }
+#dizzy-event-workspace { margin-top: 14px; max-width: 1500px; }
+.dizzy-editor-header { align-items: center; background: #171a20; border-radius: 10px 10px 0 0; color: #fff; display: flex; justify-content: space-between; padding: 18px 22px; }
+.dizzy-editor-header h1 { color: #fff; font-size: 23px; line-height: 1.2; margin: 0 0 4px; padding: 0; }
+.dizzy-editor-header p { color: #aeb5c1; margin: 0; }
+.dizzy-editor-header-actions { display: flex; gap: 9px; }
+.dizzy-editor-columns { align-items: start; background: #f0f2f5; display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr) 290px; padding: 22px 0; }
+.dizzy-editor-section { background: #fff; border: 1px solid #dce1e7; border-radius: 10px; box-shadow: 0 1px 2px rgba(20, 25, 32, .04); margin: 0 0 16px; overflow: hidden; }
+.dizzy-editor-section-head { border-bottom: 1px solid #e8ebef; padding: 15px 18px; }
+.dizzy-editor-section-head h2 { color: #20242a; font-size: 16px; font-weight: 600; margin: 0; padding: 0; }
+.dizzy-editor-section-head p { color: #727984; margin: 4px 0 0; }
+.dizzy-editor-section-body { padding: 18px; }
+.dizzy-editor-section .postbox { border: 0; box-shadow: none; margin: 0 0 18px; min-width: 0; }
+.dizzy-editor-section .postbox:last-child { margin-bottom: 0; }
+.dizzy-editor-section .postbox > .postbox-header,
+.dizzy-editor-section .postbox > h2.hndle,
+.dizzy-editor-section .postbox > button.handlediv { display: none !important; }
+.dizzy-editor-section .postbox .inside { margin: 0; padding: 0; }
+.dizzy-editor-section #titlediv,
+.dizzy-editor-section #postdivrich { margin-bottom: 18px; }
+.dizzy-editor-section #titlewrap input { border: 1px solid #cbd1d8; border-radius: 7px; box-shadow: none; font-size: 20px; padding: 8px 12px; }
+.dizzy-editor-section input[type="text"],
+.dizzy-editor-section input[type="url"],
+.dizzy-editor-section input[type="number"],
+.dizzy-editor-section input[type="date"],
+.dizzy-editor-section select,
+.dizzy-editor-section textarea { border-color: #cbd1d8; border-radius: 7px; box-shadow: none; }
+.dizzy-editor-section input:focus,
+.dizzy-editor-section select:focus,
+.dizzy-editor-section textarea:focus { border-color: #5b5cf0; box-shadow: 0 0 0 1px #5b5cf0; }
+.dizzy-editor-section #major-publishing-actions { background: transparent; border: 0; padding: 12px 0 0; }
+.dizzy-editor-section #minor-publishing { padding: 0; }
+.dizzy-editor-side .dizzy-editor-section-body { padding: 15px; }
+.dizzy-editor-side #submitdiv,
+.dizzy-editor-side #dizzy-event-status { background: transparent; }
+.dizzy-editor-success,
+.dizzy-readiness p { color: #168654; }
+.dizzy-template-summary strong { display: block; font-size: 14px; }
+.dizzy-occurrences-wrapper,
+.dizzy-editor-section .dizzy-occurrences-table { min-width: 0; width: 100%; }
+.dizzy-editor-section #postimagediv,
+.dizzy-editor-section #dizzy_event_poster_generator { display: inline-block; vertical-align: top; width: calc(50% - 10px); }
+.dizzy-editor-section #dizzy_event_poster_generator { margin-left: 16px; }
+
+@media (max-width: 1100px) {
+    .dizzy-editor-columns { grid-template-columns: 1fr; }
+    .dizzy-editor-side { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 782px) {
+    #dizzy-event-workspace { margin-right: 10px; }
+    .dizzy-editor-header { align-items: flex-start; flex-direction: column; gap: 14px; }
+    .dizzy-editor-columns { padding-top: 14px; }
+    .dizzy-editor-side,
+    .dizzy-editor-section #postimagediv,
+    .dizzy-editor-section #dizzy_event_poster_generator { display: block; width: 100%; }
+    .dizzy-editor-section #dizzy_event_poster_generator { margin-left: 0; }
+}

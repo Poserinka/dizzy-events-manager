@@ -23,6 +23,7 @@ final class AdminServiceProvider
         $container->singleton(EventDetailsMetaBox::class, static fn (): EventDetailsMetaBox => new EventDetailsMetaBox());
         $container->singleton(EventStatusMetaBox::class, static fn (): EventStatusMetaBox => new EventStatusMetaBox());
         $container->singleton(AdminAssets::class, static fn (): AdminAssets => new AdminAssets());
+        $container->singleton(EventEditor::class, static fn (): EventEditor => new EventEditor());
         $container->singleton(PosterAdmin::class, static function () use ($container): PosterAdmin {
             return new PosterAdmin(
                 $container->get(PosterService::class),
@@ -37,6 +38,7 @@ final class AdminServiceProvider
         $container->get(EventDetailsMetaBox::class)->register();
         $container->get(EventStatusMetaBox::class)->register();
         $container->get(AdminAssets::class)->register();
+        $container->get(EventEditor::class)->register();
         $container->get(PosterAdmin::class)->register();
         $container->get(VenueTaxonomyFields::class)->register();
         $container->get(ArtistTaxonomyFields::class)->register();

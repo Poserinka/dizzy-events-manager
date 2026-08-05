@@ -33,5 +33,13 @@ final class AdminAssets
             [],
             DIZZY_EVENTS_VERSION
         );
+
+        wp_enqueue_script(
+            'dizzy-events-editor',
+            DIZZY_EVENTS_URL . 'assets/js/event-editor.js',
+            [],
+            DIZZY_EVENTS_VERSION,
+            true
+        );
     }
 }
