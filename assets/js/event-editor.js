@@ -37,16 +37,58 @@
         mostUsedTab?.remove();
         find('#dizzy_event_category-pop')?.remove();
 
-        const artistBox = find('#tagsdiv-dizzy_event_artist');
-        const venueBox = find('#tagsdiv-dizzy_event_venue');
-        [artistBox, venueBox].filter(Boolean).forEach((box) => {
-            box.classList.add('dizzy-taxonomy-box-visible');
-            box.querySelector('.tagchecklist')?.classList.add('dizzy-assigned-terms');
+        const relationFields = document.createElement('div');
+        relationFields.className = 'dizzy-relation-fields';
+        const relationData = window.dizzyEventEditorData || { nonce: '', taxonomies: [] };
+        const nonce = document.createElement('input');
+        nonce.type = 'hidden';
+        nonce.name = 'dizzy_event_relations_nonce';
+        nonce.value = relationData.nonce || '';
+        relationFields.appendChild(nonce);
+
+        relationData.taxonomies.forEach((item) => {
+            const field = document.createElement('div');
+            field.className = 'dizzy-relation-field';
+            const label = document.createElement('label');
+            label.textContent = item.label;
+            const dropdown = document.createElement('details');
+            dropdown.className = 'dizzy-multi-dropdown';
+            const summary = document.createElement('summary');
+            const choices = document.createElement('div');
+            choices.className = 'dizzy-multi-dropdown-choices';
+            const updateSummary = () => {
+                const names = [...choices.querySelectorAll('input:checked')].map((input) => input.dataset.name);
+                summary.textContent = names.length ? names.join(', ') : `Select ${item.label.toLowerCase()}`;
+                summary.title = summary.textContent;
+            };
+            item.terms.forEach((term) => {
+                const choice = document.createElement('label');
+                const input = document.createElement('input');
+                const name = document.createElement('span');
+                input.type = 'checkbox';
+                input.name = `dizzy_event_relations[${item.taxonomy}][]`;
+                input.value = String(term.id);
+                input.checked = Boolean(term.selected);
+                input.dataset.name = term.name;
+                input.addEventListener('change', updateSummary);
+                name.textContent = term.name;
+                choice.append(input, name);
+                choices.appendChild(choice);
+            });
+            dropdown.append(summary, choices);
+            updateSummary();
+            const help = document.createElement('p');
+            help.className = 'description';
+            help.textContent = item.terms.length ? 'You can select more than one item.' : 'No existing items are available yet.';
+            field.append(label, dropdown, help);
+            relationFields.appendChild(field);
         });
+
+        ['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue', '#tagsdiv-dizzy_event_tag'].forEach((selector) => find(selector)?.remove());
 
         section('Event information', 'Public title, description and category.', elements(['#titlediv', '#postdivrich', '#postexcerpt', '#dizzy_event_categorydiv']));
         section('Date and time', 'Set the event start and optional end.', elements(['#dizzy_event_occurrences']));
-        section('Artists and venue', 'Assigned artists are listed above each search field.', [artistBox, venueBox].filter(Boolean));
+        section('Artists, venue and tags', 'Select one or more existing items from each list.', [relationFields]);
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
         section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']));
         section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']));

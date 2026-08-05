@@ -115,19 +115,40 @@
 .dizzy-editor-section .dizzy-occurrences-table { min-width: 0; width: 100%; }
 .dizzy-editor-section #postimagediv,
 .dizzy-editor-section #dizzy_event_poster_generator { display: block; width: 100%; }
-.dizzy-editor-section .dizzy-assigned-terms {
-    background: #f6f7f9;
-    border: 1px solid #dce1e7;
+.dizzy-relation-fields { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dizzy-relation-field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+.dizzy-multi-dropdown { position: relative; }
+.dizzy-multi-dropdown summary {
+    background: #fff;
+    border: 1px solid #cbd1d8;
     border-radius: 7px;
-    display: block !important;
-    margin: 0 0 12px;
-    min-height: 20px;
-    padding: 8px;
+    cursor: pointer;
+    list-style: none;
+    overflow: hidden;
+    padding: 9px 34px 9px 11px;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.dizzy-editor-section .dizzy-assigned-terms:empty::before {
-    color: #727984;
-    content: 'No artist or venue selected yet.';
+.dizzy-multi-dropdown summary::-webkit-details-marker { display: none; }
+.dizzy-multi-dropdown summary::after { content: '\25BE'; position: absolute; right: 11px; top: 9px; }
+.dizzy-multi-dropdown[open] summary { border-color: #5b5cf0; box-shadow: 0 0 0 1px #5b5cf0; }
+.dizzy-multi-dropdown-choices {
+    background: #fff;
+    border: 1px solid #cbd1d8;
+    border-radius: 7px;
+    box-shadow: 0 8px 24px rgba(20, 25, 32, .14);
+    left: 0;
+    margin-top: 5px;
+    max-height: 240px;
+    overflow: auto;
+    padding: 6px;
+    position: absolute;
+    right: 0;
+    z-index: 50;
 }
+.dizzy-multi-dropdown-choices label { align-items: center; border-radius: 5px; display: flex; font-weight: 400; gap: 8px; margin: 0; padding: 7px; }
+.dizzy-multi-dropdown-choices label:hover { background: #f0f2f5; }
 
 @media (max-width: 1100px) {
     .dizzy-editor-columns { grid-template-columns: 1fr; }
@@ -139,4 +160,5 @@
     .dizzy-editor-header { align-items: flex-start; flex-direction: column; gap: 14px; }
     .dizzy-editor-columns { padding-top: 14px; }
     .dizzy-editor-side { display: block; width: 100%; }
+    .dizzy-relation-fields { grid-template-columns: 1fr; }
 }

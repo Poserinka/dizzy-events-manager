@@ -183,6 +183,26 @@ final class EventPostType
                 'rewrite' => ['slug' => 'event-venue'],
             ]
         );
+
+        register_taxonomy(
+            Config::TAX_TAG,
+            [Config::POST_TYPE_EVENT],
+            [
+                'labels' => [
+                    'name' => __('Event Tags', 'dizzy-events-manager'),
+                    'singular_name' => __('Event Tag', 'dizzy-events-manager'),
+                    'search_items' => __('Search Event Tags', 'dizzy-events-manager'),
+                    'all_items' => __('All Event Tags', 'dizzy-events-manager'),
+                    'edit_item' => __('Edit Event Tag', 'dizzy-events-manager'),
+                    'add_new_item' => __('Add Event Tag', 'dizzy-events-manager'),
+                ],
+                'public' => true,
+                'hierarchical' => false,
+                'show_admin_column' => true,
+                'show_in_rest' => true,
+                'rewrite' => ['slug' => 'event-tag'],
+            ]
+        );
     }
 
     private function migrateLegacyRelations(): void

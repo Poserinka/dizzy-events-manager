@@ -17,6 +17,7 @@ final class EventEditor
         add_filter('theme_' . Config::POST_TYPE_EVENT . '_templates', [$this, 'eventTemplates'], 20, 4);
         add_action('wp_insert_post', [$this, 'assignDefaultTemplate'], 20, 3);
         add_filter('admin_body_class', [$this, 'adminBodyClass']);
+        add_action('save_post_' . Config::POST_TYPE_EVENT, [$this, 'saveRelations'], 20, 3);
     }
 
     public function disableBlockEditor(bool $useBlockEditor, string $postType): bool
@@ -53,6 +54,35 @@ final class EventEditor
         return $screen && $screen->post_type === Config::POST_TYPE_EVENT
             ? $classes . ' dizzy-event-editor-screen'
             : $classes;
+    }
+
+    public function saveRelations(int $postId, WP_Post $post, bool $update): void
+    {
+        if (
+            wp_is_post_revision($postId) !== false
+            || (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            || ! current_user_can('edit_post', $postId)
+        ) {
+            return;
+        }
+
+        $nonce = isset($_POST['dizzy_event_relations_nonce'])
+            ? sanitize_text_field(wp_unslash((string) $_POST['dizzy_event_relations_nonce']))
+            : '';
+        if ($nonce === '' || ! wp_verify_nonce($nonce, 'dizzy_event_relations_save')) {
+            return;
+        }
+
+        $relations = isset($_POST['dizzy_event_relations']) && is_array($_POST['dizzy_event_relations'])
+            ? wp_unslash($_POST['dizzy_event_relations'])
+            : [];
+
+        foreach ([Config::TAX_ARTIST, Config::TAX_VENUE, Config::TAX_TAG] as $taxonomy) {
+            $values = isset($relations[$taxonomy]) && is_array($relations[$taxonomy])
+                ? array_values(array_filter(array_map('absint', $relations[$taxonomy])))
+                : [];
+            wp_set_object_terms($postId, $values, $taxonomy, false);
+        }
     }
 
     private function findEventFullWidthTemplate(): string
