@@ -49,52 +49,45 @@ final class AdminAssets
             'dizzyEventEditorData',
             [
                 'nonce' => wp_create_nonce('dizzy_event_relations_save'),
-                'taxonomies' => [
-                    $this->taxonomyData(Config::TAX_ARTIST, __('Artists', 'dizzy-events-manager'), $postId),
-                    $this->taxonomyData(Config::TAX_VENUE, __('Venues', 'dizzy-events-manager'), $postId),
-                    $this->taxonomyData(Config::TAX_TAG, __('Tags', 'dizzy-events-manager'), $postId),
-                ],
+                'fields' => $this->eventFields($postId),
             ]
         );
     }
 
-    /** @return array{taxonomy:string,label:string,terms:array<int,array<string,mixed>>} */
-    private function taxonomyData(string $taxonomy, string $label, int $postId): array
+    /** @return array{artists:array<int,array<string,mixed>>,venue:string,tags:string} */
+    private function eventFields(int $postId): array
     {
-        $selected = $postId > 0 ? wp_get_object_terms($postId, $taxonomy, ['fields' => 'ids']) : [];
-        $selectedIds = is_wp_error($selected) ? [] : array_map('intval', $selected);
-        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
-
-        $termData = is_wp_error($terms) ? [] : array_map(
-            static function (\WP_Term $term) use ($taxonomy, $selectedIds, $postId): array {
-                $selected = in_array($term->term_id, $selectedIds, true);
-                if ($postId === 0 && $taxonomy === Config::TAX_VENUE && sanitize_title($term->name) === 'jazzcafe-dizzy') {
-                    $selected = true;
-                }
-
-                $imageId = $taxonomy === Config::TAX_ARTIST
-                    ? absint(get_term_meta($term->term_id, '_dizzy_artist_image_id', true))
-                    : 0;
-
+        $artists = $postId > 0 ? get_post_meta($postId, '_dizzy_event_artists', true) : [];
+        if (! is_array($artists) || $artists === []) {
+            $terms = $postId > 0 ? wp_get_post_terms($postId, Config::TAX_ARTIST) : [];
+            $artists = is_wp_error($terms) ? [] : array_map(static function (\WP_Term $term): array {
+                $imageId = absint(get_term_meta($term->term_id, '_dizzy_artist_image_id', true));
                 return [
-                    'id' => $term->term_id,
                     'name' => $term->name,
-                    'selected' => $selected,
-                    'role' => $taxonomy === Config::TAX_ARTIST ? $term->description : '',
-                    'contact' => $taxonomy === Config::TAX_ARTIST
-                        ? (string) get_term_meta($term->term_id, '_dizzy_artist_contact', true)
-                        : '',
+                    'role' => $term->description,
+                    'contact' => (string) get_term_meta($term->term_id, '_dizzy_artist_contact', true),
                     'imageId' => $imageId,
                     'imageUrl' => $imageId > 0 ? (string) wp_get_attachment_image_url($imageId, 'medium') : '',
                 ];
-            },
-            $terms
-        );
+            }, $terms);
+        }
+
+        $venue = $postId > 0 ? trim((string) get_post_meta($postId, '_dizzy_event_venue_name', true)) : '';
+        if ($venue === '' && $postId > 0) {
+            $names = wp_get_post_terms($postId, Config::TAX_VENUE, ['fields' => 'names']);
+            if (! is_wp_error($names) && isset($names[0])) $venue = (string) $names[0];
+        }
+
+        $tags = $postId > 0 ? trim((string) get_post_meta($postId, '_dizzy_event_tags', true)) : '';
+        if ($tags === '' && $postId > 0) {
+            $names = wp_get_post_terms($postId, Config::TAX_TAG, ['fields' => 'names']);
+            if (! is_wp_error($names)) $tags = implode(', ', array_map('strval', $names));
+        }
 
         return [
-            'taxonomy' => $taxonomy,
-            'label' => $label,
-            'terms' => $termData,
+            'artists' => array_values($artists),
+            'venue' => $venue !== '' ? $venue : 'Jazzcafe Dizzy',
+            'tags' => $tags,
         ];
     }
 }

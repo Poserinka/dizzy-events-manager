@@ -73,44 +73,45 @@ final class EventEditor
             return;
         }
 
-        $relations = isset($_POST['dizzy_event_relations']) && is_array($_POST['dizzy_event_relations'])
-            ? wp_unslash($_POST['dizzy_event_relations'])
+        $artistsInput = isset($_POST['dizzy_event_artists']) && is_array($_POST['dizzy_event_artists'])
+            ? wp_unslash($_POST['dizzy_event_artists'])
             : [];
-
-        foreach ([Config::TAX_ARTIST, Config::TAX_VENUE, Config::TAX_TAG] as $taxonomy) {
-            $values = isset($relations[$taxonomy]) && is_array($relations[$taxonomy])
-                ? array_values(array_filter(array_map('absint', $relations[$taxonomy])))
-                : [];
-            wp_set_object_terms($postId, $values, $taxonomy, false);
+        $artists = [];
+        foreach ($artistsInput as $artist) {
+            if (! is_array($artist)) continue;
+            $name = sanitize_text_field((string) ($artist['name'] ?? ''));
+            if ($name === '') continue;
+            $imageId = absint($artist['image_id'] ?? 0);
+            $artists[] = [
+                'name' => $name,
+                'role' => sanitize_text_field((string) ($artist['role'] ?? '')),
+                'contact' => sanitize_text_field((string) ($artist['contact'] ?? '')),
+                'imageId' => $imageId > 0 && wp_attachment_is_image($imageId) ? $imageId : 0,
+                'imageUrl' => $imageId > 0 ? (string) wp_get_attachment_image_url($imageId, 'medium') : '',
+            ];
         }
 
-        if (! current_user_can('manage_categories')) {
-            return;
-        }
+        $venue = sanitize_text_field(wp_unslash((string) ($_POST['dizzy_event_venue_name'] ?? '')));
+        $tags = sanitize_text_field(wp_unslash((string) ($_POST['dizzy_event_tags'] ?? '')));
+        update_post_meta($postId, '_dizzy_event_artists', $artists);
+        update_post_meta($postId, '_dizzy_event_venue_name', $venue);
+        update_post_meta($postId, '_dizzy_event_tags', $tags);
 
-        $profiles = isset($_POST['dizzy_artist_profiles']) && is_array($_POST['dizzy_artist_profiles'])
-            ? wp_unslash($_POST['dizzy_artist_profiles'])
-            : [];
-        foreach ($profiles as $termId => $profile) {
-            $termId = absint($termId);
-            if ($termId <= 0 || ! is_array($profile) || ! term_exists($termId, Config::TAX_ARTIST)) {
-                continue;
-            }
-
-            $name = isset($profile['name']) ? sanitize_text_field((string) $profile['name']) : '';
-            $role = isset($profile['role']) ? sanitize_text_field((string) $profile['role']) : '';
-            if ($name !== '') {
-                wp_update_term($termId, Config::TAX_ARTIST, ['name' => $name, 'description' => $role]);
-            }
-
-            $contact = isset($profile['contact']) ? sanitize_text_field((string) $profile['contact']) : '';
-            if ($contact === '') delete_term_meta($termId, '_dizzy_artist_contact');
-            else update_term_meta($termId, '_dizzy_artist_contact', $contact);
-
-            $imageId = isset($profile['image_id']) ? absint($profile['image_id']) : 0;
-            if ($imageId > 0 && wp_attachment_is_image($imageId)) update_term_meta($termId, '_dizzy_artist_image_id', $imageId);
+        // Keep the hidden taxonomies synchronized for backwards compatibility.
+        wp_set_object_terms($postId, array_column($artists, 'name'), Config::TAX_ARTIST, false);
+        foreach ($artists as $artist) {
+            $term = term_exists($artist['name'], Config::TAX_ARTIST);
+            $termId = is_array($term) ? absint($term['term_id'] ?? 0) : absint($term);
+            if ($termId <= 0) continue;
+            wp_update_term($termId, Config::TAX_ARTIST, ['description' => $artist['role']]);
+            if ($artist['contact'] === '') delete_term_meta($termId, '_dizzy_artist_contact');
+            else update_term_meta($termId, '_dizzy_artist_contact', $artist['contact']);
+            if ($artist['imageId'] > 0) update_term_meta($termId, '_dizzy_artist_image_id', $artist['imageId']);
             else delete_term_meta($termId, '_dizzy_artist_image_id');
         }
+        wp_set_object_terms($postId, $venue !== '' ? [$venue] : [], Config::TAX_VENUE, false);
+        $tagNames = array_values(array_filter(array_map('trim', explode(',', $tags))));
+        wp_set_object_terms($postId, $tagNames, Config::TAX_TAG, false);
     }
 
     private function findEventFullWidthTemplate(): string

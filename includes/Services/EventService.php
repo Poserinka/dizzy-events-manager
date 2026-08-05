@@ -64,13 +64,21 @@ final class EventService
      */
     public function getEventDetails(int $eventId): EventDetails
     {
-        $artistNames = wp_get_post_terms($eventId, Config::TAX_ARTIST, ['fields' => 'names']);
-        $artist = is_wp_error($artistNames)
-            ? null
-            : implode(', ', array_map('strval', $artistNames));
+        $artistsMeta = get_post_meta($eventId, '_dizzy_event_artists', true);
+        $artist = is_array($artistsMeta)
+            ? implode(', ', array_values(array_filter(array_map(
+                static fn (mixed $item): string => is_array($item) ? trim((string) ($item['name'] ?? '')) : '',
+                $artistsMeta
+            ))))
+            : '';
+        if ($artist === '') {
+            $artistNames = wp_get_post_terms($eventId, Config::TAX_ARTIST, ['fields' => 'names']);
+            $artist = is_wp_error($artistNames) ? '' : implode(', ', array_map('strval', $artistNames));
+        }
         $venueTerms = wp_get_post_terms($eventId, Config::TAX_VENUE);
         $venueTerm = ! is_wp_error($venueTerms) ? ($venueTerms[0] ?? null) : null;
-        $venue = $venueTerm instanceof \WP_Term ? $venueTerm->name : null;
+        $venueMeta = trim((string) get_post_meta($eventId, '_dizzy_event_venue_name', true));
+        $venue = $venueMeta !== '' ? $venueMeta : ($venueTerm instanceof \WP_Term ? $venueTerm->name : null);
         $address = $venueTerm instanceof \WP_Term
             ? trim((string) get_term_meta($venueTerm->term_id, '_dizzy_address', true))
             : null;

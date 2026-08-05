@@ -158,7 +158,8 @@ final class EventPostType
                 ],
                 'public' => true,
                 'hierarchical' => false,
-                'show_admin_column' => true,
+                'show_ui' => false,
+                'show_admin_column' => false,
                 'show_in_rest' => true,
                 'rewrite' => ['slug' => 'event-artist'],
             ]
@@ -178,7 +179,8 @@ final class EventPostType
                 ],
                 'public' => true,
                 'hierarchical' => false,
-                'show_admin_column' => true,
+                'show_ui' => false,
+                'show_admin_column' => false,
                 'show_in_rest' => true,
                 'rewrite' => ['slug' => 'event-venue'],
             ]
@@ -198,7 +200,8 @@ final class EventPostType
                 ],
                 'public' => true,
                 'hierarchical' => false,
-                'show_admin_column' => true,
+                'show_ui' => false,
+                'show_admin_column' => false,
                 'show_in_rest' => true,
                 'rewrite' => ['slug' => 'event-tag'],
             ]
