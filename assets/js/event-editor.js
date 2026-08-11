@@ -125,16 +125,6 @@
         section('Event status', 'Control whether the event is public, scheduled or archived.', statusContent ? [statusContent] : [], side);
         statusBox?.remove();
 
-        const template = document.createElement('section');
-        template.className = 'dizzy-editor-section dizzy-template-summary';
-        template.innerHTML = '<div class="dizzy-editor-section-head"><h2>Page template</h2></div><div class="dizzy-editor-section-body"><strong>Event Full Width</strong><p class="dizzy-editor-success">Selected automatically</p></div>';
-        side.appendChild(template);
-
-        const readiness = document.createElement('section');
-        readiness.className = 'dizzy-editor-section dizzy-readiness';
-        readiness.innerHTML = '<div class="dizzy-editor-section-head"><h2>Event readiness</h2></div><div class="dizzy-editor-section-body"><p>&#10003; Event information</p><p>&#10003; Date and time</p><p>&#10003; Artists and venue</p><p>&#10003; Tickets and capacity</p><p>&#10003; Featured image</p></div>';
-        side.appendChild(readiness);
-
         original.classList.add('dizzy-original-editor-hidden');
         document.body.classList.add('dizzy-custom-event-editor-ready');
         workspace.querySelector('.dizzy-editor-save')?.addEventListener('click', () => (document.querySelector('#publish') || document.querySelector('#save-post'))?.click());
@@ -144,3 +134,4 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
     else ready();
 })();
+

@@ -109,8 +109,6 @@
 .dizzy-editor-side .dizzy-editor-section-body { padding: 15px; }
 .dizzy-editor-side #submitdiv { background: transparent; }
 .dizzy-editor-success,
-.dizzy-readiness p { color: #168654; }
-.dizzy-template-summary strong { display: block; font-size: 14px; }
 .dizzy-occurrences-wrapper,
 .dizzy-editor-section .dizzy-occurrences-table { min-width: 0; width: 100%; }
 .dizzy-editor-section #postimagediv,
@@ -172,3 +170,4 @@
     .dizzy-editor-side { display: block; width: 100%; }
     .dizzy-artist-profile { grid-template-columns: 1fr; }
 }
+
