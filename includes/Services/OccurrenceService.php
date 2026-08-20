@@ -157,8 +157,16 @@ final class OccurrenceService
             $endDateTime = null;
 
             if ($endDate !== '' && $endTime !== '') {
+                $normalizedEndDate = $endDate;
+
+                if ($endTime === '00:00' && $endDate === $startDate) {
+                    $normalizedEndDate = $startDateTime
+                        ->modify('+1 day')
+                        ->format('Y-m-d');
+                }
+
                 $endDateTime = $this->createDateTime(
-                    $endDate,
+                    $normalizedEndDate,
                     $endTime,
                     $timezone
                 );
@@ -285,3 +293,4 @@ final class OccurrenceService
         return array_values($data[$key]);
     }
 }
+
