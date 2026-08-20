@@ -77,6 +77,14 @@ final class OccurrenceMetaBox
         $startTime = $occurrence?->startDateTime->format('H:i') ?? '';
         $endDate = $occurrence?->endDateTime?->format('Y-m-d') ?? '';
         $endTime = $occurrence?->endDateTime?->format('H:i') ?? '';
+
+        if (
+            $occurrence?->endDateTime !== null
+            && $endTime === '00:00'
+            && $occurrence->startDateTime->modify('+1 day')->format('Y-m-d') === $endDate
+        ) {
+            $endDate = $startDate;
+        }
         ?>
         <tr>
             <td>
@@ -85,14 +93,19 @@ final class OccurrenceMetaBox
             </td>
             <td><?php $this->renderTimeSelect('dizzy_event_date[start_time]', $startTime); ?></td>
             <td><input type="date" name="dizzy_event_date[end_date]" value="<?php echo esc_attr($endDate); ?>"></td>
-            <td><?php $this->renderTimeSelect('dizzy_event_date[end_time]', $endTime); ?></td>
+            <td><?php $this->renderTimeSelect('dizzy_event_date[end_time]', $endTime, true); ?></td>
         </tr>
         <?php
     }
 
-    private function renderTimeSelect(string $name, string $selected): void
+    private function renderTimeSelect(string $name, string $selected, bool $midnightLast = false): void
     {
         $options = self::timeOptions();
+
+        if ($midnightLast) {
+            $options = array_values(array_diff($options, ['00:00']));
+            $options[] = '00:00';
+        }
 
         if ($selected !== '' && ! in_array($selected, $options, true)) {
             $options[] = $selected;
@@ -312,3 +325,4 @@ final class OccurrenceMetaBox
         return isset($_GET[$key]) && sanitize_text_field(wp_unslash($_GET[$key])) === '1';
     }
 }
+
