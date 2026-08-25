@@ -198,16 +198,6 @@
             featuredPreview.append(featuredImageLink, featuredEmpty);
             featuredInside.prepend(featuredPreview);
 
-            const featuredEditLink = document.createElement('a');
-            featuredEditLink.href = '#';
-            featuredEditLink.className = 'dizzy-featured-edit-link';
-            featuredEditLink.textContent = 'Click the image to edit or update';
-            featuredEditLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                featuredImageLink.click();
-            });
-            featuredInside.appendChild(featuredEditLink);
-
             const featuredActions = document.createElement('div');
             featuredActions.className = 'dizzy-featured-actions dizzy-poster-actions';
             const featuredSetButton = document.createElement('button');
@@ -223,7 +213,6 @@
                 const hasImage = Boolean(featuredImageLink.querySelector('img'));
                 featuredImageLink.classList.toggle('has-image', hasImage);
                 featuredEmpty.hidden = hasImage;
-                featuredEditLink.hidden = !hasImage;
             };
             new MutationObserver(syncFeaturedPreview).observe(featuredImageLink, {childList: true, subtree: true});
             syncFeaturedPreview();
