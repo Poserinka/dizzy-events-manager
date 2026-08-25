@@ -108,6 +108,11 @@
         };
         const venueField = simpleField('dizzy_event_venue_name', 'Venue Name', relationData.fields.venue, 'Jazzcafe Dizzy is used by default.');
         const tagsField = simpleField('dizzy_event_tags', 'Tags', relationData.fields.tags, 'Separate multiple tags with commas.');
+        const posterBox = find('#dizzy_event_poster_generator');
+        const posterShell = posterBox?.querySelector('.dizzy-poster-generator-shell');
+        const posterGeneratorPane = posterBox?.querySelector('.dizzy-poster-generator-pane');
+        const posterOutputPane = posterBox?.querySelector('.dizzy-poster-output-pane');
+        const posterAction = posterShell?.dataset.action || '';
 
         ['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue', '#tagsdiv-dizzy_event_tag'].forEach((selector) => find(selector)?.remove());
 
@@ -118,7 +123,9 @@
         section('Tags', 'Enter event-specific tags.', [tagsField]);
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
         section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']), main, 'dizzy-editor-featured-section');
-        section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']), main, 'dizzy-editor-poster-section');
+        section('Poster Generator', 'Create social media artwork for this event.', posterGeneratorPane ? [posterGeneratorPane] : [], main, 'dizzy-editor-poster-section');
+        section('Output format', '', posterOutputPane ? [posterOutputPane] : [], main, 'dizzy-editor-output-section');
+        posterBox?.remove();
         const featuredBox = find('#postimagediv');
         const featuredRemove = featuredBox?.querySelector('#remove-post-thumbnail');
         if (featuredBox && featuredRemove) featuredBox.appendChild(featuredRemove);
@@ -128,10 +135,10 @@
         section('Event status', 'Control whether the event is public, scheduled or archived.', statusContent ? [statusContent] : [], side);
         statusBox?.remove();
 
-        const posterBox = find('#dizzy_event_poster_generator');
-        const backgroundId = posterBox?.querySelector('#dizzy_poster_background_id');
-        const backgroundPreview = posterBox?.querySelector('.dizzy-poster-background-preview img');
-        const backgroundEmpty = posterBox?.querySelector('.dizzy-poster-background-empty');
+        const posterWorkspace = workspace;
+        const backgroundId = posterWorkspace.querySelector('#dizzy_poster_background_id');
+        const backgroundPreview = posterWorkspace.querySelector('.dizzy-poster-background-preview img');
+        const backgroundEmpty = posterWorkspace.querySelector('.dizzy-poster-background-empty');
         const setPosterBackground = (id, url) => {
             if (!backgroundId || !backgroundPreview || !backgroundEmpty) return;
             backgroundId.value = String(id || 0);
@@ -145,7 +152,7 @@
                 backgroundEmpty.hidden = false;
             }
         };
-        posterBox?.querySelector('.dizzy-poster-select-image')?.addEventListener('click', () => {
+        posterWorkspace.querySelector('.dizzy-poster-select-image')?.addEventListener('click', () => {
             const frame = wp.media({title: 'Select poster background', button: {text: 'Use this image'}, library: {type: 'image'}, multiple: false});
             frame.on('select', () => {
                 const selected = frame.state().get('selection').first().toJSON();
@@ -153,17 +160,15 @@
             });
             frame.open();
         });
-        posterBox?.querySelector('.dizzy-poster-use-featured')?.addEventListener('click', () => {
-            const featuredData = posterBox.querySelector('#dizzy_poster_featured_id');
+        posterWorkspace.querySelector('.dizzy-poster-use-featured')?.addEventListener('click', () => {
+            const featuredData = posterWorkspace.querySelector('#dizzy_poster_featured_id');
             const featuredId = Number(find('#_thumbnail_id')?.value || featuredData?.value || 0);
             const featuredImage = find('#postimagediv .inside img');
             const featuredUrl = featuredImage?.src || featuredData?.dataset.url || '';
             if (featuredId > 0 && featuredUrl) setPosterBackground(featuredId, featuredUrl);
         });
-        posterBox?.querySelector('.dizzy-poster-remove-image')?.addEventListener('click', () => setPosterBackground(0, ''));
-
-        const formatSelect = posterBox?.querySelector('#dizzy_poster_format');
-        const outputPreview = posterBox?.querySelector('.dizzy-poster-output-preview');
+        const formatSelect = posterWorkspace.querySelector('#dizzy_poster_format');
+        const outputPreview = posterWorkspace.querySelector('.dizzy-poster-output-preview');
         const updateOutputRatio = () => {
             if (!formatSelect || !outputPreview) return;
             const ratios = {social_square: '1 / 1', social_portrait: '4 / 5', social_story: '9 / 16', print_a4: '210 / 297'};
@@ -171,6 +176,29 @@
         };
         formatSelect?.addEventListener('change', updateOutputRatio);
         updateOutputRatio();
+        posterWorkspace.querySelector('.dizzy-poster-generate')?.addEventListener('click', () => {
+            const postId = posterWorkspace.querySelector('#dizzy_poster_post_id')?.value || '';
+            const nonceValue = posterWorkspace.querySelector('#dizzy_poster_nonce')?.value || '';
+            if (!posterAction || !postId || !nonceValue) return;
+            const generateForm = document.createElement('form');
+            generateForm.method = 'post';
+            generateForm.action = posterAction;
+            generateForm.hidden = true;
+            const values = {
+                action: 'dizzy_generate_poster',
+                post_id: postId,
+                dizzy_poster_nonce: nonceValue,
+                background_id: backgroundId?.value || '0',
+                format: formatSelect?.value || 'social_square',
+            };
+            Object.entries(values).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden'; input.name = name; input.value = value;
+                generateForm.appendChild(input);
+            });
+            document.body.appendChild(generateForm);
+            generateForm.submit();
+        });
 
         original.classList.add('dizzy-original-editor-hidden');
         document.body.classList.add('dizzy-custom-event-editor-ready');
