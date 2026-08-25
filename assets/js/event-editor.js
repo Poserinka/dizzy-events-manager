@@ -189,7 +189,15 @@
         const featuredRemove = featuredBox?.querySelector('#remove-post-thumbnail');
         const featuredImageLink = featuredBox?.querySelector('#set-post-thumbnail');
         const featuredInside = featuredBox?.querySelector('.inside');
-        if (featuredImageLink && featuredInside) {
+        if (featuredBox && featuredImageLink && featuredInside) {
+            const featuredPreview = document.createElement('div');
+            featuredPreview.className = 'dizzy-featured-image-preview';
+            const featuredEmpty = document.createElement('span');
+            featuredEmpty.className = 'dizzy-featured-image-empty';
+            featuredEmpty.textContent = 'No image selected';
+            featuredPreview.append(featuredImageLink, featuredEmpty);
+            featuredInside.prepend(featuredPreview);
+
             const featuredEditLink = document.createElement('a');
             featuredEditLink.href = '#';
             featuredEditLink.className = 'dizzy-featured-edit-link';
@@ -199,8 +207,27 @@
                 featuredImageLink.click();
             });
             featuredInside.appendChild(featuredEditLink);
+
+            const featuredActions = document.createElement('div');
+            featuredActions.className = 'dizzy-featured-actions dizzy-poster-actions';
+            const featuredSetButton = document.createElement('button');
+            featuredSetButton.type = 'button';
+            featuredSetButton.className = 'button';
+            featuredSetButton.textContent = 'Set featured image';
+            featuredSetButton.addEventListener('click', () => featuredImageLink.click());
+            featuredActions.appendChild(featuredSetButton);
+            if (featuredRemove) featuredActions.appendChild(featuredRemove);
+            featuredBox.appendChild(featuredActions);
+
+            const syncFeaturedPreview = () => {
+                const hasImage = Boolean(featuredImageLink.querySelector('img'));
+                featuredImageLink.classList.toggle('has-image', hasImage);
+                featuredEmpty.hidden = hasImage;
+                featuredEditLink.hidden = !hasImage;
+            };
+            new MutationObserver(syncFeaturedPreview).observe(featuredImageLink, {childList: true, subtree: true});
+            syncFeaturedPreview();
         }
-        if (featuredBox && featuredRemove) featuredBox.appendChild(featuredRemove);
         section('Publish', '', elements(['#submitdiv']), side);
         const statusBox = find('#dizzy-event-status');
         const statusContent = statusBox?.querySelector('.inside');
