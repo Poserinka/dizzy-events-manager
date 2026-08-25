@@ -176,9 +176,6 @@
 .dizzy-featured-image-preview #set-post-thumbnail:not(.has-image) { display: none; }
 .dizzy-featured-image-preview #set-post-thumbnail img { display: block; height: 100%; object-fit: contain; width: 100%; }
 .dizzy-featured-image-empty { color: #7a7f87; }
-.dizzy-featured-edit-link { color: #2271b1; display: block; margin-top: 12px; text-decoration: underline; width: fit-content; }
-.dizzy-featured-edit-link:hover,
-.dizzy-featured-edit-link:focus { color: #135e96; }
 .dizzy-featured-actions { margin-top: 10px; }
 .dizzy-editor-featured-section #remove-post-thumbnail { align-items: center; border: 1px solid #3858e9; box-sizing: border-box; color: #2145e6; display: flex; justify-content: center; min-height: 42px; text-decoration: none; width: 100%; }
 .dizzy-poster-generator-pane,
