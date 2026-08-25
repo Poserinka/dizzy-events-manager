@@ -123,9 +123,13 @@
         section('Tags', 'Enter event-specific tags.', [tagsField]);
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
         section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']), main, 'dizzy-editor-featured-section');
-        section('Poster Generator', 'Create social media artwork for this event.', posterGeneratorPane ? [posterGeneratorPane] : [], main, 'dizzy-editor-poster-section');
-        section('Output format', '', posterOutputPane ? [posterOutputPane] : [], main, 'dizzy-editor-output-section');
-        posterBox?.remove();
+        if (posterGeneratorPane && posterOutputPane) {
+            section('Poster Generator', 'Create social media artwork for this event.', [posterGeneratorPane], main, 'dizzy-editor-poster-section');
+            section('Output format', '', [posterOutputPane], main, 'dizzy-editor-output-section');
+            posterBox?.remove();
+        } else {
+            section('Poster Generator', 'Create social media artwork for this event.', posterBox ? [posterBox] : [], main, 'dizzy-editor-poster-section');
+        }
         const featuredBox = find('#postimagediv');
         const featuredRemove = featuredBox?.querySelector('#remove-post-thumbnail');
         if (featuredBox && featuredRemove) featuredBox.appendChild(featuredRemove);
