@@ -44,7 +44,7 @@ final class PosterAdmin
     {
         add_meta_box(
             'dizzy_event_poster_generator',
-            esc_html__('AI Poster Generator', 'dizzy-events-manager'),
+            esc_html__('Poster Generator', 'dizzy-events-manager'),
             [$this, 'render'],
             Config::POST_TYPE_EVENT,
             'side'
@@ -58,7 +58,14 @@ final class PosterAdmin
             ? sanitize_key(wp_unslash($_GET['dizzy_poster_status']))
             : '';
 
-        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        $backgroundId = (int) get_post_meta($post->ID, '_dizzy_poster_background_id', true);
+        $backgroundUrl = $backgroundId > 0 ? wp_get_attachment_image_url($backgroundId, 'medium') : '';
+        $featuredId = (int) get_post_thumbnail_id($post->ID);
+        $featuredUrl = $featuredId > 0 ? wp_get_attachment_image_url($featuredId, 'medium') : '';
+        $storedFormat = $poster?->attachmentId ? (string) get_post_meta($poster->attachmentId, '_dizzy_poster_format', true) : 'social_square';
+        $selectedFormat = PosterFormats::sanitize($storedFormat);
+
+        echo '<form class="dizzy-poster-generator-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
 
         wp_nonce_field(
             'dizzy_generate_poster_' . $post->ID,
@@ -67,37 +74,44 @@ final class PosterAdmin
 
         echo '<input type="hidden" name="action" value="dizzy_generate_poster">';
         echo '<input type="hidden" name="post_id" value="' . esc_attr((string) $post->ID) . '">';
+        echo '<input type="hidden" id="dizzy_poster_background_id" name="background_id" value="' . esc_attr((string) $backgroundId) . '">';
+        echo '<input type="hidden" id="dizzy_poster_featured_id" value="' . esc_attr((string) $featuredId) . '" data-url="' . esc_url((string) $featuredUrl) . '">';
 
-        echo '<p>' . esc_html__('Generate an AI poster for this event.', 'dizzy-events-manager') . '</p>';
+        echo '<div class="dizzy-poster-background-card">';
+        echo '<strong>' . esc_html__('Background image', 'dizzy-events-manager') . '</strong>';
+        echo '<div class="dizzy-poster-background-preview">';
+        echo '<img src="' . esc_url((string) $backgroundUrl) . '" alt=""' . ($backgroundUrl === '' ? ' hidden' : '') . '>';
+        echo '<span class="dizzy-poster-background-empty"' . ($backgroundUrl !== '' ? ' hidden' : '') . '>' . esc_html__('No image selected', 'dizzy-events-manager') . '</span>';
+        echo '</div></div>';
+        echo '<div class="dizzy-poster-actions">';
+        echo '<button type="button" class="button dizzy-poster-select-image">' . esc_html__('Select image', 'dizzy-events-manager') . '</button>';
+        echo '<button type="button" class="button dizzy-poster-use-featured"' . ($featuredId <= 0 ? ' disabled' : '') . '>' . esc_html__('Use featured image', 'dizzy-events-manager') . '</button>';
+        echo '<button type="button" class="button dizzy-poster-remove-image">' . esc_html__('Remove image', 'dizzy-events-manager') . '</button>';
+        echo '</div>';
 
-        echo '<p><label for="dizzy_poster_template"><strong>' . esc_html__('Design', 'dizzy-events-manager') . '</strong></label><br>';
-        echo '<select id="dizzy_poster_template" name="template" style="width:100%">';
-        foreach (PosterTemplates::all() as $key => $template) {
-            echo '<option value="' . esc_attr($key) . '">' . esc_html($template['label']) . '</option>';
-        }
-        echo '</select></p>';
-
-        echo '<p><label for="dizzy_poster_format"><strong>' . esc_html__('Output format', 'dizzy-events-manager') . '</strong></label><br>';
-        echo '<select id="dizzy_poster_format" name="format" style="width:100%">';
+        echo '<div class="dizzy-poster-output-card">';
+        echo '<div class="dizzy-poster-output-controls"><label for="dizzy_poster_format"><strong>' . esc_html__('Output format', 'dizzy-events-manager') . '</strong></label>';
+        echo '<select id="dizzy_poster_format" name="format">';
         foreach (PosterFormats::all() as $key => $format) {
-            echo '<option value="' . esc_attr($key) . '">' . esc_html($format['label']) . '</option>';
+            echo '<option value="' . esc_attr($key) . '"' . selected($selectedFormat, $key, false) . '>' . esc_html($format['label']) . '</option>';
         }
-        echo '</select></p>';
-
-        echo '<p><label for="dizzy_poster_direction"><strong>' . esc_html__('Extra art direction (optional)', 'dizzy-events-manager') . '</strong></label><br>';
-        echo '<textarea id="dizzy_poster_direction" name="direction" rows="3" maxlength="300" style="width:100%" placeholder="' . esc_attr__('For example: feature a saxophone and deep blue lighting', 'dizzy-events-manager') . '"></textarea></p>';
+        echo '</select></div>';
 
         if ($status === 'success') {
-            echo '<div class="notice notice-success inline"><p>' . esc_html__('Poster generated successfully.', 'dizzy-events-manager') . '</p></div>';
+            echo '<div class="notice notice-success inline dizzy-poster-status"><p>' . esc_html__('Poster generated successfully.', 'dizzy-events-manager') . '</p></div>';
         } elseif ($status === 'error') {
-            echo '<div class="notice notice-error inline"><p>' . esc_html__('Poster generation failed. Check the API configuration and try again.', 'dizzy-events-manager') . '</p></div>';
+            echo '<div class="notice notice-error inline dizzy-poster-status"><p>' . esc_html__('Poster generation failed. Select a background image and try again.', 'dizzy-events-manager') . '</p></div>';
         }
 
+        echo '<div class="dizzy-poster-output-preview">';
         if ($poster && $poster->imageUrl !== '') {
-            echo '<img src="' . esc_url($poster->imageUrl) . '" style="width:100%;height:auto;" alt="">';
-            echo '<p><a class="button button-secondary" href="' . esc_url($poster->imageUrl) . '" download>' . esc_html__('Download latest poster', 'dizzy-events-manager') . '</a></p>';
+            echo '<img src="' . esc_url($poster->imageUrl) . '" alt="">';
+        }
+        echo '</div>';
+        echo '<div class="dizzy-poster-actions">';
+        if ($poster && $poster->imageUrl !== '') {
+            echo '<a class="button button-secondary" href="' . esc_url($poster->imageUrl) . '" download>' . esc_html__('Download latest poster', 'dizzy-events-manager') . '</a>';
 
-            $storedFormat = $poster->attachmentId ? (string) get_post_meta($poster->attachmentId, '_dizzy_poster_format', true) : '';
             $formatKey = $this->socialFormatKey($storedFormat);
 
             if (str_starts_with($formatKey, 'social_')) {
@@ -106,7 +120,7 @@ final class PosterAdmin
                         admin_url('admin-post.php?action=dizzy_export_poster&post_id=' . $post->ID . '&platform=' . $platform),
                         'dizzy_export_poster_' . $post->ID
                     );
-                    echo '<p><a class="button button-primary" href="' . esc_url($exportUrl) . '">' . esc_html(sprintf(__('Export for %s', 'dizzy-events-manager'), $platformLabel)) . '</a></p>';
+                    echo '<a class="button" href="' . esc_url($exportUrl) . '">' . esc_html(sprintf(__('Export for %s', 'dizzy-events-manager'), $platformLabel)) . '</a>';
                 }
             }
         }
@@ -117,8 +131,7 @@ final class PosterAdmin
             'submit',
             false
         );
-
-        echo '</form>';
+        echo '</div></div></form>';
     }
 
     public function generate(): void
@@ -148,22 +161,32 @@ final class PosterAdmin
             ?: admin_url('post.php?post=' . $postId . '&action=edit');
 
         try {
-            $templateKey = PosterTemplates::sanitize(isset($_POST['template']) && is_string($_POST['template']) ? sanitize_key(wp_unslash($_POST['template'])) : 'classic');
+            $templateKey = 'classic';
             $formatKey = PosterFormats::sanitize(isset($_POST['format']) && is_string($_POST['format']) ? sanitize_key(wp_unslash($_POST['format'])) : 'social_square');
-            $direction = isset($_POST['direction']) && is_string($_POST['direction'])
-                ? sanitize_textarea_field(wp_unslash($_POST['direction']))
-                : '';
+            $backgroundId = isset($_POST['background_id']) ? absint($_POST['background_id']) : 0;
+            if ($backgroundId <= 0) {
+                $backgroundId = (int) get_post_thumbnail_id($postId);
+            }
+            if ($backgroundId <= 0 || ! wp_attachment_is_image($backgroundId)) {
+                throw new \RuntimeException('A poster background image is required.');
+            }
+            $backgroundUrl = wp_get_attachment_url($backgroundId);
+            if (! is_string($backgroundUrl) || $backgroundUrl === '') {
+                throw new \RuntimeException('The poster background image is unavailable.');
+            }
             $details = $this->eventDetails($postId);
 
             $this->service->create([
                 'event_id' => $postId,
-                'prompt' => $this->buildPrompt($postId, $templateKey, $direction),
+                'prompt' => '',
+                'image_url' => $backgroundUrl,
                 'template' => $templateKey,
                 'format' => $formatKey,
                 'title' => get_the_title($postId),
                 'date' => $details['date'],
                 'venue' => $details['venue'],
             ]);
+            update_post_meta($postId, '_dizzy_poster_background_id', $backgroundId);
         } catch (Throwable) {
             wp_safe_redirect(add_query_arg('dizzy_poster_status', 'error', $redirectUrl));
             exit;
@@ -312,3 +335,4 @@ final class PosterAdmin
         return ['date' => $date, 'venue' => $venue];
     }
 }
+
