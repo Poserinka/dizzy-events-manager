@@ -23,10 +23,10 @@
         const side = workspace.querySelector('.dizzy-editor-side');
         const find = (selector) => document.querySelector(selector);
         const elements = (selectors) => selectors.map(find).filter(Boolean);
-        const section = (title, description, nodes, target = main) => {
+        const section = (title, description, nodes, target = main, className = '') => {
             if (!nodes.length) return;
             const wrapper = document.createElement('section');
-            wrapper.className = 'dizzy-editor-section';
+            wrapper.className = `dizzy-editor-section ${className}`.trim();
             wrapper.innerHTML = `<div class="dizzy-editor-section-head"><h2>${title}</h2>${description ? `<p>${description}</p>` : ''}</div><div class="dizzy-editor-section-body"></div>`;
             const body = wrapper.querySelector('.dizzy-editor-section-body');
             nodes.forEach((node) => body.appendChild(node));
@@ -113,17 +113,64 @@
 
         section('Event information', 'Public title, description and category.', elements(['#titlediv', '#postdivrich', '#postexcerpt', '#dizzy_event_categorydiv']));
         section('Date and time', 'Set the event start and optional end.', elements(['#dizzy_event_occurrences']));
-        section('Artist', 'Add one or more artists for this event.', [artistFields]);
+        section('Artist', 'Add one or more artists for this event.', [artistFields], main, 'dizzy-editor-artist-section');
         section('Venue', 'Enter the event venue.', [venueField]);
         section('Tags', 'Enter event-specific tags.', [tagsField]);
         section('Tickets and capacity', 'Leave ticket prices empty for a free event.', elements(['#dizzy_event_additional_details']));
-        section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']));
-        section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']));
+        section('Featured image', 'Choose the main image for this event.', elements(['#postimagediv']), main, 'dizzy-editor-featured-section');
+        section('Poster Generator', 'Create social media artwork for this event.', elements(['#dizzy_event_poster_generator']), main, 'dizzy-editor-poster-section');
+        const featuredBox = find('#postimagediv');
+        const featuredRemove = featuredBox?.querySelector('#remove-post-thumbnail');
+        if (featuredBox && featuredRemove) featuredBox.appendChild(featuredRemove);
         section('Publish', '', elements(['#submitdiv']), side);
         const statusBox = find('#dizzy-event-status');
         const statusContent = statusBox?.querySelector('.inside');
         section('Event status', 'Control whether the event is public, scheduled or archived.', statusContent ? [statusContent] : [], side);
         statusBox?.remove();
+
+        const posterBox = find('#dizzy_event_poster_generator');
+        const backgroundId = posterBox?.querySelector('#dizzy_poster_background_id');
+        const backgroundPreview = posterBox?.querySelector('.dizzy-poster-background-preview img');
+        const backgroundEmpty = posterBox?.querySelector('.dizzy-poster-background-empty');
+        const setPosterBackground = (id, url) => {
+            if (!backgroundId || !backgroundPreview || !backgroundEmpty) return;
+            backgroundId.value = String(id || 0);
+            if (url) {
+                backgroundPreview.src = url;
+                backgroundPreview.hidden = false;
+                backgroundEmpty.hidden = true;
+            } else {
+                backgroundPreview.removeAttribute('src');
+                backgroundPreview.hidden = true;
+                backgroundEmpty.hidden = false;
+            }
+        };
+        posterBox?.querySelector('.dizzy-poster-select-image')?.addEventListener('click', () => {
+            const frame = wp.media({title: 'Select poster background', button: {text: 'Use this image'}, library: {type: 'image'}, multiple: false});
+            frame.on('select', () => {
+                const selected = frame.state().get('selection').first().toJSON();
+                setPosterBackground(selected.id, selected.sizes?.medium?.url || selected.url);
+            });
+            frame.open();
+        });
+        posterBox?.querySelector('.dizzy-poster-use-featured')?.addEventListener('click', () => {
+            const featuredData = posterBox.querySelector('#dizzy_poster_featured_id');
+            const featuredId = Number(find('#_thumbnail_id')?.value || featuredData?.value || 0);
+            const featuredImage = find('#postimagediv .inside img');
+            const featuredUrl = featuredImage?.src || featuredData?.dataset.url || '';
+            if (featuredId > 0 && featuredUrl) setPosterBackground(featuredId, featuredUrl);
+        });
+        posterBox?.querySelector('.dizzy-poster-remove-image')?.addEventListener('click', () => setPosterBackground(0, ''));
+
+        const formatSelect = posterBox?.querySelector('#dizzy_poster_format');
+        const outputPreview = posterBox?.querySelector('.dizzy-poster-output-preview');
+        const updateOutputRatio = () => {
+            if (!formatSelect || !outputPreview) return;
+            const ratios = {social_square: '1 / 1', social_portrait: '4 / 5', social_story: '9 / 16', print_a4: '210 / 297'};
+            outputPreview.style.aspectRatio = ratios[formatSelect.value] || '1 / 1';
+        };
+        formatSelect?.addEventListener('change', updateOutputRatio);
+        updateOutputRatio();
 
         original.classList.add('dizzy-original-editor-hidden');
         document.body.classList.add('dizzy-custom-event-editor-ready');
