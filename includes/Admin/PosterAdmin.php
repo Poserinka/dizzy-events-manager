@@ -102,7 +102,7 @@ final class PosterAdmin
         if ($poster && $poster->imageUrl !== '') {
             echo '<img src="' . esc_url($poster->imageUrl) . '" alt="">';
         }
-        echo '</div>';
+        echo '</div></div>';
         echo '<div class="dizzy-poster-actions">';
         if ($poster && $poster->imageUrl !== '') {
             echo '<a class="button button-secondary" href="' . esc_url($poster->imageUrl) . '" download>' . esc_html__('Download latest poster', 'dizzy-events-manager') . '</a>';
@@ -121,7 +121,7 @@ final class PosterAdmin
         }
 
         echo '<button type="button" class="button button-primary dizzy-poster-generate">' . esc_html__('Generate Poster', 'dizzy-events-manager') . '</button>';
-        echo '</div></div></div></div>';
+        echo '</div></div></div>';
     }
 
     public function generate(): void
