@@ -187,6 +187,19 @@
         }
         const featuredBox = find('#postimagediv');
         const featuredRemove = featuredBox?.querySelector('#remove-post-thumbnail');
+        const featuredImageLink = featuredBox?.querySelector('#set-post-thumbnail');
+        const featuredInside = featuredBox?.querySelector('.inside');
+        if (featuredImageLink && featuredInside) {
+            const featuredEditLink = document.createElement('a');
+            featuredEditLink.href = '#';
+            featuredEditLink.className = 'dizzy-featured-edit-link';
+            featuredEditLink.textContent = 'Click the image to edit or update';
+            featuredEditLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                featuredImageLink.click();
+            });
+            featuredInside.appendChild(featuredEditLink);
+        }
         if (featuredBox && featuredRemove) featuredBox.appendChild(featuredRemove);
         section('Publish', '', elements(['#submitdiv']), side);
         const statusBox = find('#dizzy-event-status');
