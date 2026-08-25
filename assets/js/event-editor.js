@@ -110,9 +110,64 @@
         const tagsField = simpleField('dizzy_event_tags', 'Tags', relationData.fields.tags, 'Separate multiple tags with commas.');
         const posterBox = find('#dizzy_event_poster_generator');
         const posterShell = posterBox?.querySelector('.dizzy-poster-generator-shell');
-        const posterGeneratorPane = posterBox?.querySelector('.dizzy-poster-generator-pane');
-        const posterOutputPane = posterBox?.querySelector('.dizzy-poster-output-pane');
+        let posterGeneratorPane = posterBox?.querySelector('.dizzy-poster-generator-pane');
+        let posterOutputPane = posterBox?.querySelector('.dizzy-poster-output-pane');
         const posterAction = posterShell?.dataset.action || '';
+
+        // Backwards compatibility for the poster markup rendered by older
+        // Dizzy Social Media Manager versions.
+        if (posterBox && (!posterGeneratorPane || !posterOutputPane)) {
+            const inside = posterBox.querySelector('.inside');
+            const backgroundInput = inside?.querySelector('#dizzy_poster_background_id');
+            const backgroundPreviewLegacy = inside?.querySelector('#dizzy_poster_background_preview');
+            const selectBackground = inside?.querySelector('#dizzy_select_poster_background');
+            const useFeatured = inside?.querySelector('#dizzy_use_featured_background');
+            const formatLegacy = inside?.querySelector('#dizzy_poster_format');
+            const generateLegacy = inside?.querySelector('#dizzy_generate_poster');
+            if (inside && backgroundInput && backgroundPreviewLegacy && selectBackground && useFeatured && formatLegacy && generateLegacy) {
+                posterGeneratorPane = document.createElement('div');
+                posterGeneratorPane.className = 'dizzy-poster-generator-pane';
+                posterOutputPane = document.createElement('div');
+                posterOutputPane.className = 'dizzy-poster-output-pane';
+
+                const backgroundCard = document.createElement('div');
+                backgroundCard.className = 'dizzy-poster-background-card';
+                const backgroundLabel = Array.from(inside.querySelectorAll('p')).find((node) => {
+                    const strong = node.querySelector('strong');
+                    return strong && /background image/i.test(strong.textContent || '');
+                });
+                if (backgroundLabel) backgroundCard.appendChild(backgroundLabel);
+                backgroundCard.append(backgroundInput, backgroundPreviewLegacy);
+                backgroundPreviewLegacy.classList.add('dizzy-poster-background-preview');
+                posterGeneratorPane.appendChild(backgroundCard);
+
+                const backgroundActions = selectBackground.closest('p') || document.createElement('div');
+                backgroundActions.classList.add('dizzy-poster-actions');
+                posterGeneratorPane.appendChild(backgroundActions);
+                const nonceLegacy = inside.querySelector('[name="dizzy_poster_nonce"]');
+                const postIdLegacy = inside.querySelector('[name="post_id"]');
+                if (nonceLegacy) posterGeneratorPane.prepend(nonceLegacy);
+                if (postIdLegacy) posterGeneratorPane.prepend(postIdLegacy);
+
+                const outputControls = formatLegacy.closest('p') || document.createElement('div');
+                outputControls.classList.add('dizzy-poster-output-controls');
+                posterOutputPane.appendChild(outputControls);
+                const outputCard = document.createElement('div');
+                outputCard.className = 'dizzy-poster-output-card';
+                inside.querySelectorAll('.notice.inline').forEach((notice) => outputCard.appendChild(notice));
+                const outputPreviewLegacy = document.createElement('div');
+                outputPreviewLegacy.className = 'dizzy-poster-output-preview';
+                const outputImage = Array.from(inside.children).find((node) => node.tagName === 'IMG');
+                if (outputImage) outputPreviewLegacy.appendChild(outputImage);
+                outputCard.appendChild(outputPreviewLegacy);
+                const outputActions = document.createElement('div');
+                outputActions.className = 'dizzy-poster-actions';
+                inside.querySelectorAll(':scope > p > a.button').forEach((link) => outputActions.appendChild(link));
+                outputActions.appendChild(generateLegacy);
+                outputCard.appendChild(outputActions);
+                posterOutputPane.appendChild(outputCard);
+            }
+        }
 
         ['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue', '#tagsdiv-dizzy_event_tag'].forEach((selector) => find(selector)?.remove());
 
