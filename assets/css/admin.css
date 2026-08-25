@@ -169,14 +169,18 @@
 .dizzy-editor-featured-section #postimagediv .inside,
 .dizzy-poster-background-card,
 .dizzy-poster-output-card { background: #f6f7f9; border: 1px solid #dce1e7; border-radius: 8px; box-sizing: border-box; padding: 22px 28px; }
-.dizzy-editor-featured-section #postimagediv .inside { min-height: 338px; }
+.dizzy-editor-featured-section #postimagediv .inside { min-height: 346px; }
 .dizzy-editor-featured-section #postimagediv .inside > p { margin: 0; }
-.dizzy-editor-featured-section #set-post-thumbnail { display: inline-flex; flex-direction: column; text-decoration: none; }
-.dizzy-editor-featured-section #set-post-thumbnail img { display: block; height: 267px; max-width: 267px; object-fit: contain; width: auto; }
+.dizzy-featured-image-preview { align-items: center; aspect-ratio: 1 / 1; background: #dfe1e3; display: flex; justify-content: center; overflow: hidden; width: 300px; }
+.dizzy-featured-image-preview #set-post-thumbnail { align-items: center; display: flex; font-size: 0; height: 100%; justify-content: center; text-decoration: none; width: 100%; }
+.dizzy-featured-image-preview #set-post-thumbnail:not(.has-image) { display: none; }
+.dizzy-featured-image-preview #set-post-thumbnail img { display: block; height: 100%; object-fit: contain; width: 100%; }
+.dizzy-featured-image-empty { color: #7a7f87; }
 .dizzy-featured-edit-link { color: #2271b1; display: block; margin-top: 12px; text-decoration: underline; width: fit-content; }
 .dizzy-featured-edit-link:hover,
 .dizzy-featured-edit-link:focus { color: #135e96; }
-.dizzy-editor-featured-section #remove-post-thumbnail { align-items: center; border: 1px solid #3858e9; box-sizing: border-box; color: #2145e6; display: flex; justify-content: center; margin-top: 10px; min-height: 42px; text-decoration: none; width: 100%; }
+.dizzy-featured-actions { margin-top: 10px; }
+.dizzy-editor-featured-section #remove-post-thumbnail { align-items: center; border: 1px solid #3858e9; box-sizing: border-box; color: #2145e6; display: flex; justify-content: center; min-height: 42px; text-decoration: none; width: 100%; }
 .dizzy-poster-generator-pane,
 .dizzy-poster-output-pane { display: grid; gap: 12px; }
 .dizzy-poster-background-card strong,
@@ -211,6 +215,7 @@
     .dizzy-poster-background-card,
     .dizzy-poster-output-card { padding: 18px; }
     .dizzy-poster-background-preview,
-    .dizzy-poster-output-preview { max-width: 100%; width: 300px; }
+    .dizzy-poster-output-preview,
+    .dizzy-featured-image-preview { max-width: 100%; width: 300px; }
 }
 
