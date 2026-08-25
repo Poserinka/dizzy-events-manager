@@ -1,5 +1,6 @@
 ```gitattributes
-* text=auto eol=lf
+
+* text=auto eol=crlf
 
 *.php      text diff=php
 *.js       text
