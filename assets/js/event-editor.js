@@ -164,8 +164,8 @@
                 outputActions.className = 'dizzy-poster-actions';
                 inside.querySelectorAll(':scope > p > a.button').forEach((link) => outputActions.appendChild(link));
                 outputActions.appendChild(generateLegacy);
-                outputCard.appendChild(outputActions);
                 posterOutputPane.appendChild(outputCard);
+                posterOutputPane.appendChild(outputActions);
             }
         }
 
