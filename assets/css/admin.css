@@ -160,6 +160,12 @@
 .dizzy-artist-profiles > .button { justify-content: center; min-height: 42px; width: 100%; }
 .dizzy-simple-event-field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
 .dizzy-simple-event-field input[type="text"] { max-width: 760px; width: 100%; }
+.dizzy-editor-category-section #dizzy_event_category-all { border: 0; min-height: 0; padding: 0; }
+.dizzy-editor-category-section #dizzy_event_categorychecklist { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0; }
+.dizzy-editor-category-section #dizzy_event_categorychecklist > li { margin: 0; }
+.dizzy-editor-category-section #dizzy_event_categorychecklist label { align-items: center; display: inline-flex; gap: 6px; }
+.dizzy-editor-category-section #dizzy_event_category-adder,
+.dizzy-editor-category-section .category-tabs { display: none !important; }
 
 /* Featured image and poster workspace */
 .dizzy-editor-featured-section .dizzy-editor-section-body,

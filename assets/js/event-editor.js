@@ -33,9 +33,14 @@
             target.appendChild(wrapper);
         };
 
-        const mostUsedTab = find('#dizzy_event_category-tabs a[href="#dizzy_event_category-pop"]')?.closest('li');
-        mostUsedTab?.remove();
-        find('#dizzy_event_category-pop')?.remove();
+        const categoryBox = find('#dizzy_event_categorydiv');
+        categoryBox?.querySelector('#dizzy_event_category-tabs')?.remove();
+        categoryBox?.querySelector('#dizzy_event_category-pop')?.remove();
+        categoryBox?.querySelector('#dizzy_event_category-adder')?.remove();
+        categoryBox?.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+            input.type = 'radio';
+        });
+        find('#postexcerpt')?.remove();
 
         const relationData = window.dizzyEventEditorData || { nonce: '', fields: { artists: [], venue: 'Jazzcafe Dizzy', tags: '' } };
         const nonce = document.createElement('input');
@@ -171,7 +176,8 @@
 
         ['#tagsdiv-dizzy_event_artist', '#tagsdiv-dizzy_event_venue', '#tagsdiv-dizzy_event_tag'].forEach((selector) => find(selector)?.remove());
 
-        section('Event information', 'Public title, description and category.', elements(['#titlediv', '#postdivrich', '#postexcerpt', '#dizzy_event_categorydiv']));
+        section('Event information', 'Public title and description.', elements(['#titlediv', '#postdivrich']));
+        section('Event category', 'Choose one event category.', categoryBox ? [categoryBox] : [], main, 'dizzy-editor-category-section');
         section('Date and time', 'Set the event start and optional end.', elements(['#dizzy_event_occurrences']));
         section('Artist', 'Add one or more artists for this event.', [artistFields], main, 'dizzy-editor-artist-section');
         section('Venue', 'Enter the event venue.', [venueField]);
