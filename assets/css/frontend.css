@@ -38,6 +38,9 @@
     margin: 0.35rem 0;
 }
 
+/* Artist display is temporarily disabled without removing stored artist data. */
+.dizzy-event-artist { display: none !important; }
+
 .dizzy-event-address a,
 .dizzy-event-meta a {
     text-decoration: underline;

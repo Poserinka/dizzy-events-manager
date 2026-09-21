@@ -147,6 +147,8 @@
 .dizzy-multi-dropdown-choices label { align-items: center; border-radius: 5px; display: flex; font-weight: 400; gap: 8px; margin: 0; padding: 7px; }
 .dizzy-multi-dropdown-choices label:hover { background: #f0f2f5; }
 .dizzy-artist-profiles { display: grid; gap: 16px; }
+/* Artist editing is temporarily hidden. Keep the markup and submitted fields intact so it can be re-enabled without data loss. */
+.dizzy-editor-artist-section { display: none; }
 .dizzy-artist-profile { align-items: start; background: #f6f7f9; border: 1px solid #dce1e7; border-radius: 8px; display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)) 180px; padding: 16px; }
 .dizzy-artist-profile label span,
 .dizzy-artist-profile-photo strong { display: block; font-size: 13px; margin-bottom: 7px; }
