@@ -217,7 +217,6 @@
             new MutationObserver(syncFeaturedPreview).observe(featuredImageLink, {childList: true, subtree: true});
             syncFeaturedPreview();
         }
-        section('Publish', '', elements(['#submitdiv']), side);
         const statusBox = find('#dizzy-event-status');
         const statusContent = statusBox?.querySelector('.inside');
         section('Event status', 'Control whether the event is public, scheduled or archived.', statusContent ? [statusContent] : [], side);
