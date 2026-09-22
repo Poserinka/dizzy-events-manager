@@ -18,7 +18,7 @@ final class PosterSettings
 
     public function registerMenu(): void
     {
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Poster Settings', 'dizzy-social-media-manager'), __('Poster Settings', 'dizzy-social-media-manager'), 'manage_options', 'dizzy-poster-settings', [$this, 'renderPage']);
+        add_submenu_page(null, __('Poster Settings', 'dizzy-social-media-manager'), __('Poster Settings', 'dizzy-social-media-manager'), 'manage_options', 'dizzy-poster-settings', [$this, 'renderPage']);
     }
 
     public function registerSettings(): void

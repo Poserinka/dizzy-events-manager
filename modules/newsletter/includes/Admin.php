@@ -24,10 +24,10 @@ final class Admin
     public function menu(): void
     {
         add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Newsletter Campaigns', 'dizzy-newsletter'), __('Newsletter', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter', [$this, 'campaignsPage']);
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Add Campaign', 'dizzy-newsletter'), __('Newsletter – Add Campaign', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-campaign', [$this, 'campaignPage']);
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Subscribers', 'dizzy-newsletter'), __('Newsletter – Subscribers', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-audience', [$this, 'audiencePage']);
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Newsletter Analytics', 'dizzy-newsletter'), __('Newsletter – Analytics', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-analytics', [$this, 'analyticsPage']);
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Newsletter Settings', 'dizzy-newsletter'), __('Newsletter – Settings', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-settings', [$this, 'settingsPage']);
+        add_submenu_page(null, __('Add Campaign', 'dizzy-newsletter'), __('Newsletter – Add Campaign', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-campaign', [$this, 'campaignPage']);
+        add_submenu_page(null, __('Subscribers', 'dizzy-newsletter'), __('Newsletter – Subscribers', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-audience', [$this, 'audiencePage']);
+        add_submenu_page(null, __('Newsletter Analytics', 'dizzy-newsletter'), __('Newsletter – Analytics', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-analytics', [$this, 'analyticsPage']);
+        add_submenu_page(null, __('Newsletter Settings', 'dizzy-newsletter'), __('Newsletter – Settings', 'dizzy-newsletter'), 'manage_options', 'dizzy-newsletter-settings', [$this, 'settingsPage']);
     }
 
     public function assets(string $hook): void

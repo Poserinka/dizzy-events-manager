@@ -19,7 +19,7 @@ final class AccountsAdmin
 
     public function menu(): void
     {
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU,__('Social Accounts','dizzy-social-media-manager'),__('Social Accounts','dizzy-social-media-manager'),'manage_options','dizzy-social-accounts',[$this,'render']);
+        add_submenu_page(null,__('Social Accounts','dizzy-social-media-manager'),__('Social Accounts','dizzy-social-media-manager'),'manage_options','dizzy-social-accounts',[$this,'render']);
     }
 
     public function settings(): void

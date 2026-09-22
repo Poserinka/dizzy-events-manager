@@ -11,7 +11,7 @@ final class AutoPostAdmin
     private const GROUP='dizzy-social-autopost';
 
     public function register(): void { add_action('admin_init',[$this,'settings']);add_action('admin_menu',[$this,'menu']); }
-    public function menu(): void { add_submenu_page(DIZZY_EVENTS_ADMIN_MENU,__('WP Auto Post','dizzy-social-media-manager'),__('Social Auto Post','dizzy-social-media-manager'),'manage_options','dizzy-social-autopost',[$this,'render']); }
+    public function menu(): void { add_submenu_page(null,__('WP Auto Post','dizzy-social-media-manager'),__('Social Auto Post','dizzy-social-media-manager'),'manage_options','dizzy-social-autopost',[$this,'render']); }
     public function settings(): void
     {
         register_setting(self::GROUP,'dizzy_social_autopost_enabled',['type'=>'boolean','sanitize_callback'=>fn($v)=>(bool)$v]);

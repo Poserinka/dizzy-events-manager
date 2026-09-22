@@ -4,7 +4,7 @@
  * Plugin Name: Dizzy Events Manager
  * Plugin URI: https://github.com/Poserinka/dizzy-events-manager
  * Description: Advanced event management system for Dizzy Rotterdam.
- * Version: 4.0.0
+ * Version: 4.1.0
  * Author: Poserinka Design
  * Author URI: https://poserinka.com
  * Text Domain: dizzy-events-manager
@@ -18,11 +18,11 @@ defined('ABSPATH') || exit;
 
 define(
     'DIZZY_EVENTS_VERSION',
-    '4.0.0'
+    '4.1.0'
 );
 
 define('DIZZY_EVENTS_FILE', __FILE__);
-define('DIZZY_EVENTS_ADMIN_MENU', 'edit.php?post_type=dizzy_event');
+define('DIZZY_EVENTS_ADMIN_MENU', 'dizzy-management');
 
 define(
     'DIZZY_EVENTS_PATH',
@@ -52,6 +52,7 @@ if (file_exists($autoload)) {
 
 \Dizzy\Events\Core\ModuleManager::load();
 \Dizzy\Events\Core\ModuleManager::registerMaintenance();
+(new \Dizzy\Events\Admin\SuiteAdmin())->register();
 
 register_activation_hook(
     __FILE__,

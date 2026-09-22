@@ -8,6 +8,19 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-09-22
+
+### Added
+
+- Added a unified Dizzy Management admin area with a single Dizzy sidebar menu.
+- Added horizontal page tabs for Events, Reservations, Schedule, Tickets, Newsletter, WAnotify and Social Media.
+- Added an event overview landing page with card-based event access.
+
+### Changed
+
+- Simplified the WordPress sidebar so only each module's main entry is shown.
+- Kept secondary tools available through their module's horizontal tabs.
+
 ## [4.0.0] - 2026-09-22
 
 ### Added

@@ -40,7 +40,7 @@ final class Admin
         );
 
         $this->hooks[] = (string) add_submenu_page(
-            DIZZY_EVENTS_ADMIN_MENU,
+            null,
             __('Message Templates', 'dizzy-wanotify-manager'),
             __('WAnotify Templates', 'dizzy-wanotify-manager'),
             'manage_options',

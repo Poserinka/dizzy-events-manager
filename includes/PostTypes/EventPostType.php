@@ -60,6 +60,8 @@ final class EventPostType
 
                 'show_ui' => true,
 
+                'show_in_menu' => false,
+
                 'menu_icon' => 'dashicons-calendar-alt',
 
                 'supports' => [

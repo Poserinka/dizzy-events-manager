@@ -53,7 +53,7 @@ final class AdminController
             add_menu_page(__('Reservations Manager', 'dizzy-reservations-manager'), __('Reservations', 'dizzy-reservations-manager'), ControllerRole::RESERVATIONS_CAP, self::MENU, [$this, 'reservations'], 'dashicons-clipboard', 26);
         }
         add_submenu_page($parent, __('Reservations', 'dizzy-reservations-manager'), __('Reservations', 'dizzy-reservations-manager'), ControllerRole::RESERVATIONS_CAP, self::MENU, [$this, 'reservations']);
-        add_submenu_page($parent, __('Reservation Reports', 'dizzy-reservations-manager'), __('Reservation Reports', 'dizzy-reservations-manager'), 'manage_options', self::REPORTS, [$this, 'reports']);
+        add_submenu_page($parent === DIZZY_EVENTS_ADMIN_MENU ? null : $parent, __('Reservation Reports', 'dizzy-reservations-manager'), __('Reservation Reports', 'dizzy-reservations-manager'), 'manage_options', self::REPORTS, [$this, 'reports']);
     }
 
     public function reservations(): void

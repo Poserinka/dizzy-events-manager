@@ -35,10 +35,11 @@ final class TicketSalesAdmin
             add_menu_page(__('Tickets', 'dizzy-ticket-manager'), __('Tickets', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::MENU, [$this, 'ticketsPage'], 'dashicons-tickets-alt', 26);
         }
         add_submenu_page($parent, __('Tickets', 'dizzy-ticket-manager'), __('Tickets', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::MENU, [$this, 'ticketsPage']);
-        add_submenu_page($parent, __('Ticket Orders', 'dizzy-ticket-manager'), __('Ticket Orders', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::ORDERS, [$this, 'ordersPage']);
-        add_submenu_page($parent, __('Check-in & Attendance', 'dizzy-ticket-manager'), __('Ticket Check-in', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::CHECKIN, [$this, 'checkinPage']);
-        add_submenu_page($parent, __('Ticket Reports', 'dizzy-ticket-manager'), __('Ticket Reports', 'dizzy-ticket-manager'), 'manage_options', self::REPORTS, [$this, 'reportsPage']);
-        add_submenu_page($parent, __('Payment Settings', 'dizzy-ticket-manager'), __('Ticket Payment Settings', 'dizzy-ticket-manager'), 'manage_options', 'dizzy-ticket-payment-settings', [$this, 'settingsPage']);
+        $detailParent = $parent === DIZZY_EVENTS_ADMIN_MENU ? null : $parent;
+        add_submenu_page($detailParent, __('Ticket Orders', 'dizzy-ticket-manager'), __('Ticket Orders', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::ORDERS, [$this, 'ordersPage']);
+        add_submenu_page($detailParent, __('Check-in & Attendance', 'dizzy-ticket-manager'), __('Ticket Check-in', 'dizzy-ticket-manager'), ControllerRole::TICKETS_CAP, self::CHECKIN, [$this, 'checkinPage']);
+        add_submenu_page($detailParent, __('Ticket Reports', 'dizzy-ticket-manager'), __('Ticket Reports', 'dizzy-ticket-manager'), 'manage_options', self::REPORTS, [$this, 'reportsPage']);
+        add_submenu_page($detailParent, __('Payment Settings', 'dizzy-ticket-manager'), __('Ticket Payment Settings', 'dizzy-ticket-manager'), 'manage_options', 'dizzy-ticket-payment-settings', [$this, 'settingsPage']);
     }
 
     public function settings(): void

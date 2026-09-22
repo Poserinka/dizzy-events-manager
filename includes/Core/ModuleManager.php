@@ -46,7 +46,7 @@ final class ModuleManager
     public static function registerAdminPage(): void
     {
         add_submenu_page(
-            DIZZY_EVENTS_ADMIN_MENU,
+            null,
             __('Dizzy Suite Modules', 'dizzy-events-manager'),
             __('Dizzy Suite', 'dizzy-events-manager'),
             'manage_options',

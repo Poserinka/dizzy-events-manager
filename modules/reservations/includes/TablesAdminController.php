@@ -21,7 +21,7 @@ final class TablesAdminController
 
     public function menu(): void
     {
-        add_submenu_page(DIZZY_EVENTS_ADMIN_MENU, __('Tables', 'dizzy-reservations-manager'), __('Reservation Tables', 'dizzy-reservations-manager'), 'manage_options', self::PAGE, [$this, 'render']);
+        add_submenu_page(null, __('Tables', 'dizzy-reservations-manager'), __('Reservation Tables', 'dizzy-reservations-manager'), 'manage_options', self::PAGE, [$this, 'render']);
     }
 
     public function hideNotices(): void

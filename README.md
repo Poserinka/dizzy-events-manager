@@ -21,6 +21,8 @@ Version 4 bundles the former standalone Dizzy plugins as modules inside Dizzy Ev
 
 The modules continue using their original database tables, WordPress options, post metadata, roles, capabilities, REST routes, webhook routes and cron hook names. If an old standalone plugin is still active, its bundled counterpart pauses automatically to prevent duplicate processing. After updating Dizzy Events Manager, deactivate the old standalone plugins and verify Events → Dizzy Suite before deleting their folders.
 
+Version 4.1 presents these modules through one **Dizzy** admin menu. Each module has a single sidebar entry and its secondary pages are available as horizontal tabs beneath the shared **Dizzy Management** header.
+
 ### Event Management
 
 * Event Custom Post Type

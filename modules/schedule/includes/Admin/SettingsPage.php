@@ -29,7 +29,7 @@ final class SettingsPage
     public function menu(): void
     {
         $this->pageHook = (string) add_submenu_page(
-            DIZZY_EVENTS_ADMIN_MENU,
+            null,
             __('Schedule Settings', 'dizzy-schedule-manager'),
             __('Schedule Settings', 'dizzy-schedule-manager'),
             EmployeeRole::MANAGE_CAP,

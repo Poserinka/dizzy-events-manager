@@ -11,7 +11,7 @@ final class TemplatesAdmin
     private const GROUP='dizzy-social-templates';
 
     public function register(): void { add_action('admin_init',[$this,'settings']);add_action('admin_menu',[$this,'menu']); }
-    public function menu(): void { add_submenu_page(DIZZY_EVENTS_ADMIN_MENU,__('Social Templates','dizzy-social-media-manager'),__('Social Templates','dizzy-social-media-manager'),'manage_options','dizzy-social-templates',[$this,'render']); }
+    public function menu(): void { add_submenu_page(null,__('Social Templates','dizzy-social-media-manager'),__('Social Templates','dizzy-social-media-manager'),'manage_options','dizzy-social-templates',[$this,'render']); }
     public function settings(): void
     {
         foreach(['facebook_message','instagram_message','instagram_first_comment'] as $key)register_setting(self::GROUP,'dizzy_social_'.$key,['type'=>'string','sanitize_callback'=>'sanitize_textarea_field']);
