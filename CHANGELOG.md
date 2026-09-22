@@ -8,6 +8,15 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.6] - 2026-09-22
+
+### Changed
+
+- Applied the requested border and shadow to event editor sections.
+- Added rounded cards and the refined dark hero treatment.
+- Changed the event editor header to black on white.
+- Added rounded Schedule headers and bordered, shadowed week grids.
+
 ## [4.2.5] - 2026-09-22
 
 ### Changed

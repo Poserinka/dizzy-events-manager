@@ -76,12 +76,12 @@
 .dizzy-custom-event-editor-ready #poststuff > h2,
 .dizzy-original-editor-hidden { display: none !important; }
 #dizzy-event-workspace { margin-top: 14px; max-width: 1500px; }
-.dizzy-editor-header { align-items: center; background: #171a20; border-radius: 10px 10px 0 0; color: #fff; display: flex; justify-content: space-between; padding: 18px 22px; }
-.dizzy-editor-header h1 { color: #fff; font-size: 23px; line-height: 1.2; margin: 0 0 4px; padding: 0; }
+.dizzy-editor-header { align-items: center; background: #fff; border-radius: 10px 10px 0 0; color: #000; display: flex; justify-content: space-between; padding: 18px 22px; }
+.dizzy-editor-header h1 { color: inherit; font-size: 23px; line-height: 1.2; margin: 0 0 4px; padding: 0; }
 .dizzy-editor-header p { color: #aeb5c1; margin: 0; }
 .dizzy-editor-header-actions { display: flex; gap: 9px; }
 .dizzy-editor-columns { align-items: start; background: #f0f2f5; display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr) 290px; padding: 22px 0; }
-.dizzy-editor-section { background: #fff; border: 1px solid #dce1e7; border-radius: 10px; box-shadow: 0 1px 2px rgba(20, 25, 32, .04); margin: 0 0 16px; overflow: hidden; }
+.dizzy-editor-section { background: #fff; border: 1px solid #E8E8EB; border-radius: 10px; box-shadow: 0 2px 5px #0000000d; margin: 0 0 16px; overflow: hidden; }
 .dizzy-editor-section-head { border-bottom: 1px solid #e8ebef; padding: 15px 18px; }
 .dizzy-editor-section-head h2 { color: #20242a; font-size: 16px; font-weight: 600; margin: 0; padding: 0; }
 .dizzy-editor-section-head p { color: #727984; margin: 4px 0 0; }
