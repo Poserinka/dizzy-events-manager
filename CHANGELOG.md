@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-09-22
+
+### Changed
+
+- Introduced a shared administration layout across all Dizzy module pages.
+- Added a white brand header, dark page-introduction panel, optional primary action and attached horizontal tabs.
+- Added module-specific descriptions and removed duplicate native page headings from the shared layout.
+
 ## [4.1.12] - 2026-09-22
 
 ### Added

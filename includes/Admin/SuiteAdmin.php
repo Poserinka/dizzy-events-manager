@@ -267,10 +267,63 @@ final class SuiteAdmin
 
     private function renderHeader(string $pageName): void
     {
+        $presentation = $this->sectionPresentation($pageName);
         echo '<header class="dizzy-management-header"><div class="dizzy-management-header-inner">';
         echo '<img src="' . esc_url(DIZZY_EVENTS_URL . 'assets/images/jazzcafe-dizzy-logo-black.png') . '" width="270" height="38" alt="' . esc_attr__('Jazzcafé Dizzy', 'dizzy-events-manager') . '">';
-        echo '<h1><span>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</span><span class="dizzy-management-header-separator" aria-hidden="true">•</span><span>' . esc_html($pageName) . '</span></h1>';
+        echo '<h1>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</h1>';
         echo '</div></header>';
+        echo '<section class="dizzy-management-hero"><div><h2>' . esc_html($pageName) . '</h2><p>' . esc_html($presentation['description']) . '</p></div>';
+        if ($presentation['action_url'] !== '' && $presentation['action_label'] !== '') {
+            echo '<a class="button button-primary" href="' . esc_url($presentation['action_url']) . '">' . esc_html($presentation['action_label']) . '</a>';
+        }
+        echo '</section>';
+    }
+
+    /** @return array{description:string,action_label:string,action_url:string} */
+    private function sectionPresentation(string $pageName): array
+    {
+        $presentations = [
+            'Events' => [
+                'description' => __('Manage events, dates and publication status.', 'dizzy-events-manager'),
+                'action_label' => __('Add Event', 'dizzy-events-manager'),
+                'action_url' => admin_url('post-new.php?post_type=' . Config::POST_TYPE_EVENT),
+            ],
+            'Reservations' => [
+                'description' => __('Manage guests, tables and reservation reports.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
+            'Schedule' => [
+                'description' => __('Manage employee schedules, reports and positions.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
+            'Tickets' => [
+                'description' => __('Manage tickets, orders, check-in and payment settings.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
+            'Newsletter' => [
+                'description' => __('Create campaigns and manage subscribers.', 'dizzy-events-manager'),
+                'action_label' => __('Add Campaign', 'dizzy-events-manager'),
+                'action_url' => admin_url('admin.php?page=dizzy-newsletter-campaign'),
+            ],
+            'WA Notify' => [
+                'description' => __('Manage WhatsApp connections and message templates.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
+            'Social Media' => [
+                'description' => __('Create event posters and manage social publishing.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
+        ];
+        return $presentations[$pageName] ?? [
+            'description' => __('Manage Dizzy settings and content.', 'dizzy-events-manager'),
+            'action_label' => '',
+            'action_url' => '',
+        ];
     }
 
     /**
@@ -421,6 +474,6 @@ final class SuiteAdmin
 
     private function css(): string
     {
-        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-header{margin:0 -20px 28px;padding:24px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header-inner{display:flex;align-items:center;gap:26px;max-width:1240px;margin:0 auto}.dizzy-management-header img{display:block;width:270px;max-width:35%;height:auto}.dizzy-management-header h1{display:flex;align-items:center;gap:9px;margin:0;font-size:17px;font-weight:500;line-height:1.3}.dizzy-management-header-separator{color:#667085}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;width:auto;max-width:1240px;margin:0 auto 22px;padding:0 4px;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:12px 0 11px;color:#101828;text-decoration:none;font-weight:500;border-bottom:2px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#135eeb}.dizzy-management-page{max-width:1240px}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;align-items:center;gap:24px;min-height:58px;padding:10px 12px 10px 20px;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card-title{font-size:15px}.dizzy-management-card-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;color:#344054;white-space:nowrap}.dizzy-management-card>.button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-header-inner{align-items:flex-start;flex-direction:column;gap:12px}.dizzy-management-header img{width:240px;max-width:80%}.dizzy-management-tabs{gap:18px}.dizzy-management-card{grid-template-columns:1fr;align-items:start;gap:10px;padding:16px}.dizzy-management-card-meta{flex-wrap:wrap;justify-content:flex-start;white-space:normal}.dizzy-management-card>.button{width:max-content}}';
+        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-admin #wpbody-content>.wrap>h1:first-child{display:none}.dizzy-management-header{margin:0 -20px 26px;padding:24px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header-inner{display:flex;align-items:center;gap:26px;max-width:1240px;margin:0 auto}.dizzy-management-header img{display:block;width:270px;max-width:35%;height:auto}.dizzy-management-header h1{margin:0;font-size:17px;font-weight:500;line-height:1.3}.dizzy-management-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;box-sizing:border-box;width:auto;max-width:1240px;min-height:108px;margin:0 auto;padding:24px;background:#171b23;color:#fff}.dizzy-management-hero h2{margin:0 0 8px;color:#fff;font-size:24px;font-weight:500;line-height:1.2}.dizzy-management-hero p{margin:0;color:#c7ced9}.dizzy-management-hero>.button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px;white-space:nowrap}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;box-sizing:border-box;width:auto;max-width:1240px;margin:0 auto 28px;padding:0 20px;background:#fff;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:17px 0 14px;color:#667085;text-decoration:none;font-weight:500;border-bottom:3px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#2271b1}.dizzy-management-page{max-width:1240px;margin-top:0!important}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;align-items:center;gap:24px;min-height:58px;padding:10px 12px 10px 20px;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card-title{font-size:15px}.dizzy-management-card-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;color:#344054;white-space:nowrap}.dizzy-management-card>.button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-header-inner{align-items:flex-start;flex-direction:column;gap:12px}.dizzy-management-header img{width:240px;max-width:80%}.dizzy-management-hero{align-items:flex-start;flex-direction:column;margin-left:0;margin-right:0}.dizzy-management-tabs{gap:18px}.dizzy-management-card{grid-template-columns:1fr;align-items:start;gap:10px;padding:16px}.dizzy-management-card-meta{flex-wrap:wrap;justify-content:flex-start;white-space:normal}.dizzy-management-card>.button{width:max-content}}';
     }
 }
