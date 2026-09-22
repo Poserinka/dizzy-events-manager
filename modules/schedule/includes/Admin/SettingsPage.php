@@ -77,7 +77,10 @@ final class SettingsPage
         $status = sanitize_key(wp_unslash((string) ($_GET['dizzy_schedule_status'] ?? '')));
         ?>
         <div class="wrap dizzy-schedule-settings">
-            <h1><?php esc_html_e('Schedule Settings', 'dizzy-schedule-manager'); ?></h1>
+            <header class="dizzy-schedule-settings-header">
+                <h1><?php esc_html_e('Employee Roles', 'dizzy-schedule-manager'); ?></h1>
+                <p><?php esc_html_e('These roles are available in the Position dropdown when creating a shift.', 'dizzy-schedule-manager'); ?></p>
+            </header>
 
             <?php if ($status !== '') : ?>
                 <div class="dizzy-schedule-settings-message">
@@ -92,9 +95,6 @@ final class SettingsPage
             <?php endif; ?>
 
             <section class="dizzy-schedule-settings-panel">
-                <h2><?php esc_html_e('Employee Roles', 'dizzy-schedule-manager'); ?></h2>
-                <p><?php esc_html_e('These roles are available in the Position dropdown when creating a shift.', 'dizzy-schedule-manager'); ?></p>
-
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="dizzy-position-add">
                     <input type="hidden" name="action" value="dizzy_schedule_add_position">
                     <?php wp_nonce_field('dizzy_schedule_add_position'); ?>

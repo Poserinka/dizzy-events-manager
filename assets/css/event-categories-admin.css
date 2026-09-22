@@ -11,6 +11,7 @@
 .dizzy-event-category-admin #col-left .form-field textarea,
 .dizzy-event-category-admin #col-left .form-field select{box-sizing:border-box;width:100%;max-width:none}
 .dizzy-event-category-admin #col-right .wp-list-table{border:0;box-shadow:none}
+.dizzy-event-category-admin #col-right .search-box{display:none}
 .dizzy-event-category-admin #col-right .tablenav{height:auto;min-height:30px}
 .dizzy-event-category-admin #edittag{max-width:900px}
 .dizzy-event-category-admin #edittag .form-table{margin-top:0}

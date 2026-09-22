@@ -40,6 +40,9 @@ body.dizzy-schedule-admin-page div[id*="notice"] { display:none!important; }
 @media(max-width:782px){.dizzy-schedule-wrap{margin-right:10px}.dizzy-schedule-header{align-items:flex-start;flex-direction:column}.dizzy-schedule-toolbar{align-items:flex-start;flex-wrap:wrap;padding:12px}.dizzy-schedule-form-row{grid-template-columns:1fr}}
 
 .dizzy-schedule-settings{max-width:900px}
+.dizzy-schedule-settings-header{box-sizing:border-box;min-height:108px;padding:20px 24px;color:#000;background:#fff;border:1px solid #E8E8EB;border-radius:10px 10px 0 0;box-shadow:0 2px 5px #0000000d}
+.dizzy-schedule-settings-header h1{margin:0;color:inherit;font-size:24px}
+.dizzy-schedule-settings-header p{margin:5px 0 0;color:#646970}
 .dizzy-schedule-settings-panel{margin-top:20px;padding:24px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}
 .dizzy-position-add{display:grid;grid-template-columns:120px minmax(220px,1fr) auto;gap:10px;align-items:center;margin:20px 0}
 .dizzy-position-delete{text-align:right}

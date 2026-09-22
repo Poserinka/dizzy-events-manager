@@ -51,7 +51,6 @@ final class TablesAdminController
         ?>
         <div class="wrap dizzy-tables-admin">
             <h1><?php esc_html_e('Tables', 'dizzy-reservations-manager'); ?></h1>
-            <p><?php esc_html_e('Arrange tables on the floor plan. Drag a table to move it and select it to edit its details.', 'dizzy-reservations-manager'); ?></p>
             <?php if (isset($_GET['saved'])) : ?><div class="notice notice-success inline"><p><?php esc_html_e('Table layout saved.', 'dizzy-reservations-manager'); ?></p></div><?php endif; ?>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="dizzy-table-form">
                 <input type="hidden" name="action" value="dizzy_save_table_layout"><?php wp_nonce_field('dizzy_save_table_layout'); ?>
@@ -63,11 +62,11 @@ final class TablesAdminController
                     <button type="button" class="button" id="dizzy-add-table"><?php esc_html_e('Add table', 'dizzy-reservations-manager'); ?></button>
                     <button type="submit" class="button button-primary"><?php esc_html_e('Save layout', 'dizzy-reservations-manager'); ?></button>
                 </div>
-                <p class="description dizzy-table-keyboard-help"><?php esc_html_e('Select a table, then use the arrow keys to move it one pixel. Hold Shift for ten pixels.', 'dizzy-reservations-manager'); ?></p>
                 <div class="dizzy-table-workspace">
                     <div class="dizzy-floor-plan" id="dizzy-floor-plan-stage" style="background-image:url('<?php echo esc_url($background); ?>')"></div>
                     <aside class="dizzy-table-editor" id="dizzy-table-editor">
                         <h2><?php esc_html_e('Table details', 'dizzy-reservations-manager'); ?></h2>
+                        <p class="description dizzy-table-keyboard-help"><?php esc_html_e('Select a table, then use the arrow keys to move it one pixel. Hold Shift for ten pixels.', 'dizzy-reservations-manager'); ?></p>
                         <p class="description" id="dizzy-no-table"><?php esc_html_e('Select a table on the plan.', 'dizzy-reservations-manager'); ?></p>
                         <div id="dizzy-table-fields" hidden>
                             <label><?php esc_html_e('Code', 'dizzy-reservations-manager'); ?><input type="text" data-key="code"></label>
@@ -87,6 +86,8 @@ final class TablesAdminController
         <style>
             @font-face{font-family:"Dizzy Bebas Neue";src:url("<?php echo esc_url(DIZZY_RESERVATIONS_URL . 'assets/fonts/BebasNeue-Regular.otf'); ?>") format("opentype");font-style:normal;font-weight:400;font-display:swap}
             .dizzy-table-toolbar{display:flex;gap:8px;align-items:center;margin:15px 0 5px;padding:18px 22px;color:#000;background:#fff;border:1px solid #E8E8EB;border-radius:10px 10px 0 0;box-shadow:0 2px 5px #0000000d}.dizzy-table-keyboard-help{margin:10px 0 15px}.dizzy-table-toolbar input{flex:1;min-width:220px}.dizzy-table-workspace{display:grid;grid-template-columns:minmax(500px,850px) 280px;gap:20px;align-items:start;padding:20px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}.dizzy-floor-plan{position:relative;width:100%;aspect-ratio:1;background-color:#fff;background-size:100% 100%;background-repeat:no-repeat;border:1px solid #c3c4c7;overflow:hidden}.dizzy-layout-table{position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:rgba(70,180,80,.78);color:#fff;font:400 18px/1 "Dizzy Bebas Neue",sans-serif;letter-spacing:.04em;cursor:move;user-select:none;touch-action:none}.dizzy-layout-table.round{border-radius:50%}.dizzy-layout-table.is-selected{background:#ffb900;box-shadow:0 0 0 3px rgba(255,185,0,.35)}.dizzy-layout-table.is-snapped{box-shadow:0 0 0 5px rgba(34,113,177,.42)}.dizzy-layout-table.is-disabled{filter:grayscale(1);opacity:.6}.dizzy-table-editor{background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d;padding:18px;position:sticky;top:45px}.dizzy-table-editor h2{margin-top:0}.dizzy-table-editor label{display:block;margin:0 0 13px;font-weight:600}.dizzy-table-editor label input:not([type=checkbox]),.dizzy-table-editor select{display:block;width:100%;margin-top:5px}.dizzy-table-editor .dizzy-active{font-weight:400}@media(max-width:1050px){.dizzy-table-workspace{grid-template-columns:1fr}.dizzy-table-editor{position:static}.dizzy-table-toolbar{align-items:stretch;flex-direction:column}}
+            .dizzy-table-toolbar{box-sizing:border-box;min-height:108px;margin-top:0}
+            .dizzy-table-editor .dizzy-table-keyboard-help{margin:0 0 14px}
         </style>
         <script>
         (()=>{

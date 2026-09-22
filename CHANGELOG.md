@@ -8,6 +8,15 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.18] - 2026-09-22
+
+### Changed
+
+- Hide the Event Categories search area.
+- Align the Tables layout header with the event editor header and move keyboard guidance below Table details.
+- Place Employee Roles and its description in the Schedule Settings header.
+- Add descriptions below the Poster Settings and Auto Post Settings page titles.
+
 ## [4.2.17] - 2026-09-22
 
 ### Added
