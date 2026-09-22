@@ -40,7 +40,7 @@ body.dizzy-schedule-admin-page div[id*="notice"] { display:none!important; }
 @media(max-width:782px){.dizzy-schedule-wrap{margin-right:10px}.dizzy-schedule-header{align-items:flex-start;flex-direction:column}.dizzy-schedule-toolbar{align-items:flex-start;flex-wrap:wrap;padding:12px}.dizzy-schedule-form-row{grid-template-columns:1fr}}
 
 .dizzy-schedule-settings{max-width:900px}
-.dizzy-schedule-settings-panel{margin-top:20px;padding:24px;background:#fff;border:1px solid #dcdcde}
+.dizzy-schedule-settings-panel{margin-top:20px;padding:24px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}
 .dizzy-position-add{display:grid;grid-template-columns:120px minmax(220px,1fr) auto;gap:10px;align-items:center;margin:20px 0}
 .dizzy-position-delete{text-align:right}
 .dizzy-schedule-settings-message{margin-top:16px;padding:12px 15px;border-left:4px solid #00a32a;background:#fff}
@@ -48,14 +48,14 @@ body.dizzy-schedule-admin-page div[id*="notice"] { display:none!important; }
 
 
 .dizzy-schedule-reports{margin:20px 20px 0 0}
-.dizzy-reports-heading{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;color:#000;background:#fff;border-bottom:1px solid #dcdcde}
+.dizzy-reports-heading{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;color:#000;background:#fff;border-bottom:1px solid #dcdcde;border-radius:10px 10px 0 0}
 .dizzy-reports-heading h1{margin:0;color:inherit;font-size:24px}
 .dizzy-reports-toolbar{display:flex;align-items:center;gap:8px;min-height:58px;padding:0 16px;background:#fff;border-bottom:1px solid #dcdcde}
 .dizzy-reports-toolbar form{display:flex;align-items:center;gap:8px;margin:0}
 .dizzy-reports-toolbar select{min-width:110px}
 .dizzy-reports-toolbar strong{margin:0 10px;color:#2271b1;font-size:17px}
 .dizzy-reports-table-wrap{overflow-x:auto;margin-top:20px}
-.dizzy-reports-table{min-width:760px;border-collapse:collapse}
+.dizzy-reports-table{min-width:760px;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d;border-collapse:separate;border-spacing:0;overflow:hidden}
 .dizzy-reports-table th,.dizzy-reports-table td{padding:12px 14px;vertical-align:middle}
 .dizzy-reports-table thead th{color:#657184;background:#edf0f3;text-transform:uppercase;font-size:11px}
 .dizzy-reports-table tbody td{height:46px}

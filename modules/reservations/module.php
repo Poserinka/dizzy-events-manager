@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_RESERVATIONS_VERSION', '3.12.2');
+define('DIZZY_RESERVATIONS_VERSION', '3.12.3');
 define('DIZZY_RESERVATIONS_PATH', __DIR__ . '/');
 define('DIZZY_RESERVATIONS_URL', DIZZY_EVENTS_URL . 'modules/reservations/');
 

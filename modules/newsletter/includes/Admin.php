@@ -42,7 +42,12 @@ final class Admin
 
     public function campaignsPage(): void
     {
-        $this->header(__('Campaigns', 'dizzy-newsletter'), __('Create, schedule and monitor newsletter campaigns.', 'dizzy-newsletter'));
+        $this->header(
+            __('Campaigns', 'dizzy-newsletter'),
+            __('Create, schedule and monitor newsletter campaigns.', 'dizzy-newsletter'),
+            admin_url('admin.php?page=dizzy-newsletter-campaign'),
+            __('Add Campaign', 'dizzy-newsletter')
+        );
         if (isset($_GET['send_locked'])) {
             echo '<div class="notice notice-warning inline"><p>' . esc_html__('This campaign cannot be sent again until its 24-hour waiting period has ended.', 'dizzy-newsletter') . '</p></div>';
         } elseif (isset($_GET['queued'])) {
@@ -51,7 +56,6 @@ final class Admin
                 esc_html(sprintf(__('Campaign queued for %d subscribers.', 'dizzy-newsletter'), absint($_GET['queued'])))
             );
         }
-        echo '<p><a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=dizzy-newsletter-campaign')) . '">' . esc_html__('Add Campaign', 'dizzy-newsletter') . '</a></p>';
         echo '<table class="widefat striped"><thead><tr><th>' . esc_html__('Campaign', 'dizzy-newsletter') . '</th><th>' . esc_html__('Subject', 'dizzy-newsletter') . '</th><th>' . esc_html__('Status', 'dizzy-newsletter') . '</th><th>' . esc_html__('Recipients', 'dizzy-newsletter') . '</th><th>' . esc_html__('Sent', 'dizzy-newsletter') . '</th><th>' . esc_html__('Failed', 'dizzy-newsletter') . '</th><th></th></tr></thead><tbody>';
         foreach ($this->repository->campaigns() as $row) {
             $url = add_query_arg(['page' => 'dizzy-newsletter-campaign', 'id' => (int) $row['id']], admin_url('admin.php'));
@@ -319,7 +323,14 @@ final class Admin
         $this->redirect('dizzy-newsletter-settings', ['saved' => 1]);
     }
 
-    private function header(string $title, string $description): void { echo '<div class="wrap dizzy-nl-admin"><div class="dizzy-nl-head"><div><h1>' . esc_html($title) . '</h1><p>' . esc_html($description) . '</p></div></div>'; }
+    private function header(string $title, string $description, string $actionUrl = '', string $actionLabel = ''): void
+    {
+        echo '<div class="wrap dizzy-nl-admin"><div class="dizzy-nl-head"><div><h1>' . esc_html($title) . '</h1><p>' . esc_html($description) . '</p></div>';
+        if ($actionUrl !== '' && $actionLabel !== '') {
+            echo '<a class="button button-primary" href="' . esc_url($actionUrl) . '">' . esc_html($actionLabel) . '</a>';
+        }
+        echo '</div>';
+    }
     private function guard(string $action): void { if (! current_user_can('manage_options')) wp_die('Forbidden', '', ['response' => 403]); check_admin_referer($action); }
     private function redirect(string $page, array $args = []): void { wp_safe_redirect(add_query_arg(array_merge(['page' => $page], $args), admin_url('admin.php'))); exit; }
 }

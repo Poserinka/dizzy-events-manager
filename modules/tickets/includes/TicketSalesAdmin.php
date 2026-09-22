@@ -191,7 +191,7 @@ final class TicketSalesAdmin
         ?>
         <style>
             .dizzy-ticket-list-workspace{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(460px,.9fr);gap:24px;align-items:start;margin-top:14px}
-            .dizzy-ticket-list-panel,.dizzy-list-calendar-surface{background:#fff;border:1px solid #c3c4c7}
+            .dizzy-ticket-list-panel{background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d;overflow:hidden}.dizzy-ticket-list-calendar-column{box-sizing:border-box;padding:18px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}.dizzy-list-calendar-surface{background:#fff;border:1px solid #c3c4c7}
             .dizzy-ticket-list-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px;border-bottom:1px solid #c3c4c7}
             .dizzy-ticket-list-heading h2{margin:0 0 8px;font-size:14px}.dizzy-ticket-list-summary{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.dizzy-ticket-list-summary span{color:#50575e}.dizzy-ticket-list-summary strong{color:#1d2327}
             .dizzy-ticket-list-table-wrap{overflow-x:auto}.dizzy-ticket-list-table-wrap .widefat{border:0}.dizzy-ticket-list-table-wrap .widefat tbody td{vertical-align:middle}.dizzy-ticket-list-table-wrap tr.is-calendar-hidden{display:none}

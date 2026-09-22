@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.7] - 2026-09-22
+
+### Changed
+
+- Applied the shared rounded card treatment to reservations, table planning, Schedule reports and settings, and ticket lists.
+- Placed reservation and ticket calendars inside matching side panels.
+- Restyled Newsletter pages and tables, and moved the Add Campaign action into the Newsletter heading.
+
 ## [4.2.6] - 2026-09-22
 
 ### Changed

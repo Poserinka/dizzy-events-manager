@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_NL_VERSION', '1.0.18');
+define('DIZZY_NL_VERSION', '1.0.19');
 define('DIZZY_NL_FILE', __FILE__);
 define('DIZZY_NL_DIR', __DIR__ . '/');
 define('DIZZY_NL_URL', DIZZY_EVENTS_URL . 'modules/newsletter/');
