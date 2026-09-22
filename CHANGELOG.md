@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.6] - 2026-09-22
+
+### Fixed
+
+- Reinforced the active sidebar state immediately before WordPress renders the admin menu.
+- Applied the expanded Dizzy menu and active-module state consistently to all Newsletter and other module sub-tabs.
+
 ## [4.1.5] - 2026-09-22
 
 ### Fixed

@@ -23,6 +23,7 @@ final class SuiteAdmin
         add_filter('admin_body_class', [$this, 'bodyClass']);
         add_filter('parent_file', [$this, 'parentMenu']);
         add_filter('submenu_file', [$this, 'activeSubmenu']);
+        add_action('admin_head', [$this, 'forceMenuState'], 999);
     }
 
     public function menu(): void
@@ -116,6 +117,22 @@ final class SuiteAdmin
             return $submenuFile;
         }
 
+        return $this->activeMenuSlug() ?? $submenuFile;
+    }
+
+    public function forceMenuState(): void
+    {
+        if (! $this->isDizzyPage()) {
+            return;
+        }
+
+        $GLOBALS['parent_file'] = DIZZY_EVENTS_ADMIN_MENU;
+        $GLOBALS['submenu_file'] = $this->activeMenuSlug();
+    }
+
+    private function activeMenuSlug(): ?string
+    {
+
         $page = sanitize_key((string) ($_GET['page'] ?? ''));
         $postType = sanitize_key((string) ($_GET['post_type'] ?? ''));
         if ($this->isEventsLanding() || $postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
@@ -128,7 +145,7 @@ final class SuiteAdmin
             }
         }
 
-        return $submenuFile;
+        return null;
     }
 
     public function header(): void
