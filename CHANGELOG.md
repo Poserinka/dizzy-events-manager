@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.2] - 2026-09-22
+
+### Changed
+
+- Centered Dizzy administration pages in a consistent shared content column.
+- Aligned horizontal navigation tabs with each page's content.
+- Changed the Events overview to compact expandable event cards.
+
 ## [4.1.1] - 2026-09-22
 
 ### Fixed
