@@ -24,6 +24,7 @@ final class SuiteAdmin
         add_filter('parent_file', [$this, 'parentMenu']);
         add_filter('submenu_file', [$this, 'activeSubmenu']);
         add_action('admin_head', [$this, 'forceMenuState'], 999);
+        add_action('admin_footer', [$this, 'forceMenuStateInBrowser'], 999);
     }
 
     public function menu(): void
@@ -128,6 +129,46 @@ final class SuiteAdmin
 
         $GLOBALS['parent_file'] = DIZZY_EVENTS_ADMIN_MENU;
         $GLOBALS['submenu_file'] = $this->activeMenuSlug();
+    }
+
+    public function forceMenuStateInBrowser(): void
+    {
+        if (! $this->isDizzyPage()) {
+            return;
+        }
+
+        $activeSlug = $this->activeMenuSlug();
+        if ($activeSlug === null) {
+            return;
+        }
+        ?>
+        <script>
+        (() => {
+            const menu = document.getElementById('toplevel_page_dizzy-management');
+            if (!menu) return;
+            menu.classList.remove('wp-not-current-submenu');
+            menu.classList.add('wp-has-current-submenu', 'wp-menu-open');
+            const topLink = menu.querySelector(':scope > a');
+            if (topLink) {
+                topLink.classList.remove('wp-not-current-submenu');
+                topLink.classList.add('wp-has-current-submenu', 'wp-menu-open');
+                topLink.setAttribute('aria-expanded', 'true');
+            }
+            const activeSlug = <?php echo wp_json_encode($activeSlug); ?>;
+            menu.querySelectorAll('.wp-submenu li').forEach(item => item.classList.remove('current'));
+            menu.querySelectorAll('.wp-submenu a').forEach(link => {
+                link.classList.remove('current');
+                link.removeAttribute('aria-current');
+                let page = '';
+                try { page = new URL(link.href, window.location.href).searchParams.get('page') || ''; } catch (error) {}
+                if (page !== activeSlug) return;
+                link.classList.add('current');
+                link.setAttribute('aria-current', 'page');
+                link.closest('li')?.classList.add('current');
+            });
+        })();
+        </script>
+        <?php
     }
 
     private function activeMenuSlug(): ?string

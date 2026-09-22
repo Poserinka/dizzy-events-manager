@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.7] - 2026-09-22
+
+### Fixed
+
+- Added a browser-side fallback that keeps the Dizzy sidebar expanded on every module tab even when WordPress ignores hidden-page menu filters.
+- Applied the active highlight directly to the correct visible module item after the admin menu is rendered.
+
 ## [4.1.6] - 2026-09-22
 
 ### Fixed
