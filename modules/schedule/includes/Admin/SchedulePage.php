@@ -100,7 +100,6 @@ final class SchedulePage
         }
 
         remove_all_actions('admin_notices');
-        remove_all_actions('all_admin_notices');
         remove_all_actions('network_admin_notices');
         remove_all_actions('user_admin_notices');
     }

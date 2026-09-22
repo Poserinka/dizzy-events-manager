@@ -8,6 +8,16 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.1] - 2026-09-22
+
+### Fixed
+
+- Restored the shared logo and page header on Schedule and Schedule Reports pages.
+
+### Changed
+
+- Standardized all shared horizontal tab labels to the uppercase Schedule tab style.
+
 ## [4.2.0] - 2026-09-22
 
 ### Changed
