@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.11] - 2026-09-22
+
+### Changed
+
+- Standardized All Events dates to the localized `DD Month YYYY` format.
+
 ## [4.1.10] - 2026-09-22
 
 ### Changed

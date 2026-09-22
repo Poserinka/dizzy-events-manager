@@ -246,7 +246,7 @@ final class SuiteAdmin
             $eventDate = $eventDates[(int) $event->ID]['date'] ?? '';
             $timestamp = $eventDate !== '' ? strtotime($eventDate) : false;
             $formattedDate = $timestamp !== false
-                ? wp_date(get_option('date_format'), $timestamp, wp_timezone())
+                ? wp_date('d F Y', $timestamp, wp_timezone())
                 : __('No date', 'dizzy-events-manager');
             $formattedTime = $timestamp !== false ? wp_date('H:i', $timestamp, wp_timezone()) : '';
             echo '<article class="dizzy-management-card">';
