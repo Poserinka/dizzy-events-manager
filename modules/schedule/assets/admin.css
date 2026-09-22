@@ -6,7 +6,7 @@ body.dizzy-schedule-admin-page div[class*="notice"],
 body.dizzy-schedule-admin-page div[id*="notice"] { display:none!important; }
 
 .dizzy-schedule-wrap{margin:20px 20px 0 0}
-.dizzy-schedule-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;color:#f5f7fb;background:#171b22}
+.dizzy-schedule-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;color:#000;background:#fff;border-bottom:1px solid #dcdcde}
 .dizzy-schedule-header h1{margin:0;color:inherit;font-size:24px}.dizzy-schedule-header p{margin:4px 0 0;color:#aeb6c4}
 .dizzy-schedule-tabs{display:flex;gap:28px;padding:0 18px;background:#fff;border-bottom:1px solid #dcdcde}
 .dizzy-schedule-tabs button{padding:15px 2px;border:0;border-bottom:3px solid transparent;color:#7a8390;background:transparent;cursor:pointer;text-transform:uppercase;font-weight:600}

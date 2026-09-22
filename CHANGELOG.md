@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.3] - 2026-09-22
+
+### Changed
+
+- Changed the Schedule content header to black text on white with a `#dcdcde` bottom border.
+
 ## [4.2.2] - 2026-09-22
 
 ### Fixed
