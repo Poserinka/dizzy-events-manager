@@ -10,7 +10,7 @@ final class AutoPostAdmin
 {
     private const GROUP='dizzy-social-autopost';
 
-    public function register(): void { add_action('admin_init',[$this,'settings']);add_action('admin_menu',[$this,'menu']); }
+    public function register(): void { add_action('admin_init',[$this,'settings']);add_action('admin_menu',[$this,'menu']);add_action('admin_post_dizzy_social_clear_logs',[$this,'clearLogs']); }
     public function menu(): void { add_submenu_page(null,__('WP Auto Post','dizzy-social-media-manager'),__('Social Auto Post','dizzy-social-media-manager'),'manage_options','dizzy-social-autopost',[$this,'render']); }
     public function settings(): void
     {
@@ -30,7 +30,29 @@ final class AutoPostAdmin
         <div class="dizzy-card"><h2><?php esc_html_e('Share post delay','dizzy-social-media-manager'); ?></h2><p><?php esc_html_e('Publish immediately or schedule the social post after the event is published.','dizzy-social-media-manager'); ?></p><select name="dizzy_social_autopost_delay"><?php foreach([0=>'Immediately',5=>'5 minutes',15=>'15 minutes',30=>'30 minutes',60=>'1 hour'] as $value=>$label): ?><option value="<?php echo esc_attr((string)$value); ?>" <?php selected((int)get_option('dizzy_social_autopost_delay',0),$value); ?>><?php echo esc_html($label); ?></option><?php endforeach; ?></select></div>
         <?php $this->toggle('dizzy_social_autopost_log_enabled','Enable auto post log','Keep the latest publishing results for troubleshooting.',true); ?>
         <?php submit_button(); ?></form>
-        <div class="dizzy-card"><h2><?php esc_html_e('Recent log','dizzy-social-media-manager'); ?></h2><?php $logs=(array)get_option('dizzy_social_autopost_logs',[]);if($logs===[])echo '<p>No entries yet.</p>';else echo '<pre style="white-space:pre-wrap">'.esc_html(implode("\n",array_slice($logs,-20))).'</pre>'; ?></div><?php $this->style(); ?></div><?php
+        <?php $logs=(array)get_option('dizzy_social_autopost_logs',[]); ?>
+        <div class="dizzy-card">
+            <div class="dizzy-social-log-header">
+                <h2><?php esc_html_e('Recent log','dizzy-social-media-manager'); ?></h2>
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <input type="hidden" name="action" value="dizzy_social_clear_logs">
+                    <?php wp_nonce_field('dizzy_social_clear_logs'); ?>
+                    <button type="submit" class="button" <?php disabled($logs === []); ?>><?php esc_html_e('Clear logs', 'dizzy-social-media-manager'); ?></button>
+                </form>
+            </div>
+            <?php if($logs===[])echo '<p>'.esc_html__('No entries yet.','dizzy-social-media-manager').'</p>';else echo '<pre style="white-space:pre-wrap">'.esc_html(implode("\n",array_slice($logs,-20))).'</pre>'; ?>
+        </div><?php $this->style(); ?></div><?php
+    }
+
+    public function clearLogs(): void
+    {
+        if (! current_user_can('manage_options')) {
+            wp_die(esc_html__('Unauthorized', 'dizzy-social-media-manager'), '', ['response' => 403]);
+        }
+        check_admin_referer('dizzy_social_clear_logs');
+        update_option('dizzy_social_autopost_logs', [], false);
+        wp_safe_redirect(admin_url('admin.php?page=dizzy-social-autopost'));
+        exit;
     }
 
     private function toggle(string $name,string $title,string $description,bool $enabled): void

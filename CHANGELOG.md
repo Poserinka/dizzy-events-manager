@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.17] - 2026-09-22
+
+### Added
+
+- Added a permission- and nonce-protected Clear logs action to Social Media Auto Post's Recent log panel.
+
 ## [4.2.16] - 2026-09-22
 
 ### Fixed

@@ -11,4 +11,7 @@
 .dizzy-social-generator-card .dizzy-management-card-meta{flex-wrap:wrap;white-space:normal}
 .dizzy-social-generator-title{display:flex;align-items:center;gap:12px;min-width:0}
 .dizzy-social-generator-title img{display:block;flex:0 0 48px;width:48px;height:48px;object-fit:cover;border-radius:6px}
+.dizzy-social-log-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dizzy-social-log-header h2{margin:0}
+.dizzy-social-log-header form{margin:0}
 @media(max-width:782px){.dizzy-social-page-header{padding:18px}.dizzy-social-page .dizzy-card,.dizzy-poster-layout-settings .dizzy-social-settings-card{padding:18px}}
