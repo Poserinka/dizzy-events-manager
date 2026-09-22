@@ -70,15 +70,18 @@ final class PosterSettings
         foreach (['title', 'date', 'hours', 'logo'] as $key) $values[$key . '_enabled'] = (int) get_option('dizzy_social_' . $key . '_enabled', 1);
         ?>
         <div class="wrap dizzy-poster-layout-settings">
-            <h1><?php esc_html_e('Poster Settings', 'dizzy-social-media-manager'); ?></h1>
+            <div class="dizzy-social-page-header"><h1><?php esc_html_e('Poster Settings', 'dizzy-social-media-manager'); ?></h1></div>
             <form method="post" action="<?php echo esc_url(admin_url('options.php')); ?>">
                 <?php settings_fields(self::GROUP); ?>
+                <section class="dizzy-social-settings-card">
                 <h2><?php esc_html_e('Layer and Logo', 'dizzy-social-media-manager'); ?></h2>
                 <table class="form-table">
                     <?php $this->imageRow('layer', __('PNG layer', 'dizzy-social-media-manager'), $layerId, __('Select / Upload PNG', 'dizzy-social-media-manager'), __('Remove layer', 'dizzy-social-media-manager')); ?>
                     <?php $this->imageRow('logo', __('Logo', 'dizzy-social-media-manager'), $logoId, __('Select / Upload Logo', 'dizzy-social-media-manager'), __('Remove logo', 'dizzy-social-media-manager')); ?>
                 </table>
+                </section>
 
+                <section class="dizzy-social-settings-card">
                 <h2><?php esc_html_e('Typography', 'dizzy-social-media-manager'); ?></h2>
                 <table class="form-table">
                     <?php foreach (['title' => __('Title font', 'dizzy-social-media-manager'), 'date' => __('Date font', 'dizzy-social-media-manager'), 'hours' => __('Hours font', 'dizzy-social-media-manager')] as $key => $label) : ?>
@@ -111,7 +114,9 @@ final class PosterSettings
                     <?php endforeach; ?>
                 </table>
                 <?php if ($fonts === []) : ?><p class="notice notice-warning inline"><?php esc_html_e('No fonts were found in dizzy-events-manager/assets/fonts. Upload and commit TTF or OTF files to that folder.', 'dizzy-social-media-manager'); ?></p><?php endif; ?>
+                </section>
 
+                <section class="dizzy-social-settings-card">
                 <h2><?php esc_html_e('Drag / Drop Layout', 'dizzy-social-media-manager'); ?></h2>
                 <p><?php esc_html_e('Drag elements to move them and use the square handle to resize. Use the arrow keys for one-pixel movement; hold Shift for ten pixels. The background photo frame can be moved and resized independently.', 'dizzy-social-media-manager'); ?></p>
                 <p class="dizzy-layout-tools"><button type="button" class="button" data-add="title"><?php esc_html_e('Add Title', 'dizzy-social-media-manager'); ?></button> <button type="button" class="button" data-add="date"><?php esc_html_e('Add Date', 'dizzy-social-media-manager'); ?></button> <button type="button" class="button" data-add="hours"><?php esc_html_e('Add Hours', 'dizzy-social-media-manager'); ?></button> <button type="button" class="button" data-add="logo"><?php esc_html_e('Add Logo', 'dizzy-social-media-manager'); ?></button> <button type="button" class="button" data-select-background><?php esc_html_e('Edit Background Photo', 'dizzy-social-media-manager'); ?></button> <button type="button" class="button" data-reset-background><?php esc_html_e('Reset Background Photo', 'dizzy-social-media-manager'); ?></button></p>
@@ -131,6 +136,7 @@ final class PosterSettings
                     <div class="dizzy-layout-item dizzy-logo-item" data-item="logo"><img<?php echo $logoUrl !== '' ? ' src="' . esc_url($logoUrl) . '"' : ''; ?> alt=""><i class="dizzy-resize-handle"></i></div>
                 </div>
                 <p class="description"><?php esc_html_e('The preview uses the 1080 × 1350 portrait format. Saved percentage positions and sizes are applied proportionally during poster generation.', 'dizzy-social-media-manager'); ?></p>
+                </section>
                 <?php submit_button(); ?>
             </form>
         </div>

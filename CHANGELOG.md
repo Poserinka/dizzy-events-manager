@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.11] - 2026-09-22
+
+### Changed
+
+- Applied the shared Social Media heading, card, and table style to Poster Generator and settings tabs.
+- Grouped Poster Settings controls into separate panels for images, typography, and drag-and-drop layout.
+- Corrected a mismatched heading tag in Social Templates.
+
 ## [4.2.10] - 2026-09-22
 
 ### Changed
