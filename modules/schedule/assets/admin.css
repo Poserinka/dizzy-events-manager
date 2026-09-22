@@ -1,0 +1,67 @@
+body.dizzy-schedule-admin-page .notice,
+body.dizzy-schedule-admin-page .update-nag,
+body.dizzy-schedule-admin-page .updated,
+body.dizzy-schedule-admin-page .error,
+body.dizzy-schedule-admin-page div[class*="notice"],
+body.dizzy-schedule-admin-page div[id*="notice"] { display:none!important; }
+
+.dizzy-schedule-wrap{margin:20px 20px 0 0}
+.dizzy-schedule-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;color:#f5f7fb;background:#171b22}
+.dizzy-schedule-header h1{margin:0;color:inherit;font-size:24px}.dizzy-schedule-header p{margin:4px 0 0;color:#aeb6c4}
+.dizzy-schedule-tabs{display:flex;gap:28px;padding:0 18px;background:#fff;border-bottom:1px solid #dcdcde}
+.dizzy-schedule-tabs button{padding:15px 2px;border:0;border-bottom:3px solid transparent;color:#7a8390;background:transparent;cursor:pointer;text-transform:uppercase;font-weight:600}
+.dizzy-schedule-tabs button.is-active{border-bottom-color:#2271b1;color:#2271b1}
+.dizzy-schedule-toolbar{display:flex;align-items:center;gap:8px;min-height:58px;padding:0 16px;background:#fff;border-bottom:1px solid #dcdcde}
+.dizzy-schedule-toolbar select{min-width:100px}.dizzy-schedule-toolbar strong{margin:0 10px;color:#2271b1;font-size:17px}
+.dizzy-schedule-feedback{padding:9px 16px;color:#646970;min-height:18px}.dizzy-schedule-calendar{overflow-x:auto;background:#f6f7f7}
+.dizzy-week-grid{display:grid;grid-template-columns:180px repeat(7,minmax(130px,1fr));min-width:1090px}
+.dizzy-day-grid{display:grid;grid-template-columns:180px repeat(11,minmax(100px,1fr));min-width:1280px}
+.dizzy-month-grid{display:grid;grid-template-columns:repeat(7,minmax(145px,1fr));min-width:1015px}
+.dizzy-grid-head,.dizzy-employee-cell,.dizzy-schedule-slot,.dizzy-month-day{border-right:1px solid #dcdcde;border-bottom:1px solid #dcdcde;background:#fff}
+.dizzy-grid-head{padding:12px 8px;color:#7b8593;text-align:center;font-size:12px;font-weight:600}
+.dizzy-employee-cell{display:flex;align-items:center;gap:10px;min-height:46px;padding:4px 10px;font-weight:600}
+.dizzy-employee-cell img{width:36px;height:36px;flex:0 0 36px;border-radius:50%;object-fit:cover}
+.dizzy-employee-cell>span{display:flex;min-width:0;flex-direction:column;justify-content:center}
+.dizzy-employee-cell strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dizzy-employee-cell small{display:block;margin-top:2px;color:#8a939f;font-weight:400}
+.dizzy-schedule-slot{min-height:46px;padding:5px;cursor:pointer}.dizzy-schedule-slot:hover,.dizzy-month-day:hover{background:#f0f6fc}
+.dizzy-month-day{min-height:132px;padding:7px;color:#75808e;cursor:pointer}.dizzy-month-day.is-outside{background:#f0f0f1;color:#a7aaad}
+.dizzy-shift{display:block;width:100%;margin:3px 0;padding:7px;border:0;border-left:4px solid #2271b1;border-radius:2px;color:#173b58;background:#dceefb;text-align:left;cursor:pointer}
+.dizzy-shift strong,.dizzy-shift span,.dizzy-shift em{display:block;font-size:11px;line-height:1.35}.dizzy-shift em{font-style:normal;font-weight:600}
+.dizzy-schedule-modal[hidden]{display:none}.dizzy-schedule-modal{position:fixed;z-index:100100;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+.dizzy-schedule-modal-backdrop{position:absolute;inset:0;background:rgba(16,24,32,.65)}
+.dizzy-schedule-dialog{position:relative;width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.dizzy-schedule-dialog>header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #dcdcde}.dizzy-schedule-dialog h2{margin:0;color:#2271b1}
+.dizzy-schedule-close{border:0;background:transparent;color:#8c8f94;font-size:26px;cursor:pointer}
+.dizzy-schedule-dialog form{display:grid;gap:14px;padding:20px 22px}.dizzy-schedule-dialog label>span{display:block;margin-bottom:6px;color:#50575e;font-weight:600}
+.dizzy-schedule-dialog input,.dizzy-schedule-dialog select,.dizzy-schedule-dialog textarea{width:100%;max-width:none}
+.dizzy-schedule-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dizzy-schedule-dialog-actions{display:grid;grid-template-columns:auto 1fr auto auto;gap:9px;align-items:center;margin-top:6px}
+@media(max-width:782px){.dizzy-schedule-wrap{margin-right:10px}.dizzy-schedule-header{align-items:flex-start;flex-direction:column}.dizzy-schedule-toolbar{align-items:flex-start;flex-wrap:wrap;padding:12px}.dizzy-schedule-form-row{grid-template-columns:1fr}}
+
+.dizzy-schedule-settings{max-width:900px}
+.dizzy-schedule-settings-panel{margin-top:20px;padding:24px;background:#fff;border:1px solid #dcdcde}
+.dizzy-position-add{display:grid;grid-template-columns:120px minmax(220px,1fr) auto;gap:10px;align-items:center;margin:20px 0}
+.dizzy-position-delete{text-align:right}
+.dizzy-schedule-settings-message{margin-top:16px;padding:12px 15px;border-left:4px solid #00a32a;background:#fff}
+@media(max-width:782px){.dizzy-position-add{grid-template-columns:1fr}}
+
+
+.dizzy-schedule-reports{margin:20px 20px 0 0}
+.dizzy-reports-heading{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;color:#f5f7fb;background:#171b22}
+.dizzy-reports-heading h1{margin:0;color:inherit;font-size:24px}
+.dizzy-reports-heading p{margin:4px 0 0;color:#aeb6c4}
+.dizzy-reports-toolbar{display:flex;align-items:center;gap:8px;min-height:58px;padding:0 16px;background:#fff;border-bottom:1px solid #dcdcde}
+.dizzy-reports-toolbar form{display:flex;align-items:center;gap:8px;margin:0}
+.dizzy-reports-toolbar select{min-width:110px}
+.dizzy-reports-toolbar strong{margin:0 10px;color:#2271b1;font-size:17px}
+.dizzy-reports-table-wrap{overflow-x:auto;margin-top:20px}
+.dizzy-reports-table{min-width:760px;border-collapse:collapse}
+.dizzy-reports-table th,.dizzy-reports-table td{padding:12px 14px;vertical-align:middle}
+.dizzy-reports-table thead th{color:#657184;background:#edf0f3;text-transform:uppercase;font-size:11px}
+.dizzy-reports-table tbody td{height:46px}
+.dizzy-reports-table tfoot th{background:#edf0f3;font-weight:700}
+.dizzy-report-employee{display:flex;align-items:center;gap:10px}
+.dizzy-report-employee img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.dizzy-reports-empty{text-align:center;color:#646970}
+@media(max-width:782px){.dizzy-schedule-reports{margin-right:10px}.dizzy-reports-toolbar{align-items:flex-start;flex-wrap:wrap;padding:12px}.dizzy-reports-toolbar form{flex-wrap:wrap}}
