@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.9] - 2026-09-22
+
+### Fixed
+
+- Removed the white newsletter page background that made gaps between panels look like horizontal strips.
+- Gave the newsletter heading, cards, and nested tables consistent rounded borders and subtle shadows.
+
 ## [4.2.8] - 2026-09-22
 
 ### Changed
