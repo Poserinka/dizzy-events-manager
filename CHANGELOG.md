@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.10] - 2026-09-22
+
+### Changed
+
+- Removed the collapsible interaction from All Events cards.
+- Displayed event date, a bullet separator, 24-hour time, publication status and the Edit Event action in one row.
+
 ## [4.1.9] - 2026-09-22
 
 ### Fixed
