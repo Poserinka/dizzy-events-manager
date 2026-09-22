@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.3] - 2026-09-22
+
+### Changed
+
+- Replaced the Reservations table with a responsive card list matching the unified Dizzy administration design.
+- Added an always-visible reservation summary, details panel and automatic status selector to each reservation card.
+
 ## [4.1.2] - 2026-09-22
 
 ### Changed

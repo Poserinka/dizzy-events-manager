@@ -81,25 +81,33 @@ final class AdminController
                         </div>
                         <button type="button" class="button-link" id="dizzy-show-all"><?php esc_html_e('Show all', 'dizzy-reservations-manager'); ?></button>
                     </div>
-                    <div class="dizzy-reservations-table-wrap">
-                        <table class="widefat striped">
-                            <thead><tr><th><?php esc_html_e('Guest', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Date', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Time', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('People', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Table', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Experience', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Message', 'dizzy-reservations-manager'); ?></th><th><?php esc_html_e('Status', 'dizzy-reservations-manager'); ?></th></tr></thead>
-                            <tbody>
-                            <?php foreach ($rows as $row) : $id = (int) $row['id']; ?>
-                                <tr id="dizzy-reservation-<?php echo esc_attr((string) $id); ?>" data-reservation-date="<?php echo esc_attr((string) $row['reservation_date']); ?>">
-                                    <td><strong><?php echo esc_html((string) $row['name']); ?></strong><br><?php echo esc_html((string) $row['email']); ?><br><?php echo esc_html((string) $row['phone']); ?></td>
-                                    <td><?php echo esc_html($this->formatDate((string) $row['reservation_date'])); ?></td>
-                                    <td><?php echo esc_html(substr((string) $row['reservation_time'], 0, 5)); ?></td>
-                                    <td><?php echo esc_html((string) $row['guests']); ?></td>
-                                    <td><strong><?php echo esc_html((string) ($row['table_code'] ?: '—')); ?></strong><?php if (! empty($row['table_label']) && $row['table_label'] !== $row['table_code']) : ?><br><small><?php echo esc_html((string) $row['table_label']); ?></small><?php endif; ?></td>
-                                    <td><?php $type=(string)($row['reservation_type']??'standard'); echo esc_html($type==='dinner_concert'?'Dinner + Concert':($type==='dinner_only'?'Dinner only':'Standard')); ?><?php if($type==='dinner_concert'): ?><br><small><?php echo esc_html((string)($row['event_title']??'')); ?> · <?php echo esc_html((string)($row['ticket_status']??'')); ?><?php if(($row['ticket_status']??'')==='buy'): ?> · <?php echo esc_html((string)($row['ticket_quantity']??0)); ?> tickets<?php endif; ?></small><?php elseif($type==='dinner_only'&&!empty($row['concert_start'])): ?><br><small><?php echo esc_html(sprintf('Table until %s',(new \DateTimeImmutable((string)$row['concert_start'],wp_timezone()))->modify('-1 hour')->format('H:i'))); ?></small><?php endif; ?></td>
-                                    <td><?php echo nl2br(esc_html((string) $row['notes'])); ?></td>
-                                    <td><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="dizzy_reservation_status"><input type="hidden" name="reservation_id" value="<?php echo esc_attr((string) $id); ?>"><?php wp_nonce_field('dizzy_reservation_' . $id); ?><select name="status"><?php foreach (self::STATUSES as $status) : ?><option value="<?php echo esc_attr($status); ?>" <?php selected($row['status'], $status); ?>><?php echo esc_html(ucwords(str_replace('_', ' ', $status))); ?></option><?php endforeach; ?></select> <button class="button"><?php esc_html_e('Save', 'dizzy-reservations-manager'); ?></button></form></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            <tr id="dizzy-no-reservations" hidden><td colspan="8"><?php esc_html_e('No reservations for this date.', 'dizzy-reservations-manager'); ?></td></tr>
-                            </tbody>
-                        </table>
+                    <div class="dizzy-reservation-cards">
+                        <?php foreach ($rows as $row) :
+                            $id = (int) $row['id'];
+                            $type = (string) ($row['reservation_type'] ?? 'standard');
+                            $experience = $type === 'dinner_concert' ? 'Dinner + Concert' : ($type === 'dinner_only' ? 'Dinner only' : 'Standard');
+                            if ($type === 'dinner_concert' && ! empty($row['event_title'])) {
+                                $experience .= ' — ' . (string) $row['event_title'];
+                            } elseif ($type === 'dinner_only' && ! empty($row['concert_start'])) {
+                                $experience .= ' — ' . sprintf('Table until %s', (new \DateTimeImmutable((string) $row['concert_start'], wp_timezone()))->modify('-1 hour')->format('H:i'));
+                            }
+                            ?>
+                            <article class="dizzy-reservation-card" id="dizzy-reservation-<?php echo esc_attr((string) $id); ?>" data-reservation-date="<?php echo esc_attr((string) $row['reservation_date']); ?>">
+                                <header class="dizzy-reservation-card-header">
+                                    <strong><?php echo esc_html(sprintf('%s — %s — %s / %s — %s — %s %s', (string) $row['name'], (string) $row['email'], (string) $row['phone'], $this->formatDate((string) $row['reservation_date']), substr((string) $row['reservation_time'], 0, 5), (string) $row['guests'], __('people', 'dizzy-reservations-manager'))); ?></strong>
+                                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="dizzy_reservation_status"><input type="hidden" name="reservation_id" value="<?php echo esc_attr((string) $id); ?>"><?php wp_nonce_field('dizzy_reservation_' . $id); ?><select name="status" aria-label="<?php esc_attr_e('Reservation status', 'dizzy-reservations-manager'); ?>" onchange="this.form.submit()"><?php foreach (self::STATUSES as $status) : ?><option value="<?php echo esc_attr($status); ?>" <?php selected($row['status'], $status); ?>><?php echo esc_html(ucwords(str_replace('_', ' ', $status))); ?></option><?php endforeach; ?></select></form>
+                                </header>
+                                <div class="dizzy-reservation-card-content">
+                                    <span class="dizzy-reservation-info-label"><?php esc_html_e('Info', 'dizzy-reservations-manager'); ?></span>
+                                    <dl>
+                                        <div><dt><?php esc_html_e('Table:', 'dizzy-reservations-manager'); ?></dt><dd><?php echo esc_html((string) ($row['table_code'] ?: '—')); ?><?php if (! empty($row['table_label']) && $row['table_label'] !== $row['table_code']) : ?> — <?php echo esc_html((string) $row['table_label']); ?><?php endif; ?></dd></div>
+                                        <div><dt><?php esc_html_e('Experience:', 'dizzy-reservations-manager'); ?></dt><dd><?php echo esc_html($experience); ?></dd></div>
+                                        <div><dt><?php esc_html_e('Message:', 'dizzy-reservations-manager'); ?></dt><dd><?php echo $row['notes'] !== '' ? nl2br(esc_html((string) $row['notes'])) : '—'; ?></dd></div>
+                                    </dl>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                        <div class="dizzy-reservation-empty" id="dizzy-no-reservations" hidden><?php esc_html_e('No reservations for this date.', 'dizzy-reservations-manager'); ?></div>
                     </div>
                 </section>
                 <aside class="dizzy-reservations-calendar-column">
@@ -115,12 +123,12 @@ final class AdminController
         ?>
         <style>
             .dizzy-reservations-workspace{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(460px,.9fr);gap:24px;align-items:start;margin-top:14px}
-            .dizzy-reservations-list,.dizzy-calendar-surface{background:#fff;border:1px solid #c3c4c7}
+            .dizzy-reservations-list{background:transparent;border:0}.dizzy-calendar-surface{background:#fff;border:1px solid #c3c4c7}
             .dizzy-list-heading{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #c3c4c7}
             .dizzy-list-heading h2{margin:0;font-size:14px}.dizzy-list-summary{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.dizzy-list-summary>span{color:#50575e}.dizzy-list-summary strong{color:#1d2327}
-            .dizzy-reservations-table-wrap{overflow-x:auto}
-            .dizzy-reservations-table-wrap .widefat{border:0}.dizzy-reservations-table-wrap .widefat tbody td{vertical-align:middle}.dizzy-reservations-table-wrap .widefat tbody form{display:flex;align-items:center;gap:5px}
-            .dizzy-reservations-table-wrap tr.is-calendar-hidden{display:none}
+            .dizzy-reservation-cards{display:grid;gap:20px;margin-top:20px}.dizzy-reservation-card{background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+            .dizzy-reservation-card-header{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:48px;padding:8px 10px 8px 20px;border-bottom:1px solid #e6e9ed}.dizzy-reservation-card-header strong{min-width:0;overflow-wrap:anywhere}.dizzy-reservation-card-header form{flex:0 0 auto}.dizzy-reservation-card-header select{min-width:146px}
+            .dizzy-reservation-card-content{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;padding:20px}.dizzy-reservation-info-label{font-weight:600}.dizzy-reservation-card dl{margin:0;padding:14px 16px;border:1px solid #ccd3dc;border-radius:3px}.dizzy-reservation-card dl>div{display:grid;grid-template-columns:100px minmax(0,1fr);gap:10px;padding:4px 0}.dizzy-reservation-card dt{font-weight:600}.dizzy-reservation-card dd{margin:0;overflow-wrap:anywhere}.dizzy-reservation-card.is-calendar-hidden{display:none}.dizzy-reservation-empty{padding:20px;background:#fff;border:1px solid #dce1e7}
             .dizzy-calendar-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
             .dizzy-calendar-nav{display:flex;align-items:center;gap:8px}
             .dizzy-calendar-month{min-width:150px;text-align:center;font-size:15px;font-weight:600;text-transform:capitalize}
@@ -136,7 +144,7 @@ final class AdminController
             .dizzy-calendar-count.is-busy{background:#fff0d5}
             @media(max-width:1300px){.dizzy-reservations-workspace{grid-template-columns:minmax(0,1.35fr) minmax(400px,.9fr)}.dizzy-calendar-day{min-height:64px}}
             @media(max-width:1050px){.dizzy-reservations-workspace{display:flex;flex-direction:column-reverse}.dizzy-reservations-list,.dizzy-reservations-calendar-column{width:100%}}
-            @media(max-width:600px){.dizzy-calendar-day{min-height:52px;padding:4px}.dizzy-calendar-count{overflow:hidden;margin-top:5px;padding:0;width:8px;height:8px;text-indent:-9999px}.dizzy-calendar-toolbar{align-items:flex-start;flex-direction:column}}
+            @media(max-width:600px){.dizzy-reservation-card-header{align-items:stretch;flex-direction:column;padding:16px}.dizzy-reservation-card-header select{width:100%}.dizzy-reservation-card-content{grid-template-columns:1fr}.dizzy-reservation-card dl>div{grid-template-columns:1fr;gap:2px}.dizzy-calendar-day{min-height:52px;padding:4px}.dizzy-calendar-count{overflow:hidden;margin-top:5px;padding:0;width:8px;height:8px;text-indent:-9999px}.dizzy-calendar-toolbar{align-items:flex-start;flex-direction:column}}
         </style>
         <div class="dizzy-calendar-toolbar">
             <div class="dizzy-calendar-nav">
