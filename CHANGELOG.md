@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.4] - 2026-09-22
+
+### Changed
+
+- Split reservation card summaries into separate guest/contact and date/time/party-size lines.
+- Tightened the reservation information layout to match the compact reference design.
+
 ## [4.1.3] - 2026-09-22
 
 ### Changed
