@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.21] - 2026-09-23
+
+### Fixed
+
+- Hide the native Event Categories search form regardless of its position in the WordPress taxonomy screen.
+
 ## [4.2.20] - 2026-09-22
 
 ### Fixed
