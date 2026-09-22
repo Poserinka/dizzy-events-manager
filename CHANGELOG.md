@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.1] - 2026-09-22
+
+### Fixed
+
+- Prevented a PHP deprecation warning on hidden Dizzy tab pages by always providing WordPress with a non-null admin page title.
+
 ## [4.1.0] - 2026-09-22
 
 ### Added

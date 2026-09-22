@@ -19,6 +19,7 @@ final class SuiteAdmin
         add_action('admin_menu', [$this, 'sortMenu'], 999);
         add_action('admin_enqueue_scripts', [$this, 'assets']);
         add_action('all_admin_notices', [$this, 'header']);
+        add_action('current_screen', [$this, 'setPageTitle']);
     }
 
     public function menu(): void
@@ -73,6 +74,27 @@ final class SuiteAdmin
         usort($submenu[DIZZY_EVENTS_ADMIN_MENU], static function (array $left, array $right) use ($positions): int {
             return ($positions[(string) ($left[2] ?? '')] ?? 999) <=> ($positions[(string) ($right[2] ?? '')] ?? 999);
         });
+    }
+
+    public function setPageTitle(): void
+    {
+        if (! $this->isDizzyPage()) {
+            return;
+        }
+
+        $section = $this->currentSection();
+        if ($section !== null) {
+            $GLOBALS['title'] = sprintf(
+                /* translators: %s is the active Dizzy module name. */
+                __('Dizzy Management — %s', 'dizzy-events-manager'),
+                $section['title']
+            );
+            return;
+        }
+
+        $GLOBALS['title'] = $this->isEventsLanding()
+            ? __('Dizzy Management — Events', 'dizzy-events-manager')
+            : __('Dizzy Suite Modules', 'dizzy-events-manager');
     }
 
     public function header(): void
