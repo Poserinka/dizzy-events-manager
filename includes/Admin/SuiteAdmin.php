@@ -56,6 +56,8 @@ final class SuiteAdmin
 
         wp_enqueue_style('common');
         wp_add_inline_style('common', $this->css());
+        wp_add_inline_style('common', $this->layoutCss());
+        wp_enqueue_script('dizzy-suite-page-layout', DIZZY_EVENTS_URL . 'assets/js/suite-page-layout.js', [], DIZZY_EVENTS_VERSION, true);
         if ($this->isEventCategoryScreen()) {
             wp_enqueue_style('dizzy-event-categories-admin', DIZZY_EVENTS_URL . 'assets/css/event-categories-admin.css', ['common'], DIZZY_EVENTS_VERSION);
         }
@@ -203,6 +205,9 @@ final class SuiteAdmin
 
         $section = $this->currentSection();
         if ($section === null) {
+            if (sanitize_key((string) ($_GET['page'] ?? '')) === 'dizzy-suite-modules') {
+                $this->renderHeader(__('Modules', 'dizzy-events-manager'));
+            }
             return;
         }
 
@@ -487,6 +492,22 @@ final class SuiteAdmin
             }
         }
         return basename((string) ($parts['path'] ?? 'admin.php')) . '?' . http_build_query($filtered);
+    }
+
+    private function layoutCss(): string
+    {
+        return '.dizzy-management-admin .dizzy-management-tabs{margin-bottom:24px}'
+            . '.dizzy-management-admin #wpbody-content>.wrap{margin-top:0}'
+            . '.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header~h1:first-of-type{display:none}'
+            . '.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:108px;margin:0 0 24px;padding:20px 24px;background:#fff;border:1px solid #E8E8EB;border-radius:10px 10px 0 0;box-shadow:0 2px 5px #0000000d;color:#000}'
+            . '.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header h1{margin:0;color:#000;font-size:23px;line-height:1.2}'
+            . '.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header p{margin:5px 0 0;color:#667085}'
+            . '.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header + :is(.dizzy-editor-columns,.dizzy-management-cards,.dizzy-nl-stats,.dizzy-grid,.dizzy-table-workspace,.dizzy-schedule-toolbar,.dizzy-week-grid,.dizzy-schedule-calendar){margin-top:0}'
+            . '.dizzy-management-admin #dizzy-event-workspace{margin-top:0}'
+            . '.dizzy-management-admin #dizzy-event-workspace>.dizzy-editor-header{box-sizing:border-box;min-height:108px;margin-bottom:24px;border:1px solid #E8E8EB;box-shadow:0 2px 5px #0000000d}'
+            . '.dizzy-management-admin #dizzy-event-workspace>.dizzy-editor-columns{padding-top:0}'
+            . '.dizzy-event-category-admin #col-container{margin-top:0}'
+            . '@media(max-width:782px){.dizzy-management-admin #wpbody-content>.wrap>.dizzy-editor-header{align-items:flex-start;flex-direction:column;padding:18px}}';
     }
 
     private function css(): string

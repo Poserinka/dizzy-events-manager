@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.19] - 2026-09-22
+
+### Changed
+
+- Standardized the page title panel and spacing across Dizzy admin pages, including Event Categories.
+- Added a title and description to missing page panels while retaining existing page actions.
+
 ## [4.2.18] - 2026-09-22
 
 ### Changed
