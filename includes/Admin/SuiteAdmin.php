@@ -21,6 +21,8 @@ final class SuiteAdmin
         add_action('all_admin_notices', [$this, 'header']);
         add_action('current_screen', [$this, 'setPageTitle']);
         add_filter('admin_body_class', [$this, 'bodyClass']);
+        add_filter('parent_file', [$this, 'parentMenu']);
+        add_filter('submenu_file', [$this, 'activeSubmenu']);
     }
 
     public function menu(): void
@@ -101,6 +103,32 @@ final class SuiteAdmin
     public function bodyClass(string $classes): string
     {
         return $this->isDizzyPage() ? $classes . ' dizzy-management-admin' : $classes;
+    }
+
+    public function parentMenu(string $parentFile): string
+    {
+        return $this->isDizzyPage() ? DIZZY_EVENTS_ADMIN_MENU : $parentFile;
+    }
+
+    public function activeSubmenu(?string $submenuFile): ?string
+    {
+        if (! $this->isDizzyPage()) {
+            return $submenuFile;
+        }
+
+        $page = sanitize_key((string) ($_GET['page'] ?? ''));
+        $postType = sanitize_key((string) ($_GET['post_type'] ?? ''));
+        if ($this->isEventsLanding() || $postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
+            return DIZZY_EVENTS_ADMIN_MENU;
+        }
+
+        foreach ($this->sectionMenuMap() as $pages => $menuSlug) {
+            if (in_array($page, explode('|', $pages), true)) {
+                return $menuSlug;
+            }
+        }
+
+        return $submenuFile;
     }
 
     public function header(): void
@@ -208,6 +236,19 @@ final class SuiteAdmin
             'dizzy-newsletter|dizzy-newsletter-campaign|dizzy-newsletter-audience|dizzy-newsletter-analytics|dizzy-newsletter-settings' => ['title' => 'Newsletter', 'tabs' => [$tab('Campaigns', 'dizzy-newsletter'), $tab('Add Campaign', 'dizzy-newsletter-campaign'), $tab('Subscribers', 'dizzy-newsletter-audience'), $tab('Analytics', 'dizzy-newsletter-analytics'), $tab('Settings', 'dizzy-newsletter-settings')]],
             'dizzy-wanotify-settings|dizzy-wanotify-templates' => ['title' => 'WA Notify', 'tabs' => [$tab('Settings', 'dizzy-wanotify-settings'), $tab('Message Templates', 'dizzy-wanotify-templates')]],
             'dizzy-social-media|dizzy-poster-settings|dizzy-social-accounts|dizzy-social-templates|dizzy-social-autopost' => ['title' => 'Social Media', 'tabs' => [$tab('Poster Generator', 'dizzy-social-media', 'edit_posts'), $tab('Poster Settings', 'dizzy-poster-settings'), $tab('Accounts', 'dizzy-social-accounts'), $tab('Templates', 'dizzy-social-templates'), $tab('Auto Post', 'dizzy-social-autopost')]],
+        ];
+    }
+
+    /** @return array<string,string> */
+    private function sectionMenuMap(): array
+    {
+        return [
+            'dizzy-reservations|dizzy-reservation-tables|dizzy-reservations-reports' => 'dizzy-reservations',
+            'dizzy-schedule-manager|dizzy-schedule-reports|dizzy-schedule-settings' => 'dizzy-schedule-manager',
+            'dizzy-tickets|dizzy-ticket-orders|dizzy-ticket-checkin|dizzy-ticket-reports|dizzy-ticket-payment-settings' => 'dizzy-tickets',
+            'dizzy-newsletter|dizzy-newsletter-campaign|dizzy-newsletter-audience|dizzy-newsletter-analytics|dizzy-newsletter-settings' => 'dizzy-newsletter',
+            'dizzy-wanotify-settings|dizzy-wanotify-templates' => 'dizzy-wanotify-settings',
+            'dizzy-social-media|dizzy-poster-settings|dizzy-social-accounts|dizzy-social-templates|dizzy-social-autopost' => 'dizzy-social-media',
         ];
     }
 

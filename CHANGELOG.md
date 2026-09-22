@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.5] - 2026-09-22
+
+### Fixed
+
+- Kept the Dizzy sidebar menu expanded while viewing horizontal sub-tabs.
+- Highlighted the correct module submenu for every hidden secondary administration page.
+
 ## [4.1.4] - 2026-09-22
 
 ### Changed
