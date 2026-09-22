@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.22] - 2026-09-23
+
+### Fixed
+
+- Remove the native Event Categories search control directly on the taxonomy screen, without depending on the separate admin stylesheet.
+
 ## [4.2.21] - 2026-09-23
 
 ### Fixed

@@ -24,7 +24,9 @@ final class SuiteAdmin
         add_filter('parent_file', [$this, 'parentMenu']);
         add_filter('submenu_file', [$this, 'activeSubmenu']);
         add_action('admin_head', [$this, 'forceMenuState'], 999);
+        add_action('admin_head', [$this, 'hideCategorySearch'], 999);
         add_action('admin_footer', [$this, 'forceMenuStateInBrowser'], 999);
+        add_action('admin_footer', [$this, 'removeCategorySearch'], 999);
     }
 
     public function menu(): void
@@ -136,6 +138,39 @@ final class SuiteAdmin
 
         $GLOBALS['parent_file'] = DIZZY_EVENTS_ADMIN_MENU;
         $GLOBALS['submenu_file'] = $this->activeMenuSlug();
+    }
+
+    public function hideCategorySearch(): void
+    {
+        if (! $this->isEventCategoryScreen()) {
+            return;
+        }
+
+        echo '<style id="dizzy-category-search-hide">#wpbody-content .search-form,#wpbody-content .search-box{display:none!important}</style>';
+    }
+
+    public function removeCategorySearch(): void
+    {
+        if (! $this->isEventCategoryScreen()) {
+            return;
+        }
+        ?>
+        <script>
+        (() => {
+            const remove = () => {
+                const content = document.getElementById('wpbody-content');
+                if (!content) return;
+                content.querySelectorAll('.search-form, .search-box').forEach(element => element.remove());
+                content.querySelectorAll('#tag-search-input, #search-input, #search-submit').forEach(element => {
+                    const container = element.closest('p, .search-form, .search-box');
+                    (container || element).remove();
+                });
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', remove, {once: true});
+            else remove();
+        })();
+        </script>
+        <?php
     }
 
     public function forceMenuStateInBrowser(): void
