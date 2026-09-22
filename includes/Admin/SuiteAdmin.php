@@ -214,9 +214,25 @@ final class SuiteAdmin
             'post_type' => Config::POST_TYPE_EVENT,
             'post_status' => ['publish', 'future', 'draft', 'pending', 'private'],
             'posts_per_page' => 100,
-            'orderby' => 'date',
-            'order' => 'DESC',
+            'orderby' => 'ID',
+            'order' => 'ASC',
         ]);
+        $eventDates = $this->eventDates($events);
+        usort($events, static function (object $left, object $right) use ($eventDates): int {
+            $leftDate = $eventDates[(int) $left->ID] ?? null;
+            $rightDate = $eventDates[(int) $right->ID] ?? null;
+            $leftRank = $leftDate === null ? 2 : ($leftDate['upcoming'] ? 0 : 1);
+            $rightRank = $rightDate === null ? 2 : ($rightDate['upcoming'] ? 0 : 1);
+            if ($leftRank !== $rightRank) {
+                return $leftRank <=> $rightRank;
+            }
+            if ($leftDate === null || $rightDate === null) {
+                return (int) $right->ID <=> (int) $left->ID;
+            }
+            return $leftRank === 0
+                ? strcmp($leftDate['date'], $rightDate['date'])
+                : strcmp($rightDate['date'], $leftDate['date']);
+        });
 
         echo '<div class="dizzy-management-header"><h1>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</h1></div>';
         echo '<div class="wrap dizzy-management-page">';
@@ -227,7 +243,11 @@ final class SuiteAdmin
         }
         foreach ($events as $event) {
             $status = get_post_status_object((string) $event->post_status);
-            echo '<details class="dizzy-management-card"><summary>' . esc_html(get_the_title($event)) . '</summary>';
+            $eventDate = $eventDates[(int) $event->ID]['date'] ?? '';
+            $formattedDate = $eventDate !== ''
+                ? wp_date(get_option('date_format') . ' ' . get_option('time_format'), (int) strtotime($eventDate), wp_timezone())
+                : __('No date', 'dizzy-events-manager');
+            echo '<details class="dizzy-management-card"><summary><span>' . esc_html(get_the_title($event)) . '</span><time>' . esc_html($formattedDate) . '</time></summary>';
             echo '<div class="dizzy-management-card-body"><span><strong>' . esc_html__('Status:', 'dizzy-events-manager') . '</strong> ' . esc_html($status?->label ?? (string) $event->post_status) . '</span><a class="button button-primary" href="' . esc_url(get_edit_post_link((int) $event->ID, '')) . '">' . esc_html__('Edit Event', 'dizzy-events-manager') . '</a></div></details>';
         }
         echo '</div>';
@@ -235,6 +255,44 @@ final class SuiteAdmin
             echo '<p class="dizzy-suite-status-link"><a href="' . esc_url(admin_url('admin.php?page=dizzy-suite-modules')) . '">' . esc_html__('View module status', 'dizzy-events-manager') . '</a></p>';
         }
         echo '</div>';
+    }
+
+    /**
+     * @param array<int,object> $events
+     * @return array<int,array{date:string,upcoming:bool}>
+     */
+    private function eventDates(array $events): array
+    {
+        global $wpdb;
+
+        $ids = array_values(array_filter(array_map(static fn (object $event): int => absint($event->ID ?? 0), $events)));
+        if ($ids === []) {
+            return [];
+        }
+
+        $idList = implode(',', $ids);
+        $now = current_time('mysql');
+        $sql = $wpdb->prepare(
+            "SELECT event_id,
+                MIN(CASE WHEN start_datetime >= %s THEN start_datetime END) AS upcoming_date,
+                MAX(CASE WHEN start_datetime < %s THEN start_datetime END) AS past_date
+            FROM {$wpdb->prefix}dizzy_event_occurrences
+            WHERE event_id IN ({$idList})
+            GROUP BY event_id",
+            $now,
+            $now
+        );
+        $rows = $wpdb->get_results($sql, ARRAY_A);
+        $dates = [];
+        foreach ((array) $rows as $row) {
+            $upcoming = (string) ($row['upcoming_date'] ?? '');
+            $past = (string) ($row['past_date'] ?? '');
+            $date = $upcoming !== '' ? $upcoming : $past;
+            if ($date !== '') {
+                $dates[(int) $row['event_id']] = ['date' => $date, 'upcoming' => $upcoming !== ''];
+            }
+        }
+        return $dates;
     }
 
     /** @param array<int,array{label:string,url:string,cap:string}> $tabs */
@@ -347,6 +405,6 @@ final class SuiteAdmin
 
     private function css(): string
     {
-        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-header{margin:0 -20px 28px;padding:26px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header h1{max-width:1240px;margin:0 auto;font-size:17px;font-weight:500}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;width:auto;max-width:1240px;margin:0 auto 22px;padding:0 4px;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:12px 0 11px;color:#101828;text-decoration:none;font-weight:500;border-bottom:2px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#135eeb}.dizzy-management-page{max-width:1240px}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:block;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card summary{position:relative;padding:20px 54px 20px 20px;font-size:15px;font-weight:600;cursor:pointer;list-style:none}.dizzy-management-card summary::-webkit-details-marker{display:none}.dizzy-management-card summary:after{content:"";position:absolute;top:50%;right:24px;width:7px;height:7px;border-right:2px solid #344054;border-bottom:2px solid #344054;transform:translateY(-65%) rotate(45deg);transition:transform .18s ease}.dizzy-management-card[open] summary{border-bottom:1px solid #e6e9ed}.dizzy-management-card[open] summary:after{transform:translateY(-30%) rotate(225deg)}.dizzy-management-card-body{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px;color:#475467}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-tabs{gap:18px}.dizzy-management-card-body{align-items:flex-start;flex-direction:column}}';
+        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-header{margin:0 -20px 28px;padding:26px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header h1{max-width:1240px;margin:0 auto;font-size:17px;font-weight:500}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;width:auto;max-width:1240px;margin:0 auto 22px;padding:0 4px;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:12px 0 11px;color:#101828;text-decoration:none;font-weight:500;border-bottom:2px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#135eeb}.dizzy-management-page{max-width:1240px}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:block;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card summary{position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 54px 20px 20px;font-size:15px;font-weight:600;cursor:pointer;list-style:none}.dizzy-management-card summary time{flex:0 0 auto;color:#475467;font-weight:500}.dizzy-management-card summary::-webkit-details-marker{display:none}.dizzy-management-card summary:after{content:"";position:absolute;top:50%;right:24px;width:7px;height:7px;border-right:2px solid #344054;border-bottom:2px solid #344054;transform:translateY(-65%) rotate(45deg);transition:transform .18s ease}.dizzy-management-card[open] summary{border-bottom:1px solid #e6e9ed}.dizzy-management-card[open] summary:after{transform:translateY(-30%) rotate(225deg)}.dizzy-management-card-body{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px;color:#475467}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-tabs{gap:18px}.dizzy-management-card summary{align-items:flex-start;flex-direction:column;gap:5px}.dizzy-management-card summary time{flex:auto}.dizzy-management-card-body{align-items:flex-start;flex-direction:column}}';
     }
 }

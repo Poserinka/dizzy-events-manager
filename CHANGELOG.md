@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.8] - 2026-09-22
+
+### Changed
+
+- Displayed each event's date and time beside its name on the All Events page.
+- Sorted upcoming events from nearest to furthest, followed by past events from newest to oldest and undated events last.
+
 ## [4.1.7] - 2026-09-22
 
 ### Fixed
