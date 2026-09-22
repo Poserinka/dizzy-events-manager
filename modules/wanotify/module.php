@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_WANOTIFY_VERSION', '1.1.0');
+define('DIZZY_WANOTIFY_VERSION', '1.1.1');
 define('DIZZY_WANOTIFY_FILE', __FILE__);
 define('DIZZY_WANOTIFY_PATH', __DIR__ . '/');
 define('DIZZY_WANOTIFY_URL', DIZZY_EVENTS_URL . 'modules/wanotify/');

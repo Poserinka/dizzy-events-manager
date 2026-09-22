@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.10] - 2026-09-22
+
+### Changed
+
+- Matched WA Notify Settings and Message Templates to the other admin pages with white headings, black text, and rounded, bordered panels.
+
 ## [4.2.9] - 2026-09-22
 
 ### Fixed
