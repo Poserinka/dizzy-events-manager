@@ -33,7 +33,7 @@ final class AccountsAdmin
     {
         if(!current_user_can('manage_options'))return;
         $status=sanitize_key((string)($_GET['connection']??'')); ?>
-        <div class="wrap dizzy-social-page"><div class="dizzy-social-page-header"><h1><?php esc_html_e('Social Accounts','dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Connect the Facebook Page and Instagram Business account managed by the same Meta app.','dizzy-social-media-manager'); ?></p></div>
+        <div class="wrap dizzy-social-page"><div class="dizzy-social-page-header dizzy-editor-header"><div><h1><?php esc_html_e('Social Accounts','dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Connect the Facebook Page and Instagram Business account managed by the same Meta app.','dizzy-social-media-manager'); ?></p></div></div>
         <?php if($status!==''): ?><div class="notice <?php echo $status==='success'?'notice-success':'notice-error'; ?>"><p><?php echo esc_html($status==='success'?__('Connection successful.','dizzy-social-media-manager'):__('Connection failed. Check the IDs, token and app permissions.','dizzy-social-media-manager')); ?></p></div><?php endif; ?>
         <form method="post" action="options.php"><?php settings_fields(self::GROUP); ?><div class="dizzy-card"><h2>Meta Graph API</h2><table class="form-table">
         <?php $this->field('graph_version','Graph API version','v21.0');$this->field('app_id','Meta App ID');$this->field('app_secret','Meta App Secret','',true);$this->field('page_id','Facebook Page ID');$this->field('page_token','Page access token','',true);$this->field('instagram_id','Instagram Business Account ID'); ?>

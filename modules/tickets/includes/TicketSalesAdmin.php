@@ -309,7 +309,7 @@ final class TicketSalesAdmin
         ?>
         <style>#wpbody-content>.notice,#wpbody-content>.update-nag,#wpbody-content>.wrap>.notice{display:none!important}</style>
         <div class="wrap dizzy-ticket-checkin-admin">
-            <header class="dizzy-ticket-checkin-heading"><h1><?php esc_html_e('Check-in & Attendance', 'dizzy-ticket-manager'); ?></h1></header>
+            <header class="dizzy-ticket-checkin-heading dizzy-editor-header"><div><h1><?php esc_html_e('Check-in & Attendance', 'dizzy-ticket-manager'); ?></h1><p><?php esc_html_e('Check tickets and review attendance.', 'dizzy-ticket-manager'); ?></p></div></header>
             <section class="dizzy-ticket-checkin-panel dizzy-ticket-scanner-panel">
             <h2><?php esc_html_e('QR Scanner', 'dizzy-ticket-manager'); ?></h2>
             <p><?php esc_html_e('Allow camera access and point it at a ticket QR code.', 'dizzy-ticket-manager'); ?></p>

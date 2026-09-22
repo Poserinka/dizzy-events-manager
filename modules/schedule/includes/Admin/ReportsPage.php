@@ -91,8 +91,8 @@ final class ReportsPage
         $totalShifts = array_sum(array_column($rows, 'shifts'));
         ?>
         <div class="wrap dizzy-schedule-reports">
-            <header class="dizzy-reports-heading">
-                <h1><?php esc_html_e('Scheduled hours and shifts by employee.', 'dizzy-schedule-manager'); ?></h1>
+            <header class="dizzy-reports-heading dizzy-editor-header">
+                <div><h1><?php esc_html_e('Schedule Reports', 'dizzy-schedule-manager'); ?></h1><p><?php esc_html_e('Scheduled hours and shifts by employee.', 'dizzy-schedule-manager'); ?></p></div>
             </header>
 
             <div class="dizzy-reports-toolbar">

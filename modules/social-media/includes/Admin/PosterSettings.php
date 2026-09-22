@@ -70,7 +70,7 @@ final class PosterSettings
         foreach (['title', 'date', 'hours', 'logo'] as $key) $values[$key . '_enabled'] = (int) get_option('dizzy_social_' . $key . '_enabled', 1);
         ?>
         <div class="wrap dizzy-poster-layout-settings">
-            <div class="dizzy-social-page-header"><h1><?php esc_html_e('Poster Settings', 'dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Configure poster layers, typography and layout.', 'dizzy-social-media-manager'); ?></p></div>
+            <div class="dizzy-social-page-header dizzy-editor-header"><div><h1><?php esc_html_e('Poster Settings', 'dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Configure poster layers, typography and layout.', 'dizzy-social-media-manager'); ?></p></div></div>
             <form method="post" action="<?php echo esc_url(admin_url('options.php')); ?>">
                 <?php settings_fields(self::GROUP); ?>
                 <section class="dizzy-social-settings-card">

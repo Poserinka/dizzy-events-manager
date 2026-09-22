@@ -80,7 +80,7 @@ final class Admin
         $settings = $this->settings->connection();
         ?>
         <div class="wrap dizzy-wa-wrap">
-            <div class="dizzy-wa-heading"><h1><?php esc_html_e('WhatsApp Settings', 'dizzy-wanotify-manager'); ?></h1><p><?php esc_html_e('Connect WAnotify to the WhatsApp Cloud API.', 'dizzy-wanotify-manager'); ?></p></div>
+            <div class="dizzy-wa-heading dizzy-editor-header"><div><h1><?php esc_html_e('WhatsApp Settings', 'dizzy-wanotify-manager'); ?></h1><p><?php esc_html_e('Connect WAnotify to the WhatsApp Cloud API.', 'dizzy-wanotify-manager'); ?></p></div></div>
             <?php settings_errors(); ?>
             <form method="post" action="options.php" class="dizzy-wa-panel">
                 <?php settings_fields('dizzy_wanotify_connection'); ?>
@@ -109,7 +109,7 @@ final class Admin
         ];
         ?>
         <div class="wrap dizzy-wa-wrap">
-            <div class="dizzy-wa-heading"><h1><?php esc_html_e('Message Templates', 'dizzy-wanotify-manager'); ?></h1><p><?php esc_html_e('Enable notifications and map them to approved Meta templates.', 'dizzy-wanotify-manager'); ?></p></div>
+            <div class="dizzy-wa-heading dizzy-editor-header"><div><h1><?php esc_html_e('Message Templates', 'dizzy-wanotify-manager'); ?></h1><p><?php esc_html_e('Enable notifications and map them to approved Meta templates.', 'dizzy-wanotify-manager'); ?></p></div></div>
             <?php settings_errors(); ?>
             <form method="post" action="options.php">
                 <?php settings_fields('dizzy_wanotify_templates'); ?>

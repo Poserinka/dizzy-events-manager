@@ -22,7 +22,7 @@ final class TemplatesAdmin
     public function render(): void
     {
         if(!current_user_can('manage_options'))return; ?>
-        <div class="wrap dizzy-social-page"><div class="dizzy-social-page-header"><h1><?php esc_html_e('Social Templates','dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Available smart tags: {post_title}, {post_excerpt}, {post_url}, {event_date}, {venue}.','dizzy-social-media-manager'); ?></p></div><form method="post" action="options.php"><?php settings_fields(self::GROUP); ?><div class="dizzy-grid">
+        <div class="wrap dizzy-social-page"><div class="dizzy-social-page-header dizzy-editor-header"><div><h1><?php esc_html_e('Social Templates','dizzy-social-media-manager'); ?></h1><p><?php esc_html_e('Available smart tags: {post_title}, {post_excerpt}, {post_url}, {event_date}, {venue}.','dizzy-social-media-manager'); ?></p></div></div><form method="post" action="options.php"><?php settings_fields(self::GROUP); ?><div class="dizzy-grid">
         <?php $this->platform('facebook','Facebook',63206);$this->platform('instagram','Instagram',2200,true); ?>
         </div><?php submit_button(); ?></form><style>.dizzy-social-page{max-width:1200px}.dizzy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px}.dizzy-card{background:#fff;border:1px solid #dcdcde;border-radius:10px;padding:20px}.dizzy-card textarea{width:100%;min-height:150px}</style></div><?php
     }

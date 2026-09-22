@@ -325,7 +325,7 @@ final class Admin
 
     private function header(string $title, string $description, string $actionUrl = '', string $actionLabel = ''): void
     {
-        echo '<div class="wrap dizzy-nl-admin"><div class="dizzy-nl-head"><div><h1>' . esc_html($title) . '</h1><p>' . esc_html($description) . '</p></div>';
+        echo '<div class="wrap dizzy-nl-admin"><div class="dizzy-nl-head dizzy-editor-header"><div><h1>' . esc_html($title) . '</h1><p>' . esc_html($description) . '</p></div>';
         if ($actionUrl !== '' && $actionLabel !== '') {
             echo '<a class="button button-primary" href="' . esc_url($actionUrl) . '">' . esc_html($actionLabel) . '</a>';
         }

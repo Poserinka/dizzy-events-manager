@@ -171,8 +171,8 @@ final class SchedulePage
         }
         ?>
         <div class="wrap dizzy-schedule-wrap" id="dizzy-schedule-app">
-            <header class="dizzy-schedule-header">
-                <h1><?php esc_html_e('Employee shift planning', 'dizzy-schedule-manager'); ?></h1>
+            <header class="dizzy-schedule-header dizzy-editor-header">
+                <div><h1><?php esc_html_e('Employee shift planning', 'dizzy-schedule-manager'); ?></h1><p><?php esc_html_e('Plan and review employee shifts.', 'dizzy-schedule-manager'); ?></p></div>
                 <?php if ($canManage) : ?>
                     <button type="button" class="button button-primary" data-action="new-shift">
                         <?php esc_html_e('Add new shift', 'dizzy-schedule-manager'); ?>

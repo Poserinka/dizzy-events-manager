@@ -77,9 +77,9 @@ final class SettingsPage
         $status = sanitize_key(wp_unslash((string) ($_GET['dizzy_schedule_status'] ?? '')));
         ?>
         <div class="wrap dizzy-schedule-settings">
-            <header class="dizzy-schedule-settings-header">
-                <h1><?php esc_html_e('Employee Roles', 'dizzy-schedule-manager'); ?></h1>
-                <p><?php esc_html_e('These roles are available in the Position dropdown when creating a shift.', 'dizzy-schedule-manager'); ?></p>
+            <header class="dizzy-schedule-settings-header dizzy-editor-header">
+                <div><h1><?php esc_html_e('Employee Roles', 'dizzy-schedule-manager'); ?></h1>
+                <p><?php esc_html_e('These roles are available in the Position dropdown when creating a shift.', 'dizzy-schedule-manager'); ?></p></div>
             </header>
 
             <?php if ($status !== '') : ?>

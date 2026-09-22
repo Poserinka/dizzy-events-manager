@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.20] - 2026-09-22
+
+### Fixed
+
+- Render admin content headers with the page instead of inserting them after load; Event Categories now has a reliable title and description.
+- Keep Schedule, Reports and Settings descriptions aligned beneath their titles while preserving action buttons.
+- Remove the gap between the Tables toolbar and workspace, with a one-pixel divider.
+
 ## [4.2.19] - 2026-09-22
 
 ### Changed

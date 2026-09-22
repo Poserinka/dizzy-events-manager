@@ -58,8 +58,8 @@ final class SocialMediaAdmin
                 : strcmp($rightDate['date'], $leftDate['date']);
         });
 
-        echo '<div class="wrap dizzy-social-page"><div class="dizzy-social-page-header"><h1>' . esc_html__('Social Media & Poster Generator', 'dizzy-social-media-manager') . '</h1>';
-        echo '<p>' . esc_html__('Choose an event to create posters and social media exports.', 'dizzy-social-media-manager') . '</p></div>';
+        echo '<div class="wrap dizzy-social-page"><div class="dizzy-social-page-header dizzy-editor-header"><div><h1>' . esc_html__('Social Media & Poster Generator', 'dizzy-social-media-manager') . '</h1>';
+        echo '<p>' . esc_html__('Choose an event to create posters and social media exports.', 'dizzy-social-media-manager') . '</p></div></div>';
         echo '<div class="dizzy-management-cards dizzy-social-generator-cards">';
         if ($events === []) {
             echo '<div class="dizzy-management-card"><strong>' . esc_html__('No events found', 'dizzy-social-media-manager') . '</strong></div>';
