@@ -56,6 +56,9 @@ final class SuiteAdmin
 
         wp_enqueue_style('common');
         wp_add_inline_style('common', $this->css());
+        if ($this->isEventCategoryScreen()) {
+            wp_enqueue_style('dizzy-event-categories-admin', DIZZY_EVENTS_URL . 'assets/css/event-categories-admin.css', ['common'], DIZZY_EVENTS_VERSION);
+        }
     }
 
     public function sortMenu(): void
@@ -104,7 +107,10 @@ final class SuiteAdmin
 
     public function bodyClass(string $classes): string
     {
-        return $this->isDizzyPage() ? $classes . ' dizzy-management-admin' : $classes;
+        if (! $this->isDizzyPage()) {
+            return $classes;
+        }
+        return $classes . ' dizzy-management-admin' . ($this->isEventCategoryScreen() ? ' dizzy-event-category-admin' : '');
     }
 
     public function parentMenu(string $parentFile): string
@@ -176,7 +182,7 @@ final class SuiteAdmin
 
         $page = sanitize_key((string) ($_GET['page'] ?? ''));
         $postType = sanitize_key((string) ($_GET['post_type'] ?? ''));
-        if ($this->isEventsLanding() || $postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
+        if ($this->isEventsLanding() || $this->isEventCategoryScreen() || $postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
             return DIZZY_EVENTS_ADMIN_MENU;
         }
 
@@ -394,7 +400,7 @@ final class SuiteAdmin
     {
         $page = sanitize_key((string) ($_GET['page'] ?? ''));
         $postType = sanitize_key((string) ($_GET['post_type'] ?? ''));
-        if ($postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
+        if ($this->isEventCategoryScreen() || $postType === Config::POST_TYPE_EVENT || get_post_type() === Config::POST_TYPE_EVENT) {
             return ['title' => 'Events', 'tabs' => $this->eventTabs()];
         }
 
@@ -447,9 +453,20 @@ final class SuiteAdmin
         return sanitize_key((string) ($_GET['page'] ?? '')) === DIZZY_EVENTS_ADMIN_MENU;
     }
 
+    private function isEventCategoryScreen(): bool
+    {
+        global $pagenow;
+
+        return in_array($pagenow, ['edit-tags.php', 'term.php'], true)
+            && sanitize_key((string) ($_GET['taxonomy'] ?? '')) === Config::TAX_CATEGORY;
+    }
+
     private function currentUrlKey(): string
     {
         global $pagenow;
+        if ($this->isEventCategoryScreen()) {
+            return $this->urlKey(admin_url('edit-tags.php?taxonomy=' . Config::TAX_CATEGORY . '&post_type=' . Config::POST_TYPE_EVENT));
+        }
         $query = [];
         foreach (['page', 'post_type', 'taxonomy'] as $key) {
             if (isset($_GET[$key])) {

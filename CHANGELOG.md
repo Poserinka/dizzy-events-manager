@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.14] - 2026-09-22
+
+### Changed
+
+- Styled Event Categories add, list, and edit areas as Dizzy admin cards while retaining WordPress category actions.
+- Kept the Events navigation active on category edit screens.
+
 ## [4.2.13] - 2026-09-22
 
 ### Changed

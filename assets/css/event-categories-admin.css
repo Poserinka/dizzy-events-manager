@@ -1,0 +1,18 @@
+.dizzy-event-category-admin #wpbody-content>.wrap>.wp-heading-inline,
+.dizzy-event-category-admin #wpbody-content>.wrap>.page-title-action,
+.dizzy-event-category-admin #wpbody-content>.wrap>.wp-header-end{display:none}
+.dizzy-event-category-admin #col-container{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,2fr);gap:20px;align-items:start;margin-top:0}
+.dizzy-event-category-admin #col-container:before,.dizzy-event-category-admin #col-container:after{display:none}
+.dizzy-event-category-admin #col-left,.dizzy-event-category-admin #col-right{float:none;width:auto;min-width:0}
+.dizzy-event-category-admin #col-left .col-wrap,.dizzy-event-category-admin #col-right .col-wrap,
+.dizzy-event-category-admin #edittag{box-sizing:border-box;margin:0;padding:22px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}
+.dizzy-event-category-admin #col-left .form-wrap h2{margin-top:0}
+.dizzy-event-category-admin #col-left .form-field input[type=text],
+.dizzy-event-category-admin #col-left .form-field textarea,
+.dizzy-event-category-admin #col-left .form-field select{box-sizing:border-box;width:100%;max-width:none}
+.dizzy-event-category-admin #col-right .wp-list-table{border:0;box-shadow:none}
+.dizzy-event-category-admin #col-right .tablenav{height:auto;min-height:30px}
+.dizzy-event-category-admin #edittag{max-width:900px}
+.dizzy-event-category-admin #edittag .form-table{margin-top:0}
+@media(max-width:1050px){.dizzy-event-category-admin #col-container{grid-template-columns:1fr}}
+@media(max-width:782px){.dizzy-event-category-admin #col-left .col-wrap,.dizzy-event-category-admin #col-right .col-wrap,.dizzy-event-category-admin #edittag{padding:18px}}
