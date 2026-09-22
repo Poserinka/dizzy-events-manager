@@ -92,10 +92,7 @@ final class ReportsPage
         ?>
         <div class="wrap dizzy-schedule-reports">
             <header class="dizzy-reports-heading">
-                <div>
-                    <h1><?php esc_html_e('Schedule Reports', 'dizzy-schedule-manager'); ?></h1>
-                    <p><?php esc_html_e('Scheduled hours and shifts by employee.', 'dizzy-schedule-manager'); ?></p>
-                </div>
+                <h1><?php esc_html_e('Scheduled hours and shifts by employee.', 'dizzy-schedule-manager'); ?></h1>
             </header>
 
             <div class="dizzy-reports-toolbar">

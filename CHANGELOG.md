@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.4] - 2026-09-22
+
+### Changed
+
+- Replaced the Schedule content heading with `Employee shift planning`.
+- Replaced the Reports content heading with `Scheduled hours and shifts by employee.`.
+- Applied the white content-header treatment consistently to Schedule Reports.
+
 ## [4.2.3] - 2026-09-22
 
 ### Changed
