@@ -200,7 +200,7 @@ final class SuiteAdmin
             return;
         }
 
-        echo '<div class="dizzy-management-header"><h1>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</h1></div>';
+        $this->renderHeader($section['title']);
         $this->tabs($section['tabs']);
     }
 
@@ -234,7 +234,7 @@ final class SuiteAdmin
                 : strcmp($rightDate['date'], $leftDate['date']);
         });
 
-        echo '<div class="dizzy-management-header"><h1>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</h1></div>';
+        $this->renderHeader(__('Events', 'dizzy-events-manager'));
         echo '<div class="wrap dizzy-management-page">';
         $this->tabs($this->eventTabs());
         echo '<div class="dizzy-management-cards">';
@@ -263,6 +263,14 @@ final class SuiteAdmin
             echo '<p class="dizzy-suite-status-link"><a href="' . esc_url(admin_url('admin.php?page=dizzy-suite-modules')) . '">' . esc_html__('View module status', 'dizzy-events-manager') . '</a></p>';
         }
         echo '</div>';
+    }
+
+    private function renderHeader(string $pageName): void
+    {
+        echo '<header class="dizzy-management-header"><div class="dizzy-management-header-inner">';
+        echo '<img src="' . esc_url(DIZZY_EVENTS_URL . 'assets/images/jazzcafe-dizzy-logo-black.png') . '" width="270" height="38" alt="' . esc_attr__('Jazzcafé Dizzy', 'dizzy-events-manager') . '">';
+        echo '<h1><span>' . esc_html__('Dizzy Management', 'dizzy-events-manager') . '</span><span class="dizzy-management-header-separator" aria-hidden="true">•</span><span>' . esc_html($pageName) . '</span></h1>';
+        echo '</div></header>';
     }
 
     /**
@@ -413,6 +421,6 @@ final class SuiteAdmin
 
     private function css(): string
     {
-        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-header{margin:0 -20px 28px;padding:26px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header h1{max-width:1240px;margin:0 auto;font-size:17px;font-weight:500}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;width:auto;max-width:1240px;margin:0 auto 22px;padding:0 4px;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:12px 0 11px;color:#101828;text-decoration:none;font-weight:500;border-bottom:2px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#135eeb}.dizzy-management-page{max-width:1240px}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;align-items:center;gap:24px;min-height:58px;padding:10px 12px 10px 20px;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card-title{font-size:15px}.dizzy-management-card-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;color:#344054;white-space:nowrap}.dizzy-management-card>.button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-tabs{gap:18px}.dizzy-management-card{grid-template-columns:1fr;align-items:start;gap:10px;padding:16px}.dizzy-management-card-meta{flex-wrap:wrap;justify-content:flex-start;white-space:normal}.dizzy-management-card>.button{width:max-content}}';
+        return '.dizzy-management-admin #wpcontent{background:#f4f5f7}.dizzy-management-admin #wpbody-content>.wrap{width:auto;max-width:1240px;margin-left:auto;margin-right:auto}.dizzy-management-header{margin:0 -20px 28px;padding:24px 20px;background:#fff;border-bottom:1px solid #e2e5e9}.dizzy-management-header-inner{display:flex;align-items:center;gap:26px;max-width:1240px;margin:0 auto}.dizzy-management-header img{display:block;width:270px;max-width:35%;height:auto}.dizzy-management-header h1{display:flex;align-items:center;gap:9px;margin:0;font-size:17px;font-weight:500;line-height:1.3}.dizzy-management-header-separator{color:#667085}.dizzy-management-tabs{display:flex;flex-wrap:wrap;gap:30px;width:auto;max-width:1240px;margin:0 auto 22px;padding:0 4px;border-bottom:1px solid #d9dde3}.dizzy-management-tabs a{padding:12px 0 11px;color:#101828;text-decoration:none;font-weight:500;border-bottom:2px solid transparent}.dizzy-management-tabs a:hover,.dizzy-management-tabs a.is-active{color:#135eeb;border-bottom-color:#135eeb}.dizzy-management-page{max-width:1240px}.dizzy-management-cards{display:grid;gap:20px}.dizzy-management-card{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;align-items:center;gap:24px;min-height:58px;padding:10px 12px 10px 20px;background:#fff;border:1px solid #dce1e7;box-shadow:0 1px 3px rgba(16,24,40,.08)}.dizzy-management-card-title{font-size:15px}.dizzy-management-card-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;color:#344054;white-space:nowrap}.dizzy-management-card>.button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px}.dizzy-suite-status-link{margin-top:20px}@media(max-width:782px){.dizzy-management-header{margin-left:-10px;margin-right:-10px}.dizzy-management-header-inner{align-items:flex-start;flex-direction:column;gap:12px}.dizzy-management-header img{width:240px;max-width:80%}.dizzy-management-tabs{gap:18px}.dizzy-management-card{grid-template-columns:1fr;align-items:start;gap:10px;padding:16px}.dizzy-management-card-meta{flex-wrap:wrap;justify-content:flex-start;white-space:normal}.dizzy-management-card>.button{width:max-content}}';
     }
 }

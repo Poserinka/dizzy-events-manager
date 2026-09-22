@@ -8,6 +8,16 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.12] - 2026-09-22
+
+### Added
+
+- Added the Jazzcafé Dizzy logo to the shared administration header.
+
+### Changed
+
+- Updated the header label to `Dizzy Management • Page Name` and aligned it vertically with the logo.
+
 ## [4.1.11] - 2026-09-22
 
 ### Changed
