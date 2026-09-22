@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.13] - 2026-09-22
+
+### Changed
+
+- Replaced the Poster Generator table with All Events-style cards showing event date, time, publication status, poster state, preview, and generator action.
+- Sorted Poster Generator events in the same upcoming-first order as All Events.
+
 ## [4.2.12] - 2026-09-22
 
 ### Changed

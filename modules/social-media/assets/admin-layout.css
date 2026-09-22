@@ -6,7 +6,8 @@
 .dizzy-poster-layout-settings .dizzy-social-settings-card{margin:18px 0}
 .dizzy-poster-layout-settings .dizzy-social-settings-card>h2{margin:0 0 14px;font-size:18px}
 .dizzy-poster-layout-settings .dizzy-social-settings-card>.form-table{margin-top:0}
-.dizzy-social-generator-table{margin-top:18px;border:1px solid #E8E8EB;border-radius:10px;border-collapse:separate;border-spacing:0;box-shadow:0 2px 5px #0000000d;overflow:hidden}
-.dizzy-social-generator-table td{vertical-align:middle}
-.dizzy-social-generator-table img{display:block;border-radius:6px}
+.dizzy-social-generator-cards{margin-top:20px}
+.dizzy-social-generator-card .dizzy-management-card-meta{flex-wrap:wrap;white-space:normal}
+.dizzy-social-generator-title{display:flex;align-items:center;gap:12px;min-width:0}
+.dizzy-social-generator-title img{display:block;flex:0 0 48px;width:48px;height:48px;object-fit:cover;border-radius:6px}
 @media(max-width:782px){.dizzy-social-page-header{padding:18px}.dizzy-social-page .dizzy-card,.dizzy-poster-layout-settings .dizzy-social-settings-card{padding:18px}}

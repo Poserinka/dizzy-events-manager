@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_SOCIAL_VERSION', '1.10.17');
+define('DIZZY_SOCIAL_VERSION', '1.10.18');
 define('DIZZY_SOCIAL_PATH', __DIR__ . '/');
 define('DIZZY_SOCIAL_URL', DIZZY_EVENTS_URL . 'modules/social-media/');
 
