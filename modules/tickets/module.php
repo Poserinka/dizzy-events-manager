@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_TICKETS_VERSION', '1.11.2');
+define('DIZZY_TICKETS_VERSION', '1.11.3');
 define('DIZZY_TICKETS_PATH', __DIR__ . '/');
 
 require_once DIZZY_TICKETS_PATH . 'includes/Autoloader.php';

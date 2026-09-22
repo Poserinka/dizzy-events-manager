@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.12] - 2026-09-22
+
+### Changed
+
+- Matched Tickets Check-in to the other admin screens with a white heading, rounded scanner and manual check-in panels, and responsive attendance cards.
+
 ## [4.2.11] - 2026-09-22
 
 ### Changed

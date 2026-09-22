@@ -308,20 +308,24 @@ final class TicketSalesAdmin
         $manualTickets = $this->repository->allTickets($today);
         ?>
         <style>#wpbody-content>.notice,#wpbody-content>.update-nag,#wpbody-content>.wrap>.notice{display:none!important}</style>
-        <div class="wrap">
-            <h1><?php esc_html_e('Check-in & Attendance', 'dizzy-ticket-manager'); ?></h1>
+        <div class="wrap dizzy-ticket-checkin-admin">
+            <header class="dizzy-ticket-checkin-heading"><h1><?php esc_html_e('Check-in & Attendance', 'dizzy-ticket-manager'); ?></h1></header>
+            <section class="dizzy-ticket-checkin-panel dizzy-ticket-scanner-panel">
             <h2><?php esc_html_e('QR Scanner', 'dizzy-ticket-manager'); ?></h2>
             <p><?php esc_html_e('Allow camera access and point it at a ticket QR code.', 'dizzy-ticket-manager'); ?></p>
-            <video id="dizzy-ticket-qr-video" style="width:100%;max-width:480px;background:#111" playsinline></video>
+            <video id="dizzy-ticket-qr-video" playsinline></video>
             <p id="dizzy-ticket-qr-message"></p>
             <p><input id="dizzy-ticket-qr-url" type="url" class="regular-text" placeholder="<?php esc_attr_e('Paste ticket URL', 'dizzy-ticket-manager'); ?>"> <button id="dizzy-ticket-open" class="button"><?php esc_html_e('Open ticket', 'dizzy-ticket-manager'); ?></button></p>
+            </section>
             <?php echo $this->cards([
                 __('Sold tickets', 'dizzy-ticket-manager') => $totals['sold'],
                 __('Expected attendees', 'dizzy-ticket-manager') => $totals['expected'],
                 __('Checked-in tickets', 'dizzy-ticket-manager') => $totals['checked_in'],
                 __('Guests attended', 'dizzy-ticket-manager') => $totals['attended'],
             ]); ?>
+            <section class="dizzy-ticket-checkin-panel dizzy-ticket-manual-panel">
             <h2><?php esc_html_e('Manual Check-in', 'dizzy-ticket-manager'); ?> — <?php echo esc_html(wp_date(get_option('date_format'), strtotime($today), wp_timezone())); ?></h2>
+            <div class="dizzy-ticket-checkin-table-wrap">
             <table class="widefat striped">
                 <thead><tr><th><?php esc_html_e('Holder', 'dizzy-ticket-manager'); ?></th><th><?php esc_html_e('Ticket', 'dizzy-ticket-manager'); ?></th><th><?php esc_html_e('Event', 'dizzy-ticket-manager'); ?></th><th><?php esc_html_e('Date', 'dizzy-ticket-manager'); ?></th><th><?php esc_html_e('Checked in', 'dizzy-ticket-manager'); ?></th><th><?php esc_html_e('Action', 'dizzy-ticket-manager'); ?></th></tr></thead>
                 <tbody>
@@ -340,6 +344,24 @@ final class TicketSalesAdmin
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
+            </section>
+            <style>
+                .dizzy-ticket-checkin-heading{padding:20px 24px;background:#fff;border:1px solid #E8E8EB;border-radius:10px 10px 0 0;box-shadow:0 2px 5px #0000000d;color:#000}
+                .dizzy-ticket-checkin-heading h1{margin:0;color:inherit}
+                .dizzy-ticket-checkin-panel,.dizzy-ticket-checkin-stats>div{box-sizing:border-box;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}
+                .dizzy-ticket-checkin-panel{margin-top:18px;padding:22px}
+                .dizzy-ticket-checkin-panel h2{margin:0 0 12px}
+                #dizzy-ticket-qr-video{display:block;width:100%;max-width:480px;background:#111;border-radius:8px}
+                .dizzy-ticket-checkin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:18px 0}
+                .dizzy-ticket-checkin-stats>div{padding:18px}
+                .dizzy-ticket-checkin-stats strong{display:block;font-size:22px;line-height:1.2}
+                .dizzy-ticket-checkin-table-wrap{overflow-x:auto}
+                .dizzy-ticket-checkin-table-wrap .widefat{margin:0;border:0;box-shadow:none}
+                .dizzy-ticket-checkin-table-wrap td{vertical-align:middle}
+                @media(max-width:900px){.dizzy-ticket-checkin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+                @media(max-width:600px){.dizzy-ticket-checkin-stats{grid-template-columns:1fr}.dizzy-ticket-checkin-panel{padding:18px}}
+            </style>
             <script>(()=>{const v=document.getElementById('dizzy-ticket-qr-video'),m=document.getElementById('dizzy-ticket-qr-message'),i=document.getElementById('dizzy-ticket-qr-url'),nonce=<?php echo wp_json_encode(wp_create_nonce('dizzy_ticket_qr_checkin')); ?>;const open=x=>{try{const u=new URL(x,location.origin);if(u.origin!==location.origin||!u.searchParams.has('dizzy_tm_paid_ticket'))throw 0;u.searchParams.set('checkin_nonce',nonce);location.assign(u.href);return true}catch(e){m.textContent='<?php echo esc_js(__('Invalid ticket URL.', 'dizzy-ticket-manager')); ?>';return false}};document.getElementById('dizzy-ticket-open').onclick=e=>{e.preventDefault();open(i.value)};if(!('BarcodeDetector'in window)||!navigator.mediaDevices?.getUserMedia){m.textContent='<?php echo esc_js(__('Camera QR scanning is not supported. Paste the ticket URL instead.', 'dizzy-ticket-manager')); ?>';return}const detector=new BarcodeDetector({formats:['qr_code']});navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(stream=>{v.srcObject=stream;v.play();const scan=async()=>{try{const codes=await detector.detect(v);if(codes[0]?.rawValue&&open(codes[0].rawValue)){stream.getTracks().forEach(track=>track.stop());return}}catch(e){}requestAnimationFrame(scan)};scan()}).catch(()=>m.textContent='<?php echo esc_js(__('Camera access was denied.', 'dizzy-ticket-manager')); ?>')})();</script>
         </div>
         <?php
@@ -575,9 +597,9 @@ final class TicketSalesAdmin
 
     private function cards(array $items): string
     {
-        $html = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:16px 0">';
+        $html = '<div class="dizzy-ticket-checkin-stats">';
         foreach ($items as $label => $value) {
-            $html .= '<div style="background:#fff;border:1px solid #ccd0d4;padding:14px;min-width:150px"><strong style="font-size:22px;display:block">' . esc_html((string) $value) . '</strong>' . esc_html((string) $label) . '</div>';
+            $html .= '<div><strong>' . esc_html((string) $value) . '</strong>' . esc_html((string) $label) . '</div>';
         }
         return $html . '</div>';
     }
