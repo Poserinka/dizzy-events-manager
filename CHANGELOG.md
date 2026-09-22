@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.8] - 2026-09-22
+
+### Changed
+
+- Added rounded report list and calendar panels to Reservation Reports and Ticket Reports.
+- Moved the Schedule border, radius and shadow from the week grid to the complete calendar container.
+- Added the matching card layout to Ticket Payment Settings.
+
 ## [4.2.7] - 2026-09-22
 
 ### Changed

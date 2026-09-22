@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_SCHEDULE_VERSION', '2.2.4');
+define('DIZZY_SCHEDULE_VERSION', '2.2.5');
 define('DIZZY_SCHEDULE_FILE', __FILE__);
 define('DIZZY_SCHEDULE_PATH', __DIR__ . '/');
 define('DIZZY_SCHEDULE_URL', DIZZY_EVENTS_URL . 'modules/schedule/');

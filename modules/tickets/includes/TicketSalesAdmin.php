@@ -67,8 +67,9 @@ final class TicketSalesAdmin
     {
         $this->guard();
         ?>
-        <div class="wrap">
+        <div class="wrap dizzy-ticket-payment-settings">
             <h1><?php esc_html_e('Payment Settings', 'dizzy-ticket-manager'); ?></h1>
+            <section class="dizzy-ticket-payment-panel">
             <form method="post" action="options.php">
                 <?php settings_fields('dizzy_ticket_payment_settings'); ?>
                 <table class="form-table">
@@ -79,7 +80,12 @@ final class TicketSalesAdmin
                 </table>
                 <?php submit_button(); ?>
             </form>
+            </section>
         </div>
+        <style>
+            .dizzy-ticket-payment-panel{box-sizing:border-box;padding:24px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}
+            .dizzy-ticket-payment-panel .form-table{margin-top:0}.dizzy-ticket-payment-panel .submit{margin-bottom:0;padding-bottom:0}
+        </style>
         <?php
     }
 
@@ -401,7 +407,7 @@ final class TicketSalesAdmin
         ?>
         <style>
             .dizzy-ticket-reports-workspace{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(460px,.9fr);gap:24px;align-items:start;margin-top:14px}
-            .dizzy-ticket-report-list,.dizzy-ticket-calendar-surface{background:#fff;border:1px solid #c3c4c7}
+            .dizzy-ticket-report-list{background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d;overflow:hidden}.dizzy-ticket-report-calendar-column{box-sizing:border-box;padding:18px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}.dizzy-ticket-calendar-surface{background:#fff;border:1px solid #c3c4c7}
             .dizzy-ticket-report-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px;border-bottom:1px solid #c3c4c7}
             .dizzy-ticket-report-heading h2{margin:0 0 12px;font-size:14px}
             .dizzy-ticket-report-cards{display:flex;gap:12px;flex-wrap:wrap}

@@ -310,7 +310,7 @@ final class AdminController
         ?>
         <style>
             .dizzy-reservation-reports-workspace{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(460px,.9fr);gap:24px;align-items:start;margin-top:14px}
-            .dizzy-reservation-report-list,.dizzy-report-calendar-surface{background:#fff;border:1px solid #c3c4c7}
+            .dizzy-reservation-report-list{background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d;overflow:hidden}.dizzy-reservation-report-calendar-column{box-sizing:border-box;padding:18px;background:#fff;border:1px solid #E8E8EB;border-radius:10px;box-shadow:0 2px 5px #0000000d}.dizzy-report-calendar-surface{background:#fff;border:1px solid #c3c4c7}
             .dizzy-reservation-report-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px;border-bottom:1px solid #c3c4c7}
             .dizzy-reservation-report-heading h2{margin:0 0 12px;font-size:14px}.dizzy-reservation-report-cards{display:flex;gap:12px;flex-wrap:wrap}
             .dizzy-reservation-report-cards>div{background:#fff;border:1px solid #ccd0d4;padding:12px 14px;min-width:150px}.dizzy-reservation-report-cards strong{display:block;font-size:22px;line-height:1.1}
