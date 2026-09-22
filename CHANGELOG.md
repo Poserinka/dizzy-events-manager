@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.15] - 2026-09-22
+
+### Fixed
+
+- Added the missing gap between the Social Templates heading and its Facebook/Instagram cards.
+
 ## [4.2.14] - 2026-09-22
 
 ### Changed
