@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.16] - 2026-09-22
+
+### Fixed
+
+- Display ticket report times without seconds, for example `21:00` instead of `21:00:00`.
+
 ## [4.2.15] - 2026-09-22
 
 ### Fixed

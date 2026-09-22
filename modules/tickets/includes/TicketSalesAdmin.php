@@ -403,7 +403,7 @@ final class TicketSalesAdmin
                             <?php foreach ($rows as $row) : $capacity = (int) ($row['capacity'] ?? 0); $sold = (int) $row['sold']; $date = substr((string) ($row['start_datetime'] ?? ''), 0, 10); ?>
                                 <tr data-ticket-report-date="<?php echo esc_attr($date); ?>">
                                     <td><?php echo esc_html((string) $row['post_title']); ?></td>
-                                    <td><?php echo esc_html((string) $row['start_datetime']); ?></td>
+                                    <td><?php echo esc_html(substr((string) $row['start_datetime'], 0, 16)); ?></td>
                                     <td><?php echo esc_html((string) $sold); ?></td>
                                     <td><?php echo esc_html((string) $row['attended']); ?></td>
                                     <td><?php echo esc_html($capacity > 0 ? (string) $capacity : __('Unlimited', 'dizzy-ticket-manager')); ?></td>
