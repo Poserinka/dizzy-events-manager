@@ -38,4 +38,14 @@ foreach ($expected as $constant) {
     }
 }
 
+foreach ([
+    \Dizzy\Reservations\EventGateway::class,
+    \Dizzy\Reservations\TicketGateway::class,
+    \Dizzy\Reservations\Plugin::class,
+] as $class) {
+    if (! class_exists($class)) {
+        throw new RuntimeException('Missing bundled Reservations class: ' . $class);
+    }
+}
+
 echo "Dizzy Suite bootstrap smoke test passed.\n";

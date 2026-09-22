@@ -8,6 +8,14 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.2] - 2026-09-22
+
+### Fixed
+
+- Loaded all Reservations runtime dependencies deterministically before the module boots.
+- Prevented the production `EventGateway` class-not-found fatal error after plugin updates.
+- Extended the suite bootstrap test to verify critical bundled Reservations classes.
+
 ## [4.2.1] - 2026-09-22
 
 ### Fixed
