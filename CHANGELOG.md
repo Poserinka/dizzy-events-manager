@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.2.5] - 2026-09-22
+
+### Changed
+
+- Standardized cards and applicable administration panels with a white background, `#E8E8EB` border and subtle `0 2px 5px #0000000d` shadow.
+
 ## [4.2.4] - 2026-09-22
 
 ### Changed
