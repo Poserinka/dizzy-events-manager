@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.1.9] - 2026-09-22
+
+### Fixed
+
+- Corrected Newsletter `dbDelta` index definitions so WordPress no longer interprets `UNIQUE` and `KEY` as column names.
+- Preserved all existing Newsletter records while safely creating or repairing the intended indexes.
+
 ## [4.1.8] - 2026-09-22
 
 ### Changed

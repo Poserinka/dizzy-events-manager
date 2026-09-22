@@ -28,7 +28,9 @@ final class Database
             token_hash char(64) NOT NULL,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,
-            PRIMARY KEY  (id), UNIQUE KEY email (email), KEY status (status)
+            PRIMARY KEY  (id),
+            UNIQUE KEY email (email),
+            KEY status (status)
         ) {$charset};");
 
         dbDelta("CREATE TABLE {$prefix}campaigns (
@@ -47,7 +49,8 @@ final class Database
             completed_at datetime NULL,
             created_at datetime NOT NULL,
             updated_at datetime NOT NULL,
-            PRIMARY KEY  (id), KEY status_schedule (status,scheduled_at)
+            PRIMARY KEY  (id),
+            KEY status_schedule (status,scheduled_at)
         ) {$charset};");
 
         dbDelta("CREATE TABLE {$prefix}queue (
@@ -59,7 +62,9 @@ final class Database
             error_message text NULL,
             sent_at datetime NULL,
             created_at datetime NOT NULL,
-            PRIMARY KEY  (id), UNIQUE KEY campaign_contact (campaign_id,contact_id), KEY queue_status (status,id)
+            PRIMARY KEY  (id),
+            UNIQUE KEY campaign_contact (campaign_id,contact_id),
+            KEY queue_status (status,id)
         ) {$charset};");
 
         dbDelta("CREATE TABLE {$prefix}events (
@@ -69,7 +74,9 @@ final class Database
             event_type varchar(30) NOT NULL,
             meta text NULL,
             created_at datetime NOT NULL,
-            PRIMARY KEY  (id), KEY campaign_type (campaign_id,event_type), KEY contact_id (contact_id)
+            PRIMARY KEY  (id),
+            KEY campaign_type (campaign_id,event_type),
+            KEY contact_id (contact_id)
         ) {$charset};");
 
         add_option('dizzy_nl_settings', [
