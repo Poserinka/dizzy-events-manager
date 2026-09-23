@@ -103,9 +103,13 @@ a[x-apple-data-detectors],
                          <tr>
                           <td align="center" style="padding:20px 0;Margin:0;font-size:0px"><img src="<?php echo esc_url(DIZZY_EMAILS_URL . 'assets/images/jazzcafe-dizzy-logo-black.png'); ?>" alt="" width="484" class="adapt-img" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0"></td>
                          </tr>
+						   
+						   
                          <tr>
                           <td align="center" style="padding:0;Margin:0;font-size:0"><img src="https://poserinka.com/dizzy/wp-content/uploads/2026/08/dizzy-poster-981b6d9d-8f1b-4eb6-b4e8-f6198bfd3426.png" alt="" width="556" referrerpolicy class="adapt-img" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0"></td>
                          </tr>
+						   
+						   
                          <tr>
                           <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333"><?php echo esc_html((string) $event_name); ?></h3></td>
                          </tr>
