@@ -294,6 +294,7 @@ final class ReservationService
         $experience = $this->experienceFromRow($row);
         $data = [
             'reservation_id' => (int) $row['id'],
+            'event_id' => (int) ($row['event_id'] ?? 0),
             'name' => (string) $row['name'],
             'email' => (string) $row['email'],
             'phone' => (string) ($row['phone'] ?? ''),

@@ -289,6 +289,7 @@ final class TicketSalesService
             'ticket-confirmed',
             [
                 'order_id' => (int) $order['id'],
+                'event_id' => (int) $order['event_id'],
                 'event_name' => get_the_title((int) $order['event_id']),
                 'event_date' => $eventDate,
                 'event_time' => $eventTime,

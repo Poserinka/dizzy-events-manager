@@ -28,6 +28,7 @@ final class Mailer
             }
             $subject = Settings::subject($key, $subject);
             $data['email_message'] = Settings::message($key);
+            $data['event_image_url'] = EventImage::url((int) ($data['event_id'] ?? 0), Settings::imageSource($key));
         }
         if (! preg_match('/^[a-z0-9-]+$/', $template)) {
             throw new RuntimeException('Invalid email template name.');

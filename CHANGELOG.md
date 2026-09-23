@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.3.2] - 2026-09-23
+
+### Added
+
+- Add per-template event image selection for ticket and reservation emails; expose the selected image URL to templates without modifying their HTML.
+
 ## [4.3.1] - 2026-09-23
 
 ### Changed

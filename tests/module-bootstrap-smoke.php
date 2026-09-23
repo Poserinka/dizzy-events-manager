@@ -45,6 +45,7 @@ foreach ([
     \Dizzy\Reservations\Plugin::class,
     \Dizzy\Emails\Settings::class,
     \Dizzy\Emails\Delivery::class,
+    \Dizzy\Emails\EventImage::class,
     \Dizzy\Emails\Mailer::class,
     \Dizzy\Emails\ShiftReminders::class,
     \Dizzy\Newsletter\CampaignSender::class,

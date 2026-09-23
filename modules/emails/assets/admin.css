@@ -8,5 +8,6 @@
 .dizzy-email-field{display:grid;gap:6px;font-weight:600}
 .dizzy-email-field input{width:100%;max-width:620px}
 .dizzy-email-field textarea{width:100%;max-width:620px}
+.dizzy-email-field select{width:100%;max-width:620px}
 .dizzy-email-panel .description{margin-bottom:0}
 @media(max-width:782px){.dizzy-email-panel-head{flex-direction:column}.dizzy-email-panel{padding:18px}}

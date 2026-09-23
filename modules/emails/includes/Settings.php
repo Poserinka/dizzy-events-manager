@@ -14,8 +14,8 @@ final class Settings
     {
         $saved = (array) get_option(self::OPTION, []);
         $defaults = [
-            'ticket' => ['enabled' => '1', 'subject' => 'Your event tickets', 'message' => ''],
-            'reservation' => ['enabled' => '1', 'subject' => 'Reservation confirmed', 'message' => ''],
+            'ticket' => ['enabled' => '1', 'subject' => 'Your event tickets', 'message' => '', 'image_source' => 'none'],
+            'reservation' => ['enabled' => '1', 'subject' => 'Reservation confirmed', 'message' => '', 'image_source' => 'none'],
             'schedule' => ['enabled' => '0', 'subject' => 'Shift reminder', 'message' => 'This is a reminder for your upcoming shift at Jazzcafe Dizzy.'],
         ];
         foreach ($defaults as $key => $default) {
@@ -40,6 +40,12 @@ final class Settings
         return (string) (self::templates()[$key]['message'] ?? '');
     }
 
+    public static function imageSource(string $key): string
+    {
+        $source = (string) (self::templates()[$key]['image_source'] ?? 'none');
+        return in_array($source, ['none', 'featured', 'poster'], true) ? $source : 'none';
+    }
+
     public static function sanitize(mixed $input): array
     {
         $input = is_array($input) ? $input : [];
@@ -51,6 +57,8 @@ final class Settings
                 'enabled' => isset($item['enabled']) ? '1' : '0',
                 'subject' => $subject !== '' ? $subject : (string) $current['subject'],
                 'message' => sanitize_textarea_field((string) ($item['message'] ?? '')),
+                'image_source' => in_array((string) ($item['image_source'] ?? 'none'), ['none', 'featured', 'poster'], true)
+                    ? (string) $item['image_source'] : 'none',
             ];
         }
         return $clean;
