@@ -11,8 +11,8 @@ $ticketStatus = (string) ($experience['ticket_status'] ?? 'none');
 $ticketUrl = (string) ($experience['ticket_url'] ?? '');
 ?>
 <tr>
- <td align="center" style="padding:14px 18px;Margin:10px 0;background:#fff6d8;border-left:4px solid #ffb900;color:#333333;font-family:arial,'helvetica neue',helvetica,sans-serif">
-  <h3 style="Margin:0 0 8px;font-size:20px;line-height:28px;color:#333333"><?php echo esc_html($isDinnerOnly ? __('Dinner only', 'dizzy-reservations-manager') : __('Dinner & Live Music', 'dizzy-reservations-manager')); ?></h3>
+ <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0">
+  <h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef"><?php echo esc_html($isDinnerOnly ? __('Dinner only', 'dizzy-reservations-manager') : __('Dinner & Live Music', 'dizzy-reservations-manager')); ?></h3>
   <?php if ($isDinnerOnly) : ?>
    <p style="Margin:0;line-height:22px;font-size:14px"><strong><?php echo esc_html(sprintf(__('Dinner reservation — %1$s–%2$s', 'dizzy-reservations-manager'), (string) $time, (string) ($experience['dinner_cutoff'] ?? ''))); ?></strong><br><?php echo esc_html(sprintf(__('A ticketed concert starts at %s. This reservation does not include concert admission. If you would like to stay for the concert, please book Dinner + Concert.', 'dizzy-reservations-manager'), (string) ($experience['concert_time'] ?? ''))); ?></p>
   <?php else : ?>
@@ -21,3 +21,4 @@ $ticketUrl = (string) ($experience['ticket_url'] ?? '');
   <?php endif; ?>
  </td>
 </tr>
+
