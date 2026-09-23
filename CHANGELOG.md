@@ -8,6 +8,17 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.3.0] - 2026-09-23
+
+### Added
+
+- Add an Emails module with Ticket purchased, Reservation confirmed and Shift reminder templates, per-template enable controls, subject lines and optional message text.
+- Add a branded, opt-in employee shift reminder email about two hours before a published shift.
+
+### Changed
+
+- Keep existing ticket and reservation confirmation templates and image assets while allowing their sending to be controlled from Emails.
+
 ## [4.2.22] - 2026-09-23
 
 ### Fixed

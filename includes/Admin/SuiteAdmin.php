@@ -79,6 +79,7 @@ final class SuiteAdmin
             'dizzy-tickets',
             'dizzy-newsletter',
             'dizzy-wanotify-settings',
+            'dizzy-emails',
             'dizzy-social-media',
         ];
         $positions = array_flip($order);
@@ -387,6 +388,11 @@ final class SuiteAdmin
                 'action_label' => '',
                 'action_url' => '',
             ],
+            'Emails' => [
+                'description' => __('Manage transactional email templates and reminders.', 'dizzy-events-manager'),
+                'action_label' => '',
+                'action_url' => '',
+            ],
             'Social Media' => [
                 'description' => __('Create event posters and manage social publishing.', 'dizzy-events-manager'),
                 'action_label' => '',
@@ -494,6 +500,7 @@ final class SuiteAdmin
             'dizzy-tickets|dizzy-ticket-orders|dizzy-ticket-checkin|dizzy-ticket-reports|dizzy-ticket-payment-settings' => ['title' => 'Tickets', 'tabs' => [$tab('Tickets', 'dizzy-tickets', 'dizzy_manage_tickets'), $tab('Orders', 'dizzy-ticket-orders', 'dizzy_manage_tickets'), $tab('Check-in', 'dizzy-ticket-checkin', 'dizzy_manage_tickets'), $tab('Reports', 'dizzy-ticket-reports'), $tab('Payment Settings', 'dizzy-ticket-payment-settings')]],
             'dizzy-newsletter|dizzy-newsletter-campaign|dizzy-newsletter-audience|dizzy-newsletter-analytics|dizzy-newsletter-settings' => ['title' => 'Newsletter', 'tabs' => [$tab('Campaigns', 'dizzy-newsletter'), $tab('Add Campaign', 'dizzy-newsletter-campaign'), $tab('Subscribers', 'dizzy-newsletter-audience'), $tab('Analytics', 'dizzy-newsletter-analytics'), $tab('Settings', 'dizzy-newsletter-settings')]],
             'dizzy-wanotify-settings|dizzy-wanotify-templates' => ['title' => 'WA Notify', 'tabs' => [$tab('Settings', 'dizzy-wanotify-settings'), $tab('Message Templates', 'dizzy-wanotify-templates')]],
+            'dizzy-emails' => ['title' => 'Emails', 'tabs' => [$tab('Email Templates', 'dizzy-emails')]],
             'dizzy-social-media|dizzy-poster-settings|dizzy-social-accounts|dizzy-social-templates|dizzy-social-autopost' => ['title' => 'Social Media', 'tabs' => [$tab('Poster Generator', 'dizzy-social-media', 'edit_posts'), $tab('Poster Settings', 'dizzy-poster-settings'), $tab('Accounts', 'dizzy-social-accounts'), $tab('Templates', 'dizzy-social-templates'), $tab('Auto Post', 'dizzy-social-autopost')]],
         ];
     }
@@ -507,6 +514,7 @@ final class SuiteAdmin
             'dizzy-tickets|dizzy-ticket-orders|dizzy-ticket-checkin|dizzy-ticket-reports|dizzy-ticket-payment-settings' => 'dizzy-tickets',
             'dizzy-newsletter|dizzy-newsletter-campaign|dizzy-newsletter-audience|dizzy-newsletter-analytics|dizzy-newsletter-settings' => 'dizzy-newsletter',
             'dizzy-wanotify-settings|dizzy-wanotify-templates' => 'dizzy-wanotify-settings',
+            'dizzy-emails' => 'dizzy-emails',
             'dizzy-social-media|dizzy-poster-settings|dizzy-social-accounts|dizzy-social-templates|dizzy-social-autopost' => 'dizzy-social-media',
         ];
     }

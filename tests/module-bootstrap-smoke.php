@@ -30,6 +30,7 @@ $expected = [
     'DIZZY_SOCIAL_VERSION',
     'DIZZY_TICKETS_VERSION',
     'DIZZY_WANOTIFY_VERSION',
+    'DIZZY_EMAILS_VERSION',
 ];
 
 foreach ($expected as $constant) {
@@ -42,6 +43,8 @@ foreach ([
     \Dizzy\Reservations\EventGateway::class,
     \Dizzy\Reservations\TicketGateway::class,
     \Dizzy\Reservations\Plugin::class,
+    \Dizzy\Emails\Settings::class,
+    \Dizzy\Emails\ShiftReminders::class,
 ] as $class) {
     if (! class_exists($class)) {
         throw new RuntimeException('Missing bundled Reservations class: ' . $class);

@@ -17,6 +17,13 @@ final class Mailer
 
     public function sendTemplate(string $email, string $subject, string $template, array $data): bool
     {
+        if ($template === 'ticket-confirmed' && class_exists(\Dizzy\Emails\Settings::class)) {
+            if (! \Dizzy\Emails\Settings::enabled('ticket')) {
+                return true;
+            }
+            $subject = \Dizzy\Emails\Settings::subject('ticket', $subject);
+            $data['email_message'] = \Dizzy\Emails\Settings::message('ticket');
+        }
         if (! preg_match('/^[a-z0-9-]+$/', $template)) {
             throw new RuntimeException('Invalid ticket email template name.');
         }

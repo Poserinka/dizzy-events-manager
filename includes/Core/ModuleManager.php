@@ -10,6 +10,7 @@ final class ModuleManager
 {
     /** @var array<string, array{standalone:string,bootstrap:string}> */
     private const MODULES = [
+        'emails' => ['standalone' => '', 'bootstrap' => 'modules/emails/module.php'],
         'newsletter' => ['standalone' => 'dizzy-newsletter/dizzy-newsletter.php', 'bootstrap' => 'modules/newsletter/module.php'],
         'reservations' => ['standalone' => 'dizzy-reservations-manager/dizzy-reservations-manager.php', 'bootstrap' => 'modules/reservations/module.php'],
         'schedule' => ['standalone' => 'dizzy-schedule-manager/dizzy-schedule-manager.php', 'bootstrap' => 'modules/schedule/module.php'],
@@ -136,10 +137,16 @@ final class ModuleManager
         if (isset(self::$loaded['wanotify'])) {
             wp_clear_scheduled_hook('dizzy_wanotify_check_shift_reminders');
         }
+        if (isset(self::$loaded['emails'])) {
+            wp_clear_scheduled_hook(\Dizzy\Emails\ShiftReminders::HOOK);
+        }
     }
 
     private static function standaloneIsActive(string $plugin): bool
     {
+        if ($plugin === '') {
+            return false;
+        }
         $active = (array) get_option('active_plugins', []);
         if (in_array($plugin, $active, true) || self::containsPluginFile($active, $plugin)) {
             return true;
@@ -177,6 +184,9 @@ final class ModuleManager
         }
         if (isset(self::$loaded['wanotify']) && ! wp_next_scheduled('dizzy_wanotify_check_shift_reminders')) {
             wp_schedule_event(time() + 60, 'dizzy_wanotify_five_minutes', 'dizzy_wanotify_check_shift_reminders');
+        }
+        if (isset(self::$loaded['emails']) && ! wp_next_scheduled(\Dizzy\Emails\ShiftReminders::HOOK)) {
+            wp_schedule_event(time() + 60, 'dizzy_emails_five_minutes', \Dizzy\Emails\ShiftReminders::HOOK);
         }
     }
 }

@@ -23,6 +23,13 @@ final class Mailer
      */
     public function sendTemplate(string $email, string $subject, string $template, array $data): bool
     {
+        if ($template === 'reservation-confirmed' && class_exists(\Dizzy\Emails\Settings::class)) {
+            if (! \Dizzy\Emails\Settings::enabled('reservation')) {
+                return true;
+            }
+            $subject = \Dizzy\Emails\Settings::subject('reservation', $subject);
+            $data['email_message'] = \Dizzy\Emails\Settings::message('reservation');
+        }
         if (! preg_match('/^[a-z0-9-]+$/', $template)) {
             throw new RuntimeException('Invalid email template name.');
         }
