@@ -8,13 +8,13 @@ defined('ABSPATH') || exit;
 
 final class EventImage
 {
-    public static function url(int $eventId, string $source): string
+    public static function url(int $eventId): string
     {
-        if ($eventId <= 0 || $source === 'none') {
+        if ($eventId <= 0) {
             return '';
         }
 
-        if ($source === 'poster' && class_exists(\Dizzy\SocialMedia\Poster\Repositories\PosterRepository::class)) {
+        if (class_exists(\Dizzy\SocialMedia\Poster\Repositories\PosterRepository::class)) {
             try {
                 $poster = (new \Dizzy\SocialMedia\Poster\Repositories\PosterRepository())->findByEvent($eventId);
                 if ($poster !== null) {
@@ -27,10 +27,6 @@ final class EventImage
             } catch (\Throwable) {
                 // The Social Media module may be unavailable; use the featured image below.
             }
-        }
-
-        if (! in_array($source, ['featured', 'poster'], true)) {
-            return '';
         }
 
         $url = get_the_post_thumbnail_url($eventId, 'full');

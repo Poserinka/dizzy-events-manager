@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.3.3] - 2026-09-23
+
+### Changed
+
+- Automatically choose a generated event poster for ticket and reservation emails, falling back to the featured image or no image.
+- Remove the Event image selector from Email Templates; templates remain unchanged.
+
 ## [4.3.2] - 2026-09-23
 
 ### Added

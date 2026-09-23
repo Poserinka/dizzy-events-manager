@@ -70,15 +70,6 @@ final class Admin
                         </div>
                         <label class="dizzy-email-field"><?php esc_html_e('Subject', 'dizzy-events-manager'); ?><input type="text" name="<?php echo esc_attr(Settings::OPTION . '[' . $key . '][subject]'); ?>" value="<?php echo esc_attr((string) $item['subject']); ?>" required></label>
                         <label class="dizzy-email-field"><?php esc_html_e('Message', 'dizzy-events-manager'); ?><textarea name="<?php echo esc_attr(Settings::OPTION . '[' . $key . '][message]'); ?>" rows="3"><?php echo esc_textarea((string) $item['message']); ?></textarea></label>
-                        <?php if (in_array($key, ['ticket', 'reservation'], true)) : ?>
-                            <label class="dizzy-email-field"><?php esc_html_e('Event image', 'dizzy-events-manager'); ?>
-                                <select name="<?php echo esc_attr(Settings::OPTION . '[' . $key . '][image_source]'); ?>">
-                                    <option value="none" <?php selected($item['image_source'], 'none'); ?>><?php esc_html_e('None', 'dizzy-events-manager'); ?></option>
-                                    <option value="featured" <?php selected($item['image_source'], 'featured'); ?>><?php esc_html_e('Featured image', 'dizzy-events-manager'); ?></option>
-                                    <option value="poster" <?php selected($item['image_source'], 'poster'); ?>><?php esc_html_e('Generated poster', 'dizzy-events-manager'); ?></option>
-                                </select>
-                            </label>
-                        <?php endif; ?>
                         <p class="description"><?php esc_html_e('HTML template:', 'dizzy-events-manager'); ?> <code><?php echo esc_html($file); ?></code></p>
                     </section>
                 <?php endforeach; ?>

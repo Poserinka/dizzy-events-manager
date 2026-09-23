@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('DIZZY_EMAILS_VERSION', '1.0.2');
+define('DIZZY_EMAILS_VERSION', '1.0.3');
 define('DIZZY_EMAILS_PATH', __DIR__ . '/');
 define('DIZZY_EMAILS_URL', DIZZY_EVENTS_URL . 'modules/emails/');
 
