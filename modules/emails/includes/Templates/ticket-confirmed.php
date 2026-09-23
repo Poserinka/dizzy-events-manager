@@ -113,7 +113,7 @@ a[x-apple-data-detectors],
                           <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333"><?php echo esc_html((string) $event_date); ?> · <?php echo esc_html((string) $event_time); ?></h3></td>
                          </tr>
                          <tr>
-                          <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333">TOTAL PRICE: <?php echo esc_html((string) $currency . ' ' . (string) $total_amount); ?></h3></td>
+                          <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333">Total Price: <?php echo esc_html((string) $currency . ' ' . (string) $total_amount); ?></h3></td>
                          </tr>
 						 <?php foreach ((array) $tickets as $index => $ticket) : ?>   
                          <tr>
@@ -133,7 +133,7 @@ a[x-apple-data-detectors],
                           <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333"><?php echo esc_html((string) $customer_phone); ?></h3></td>
                          </tr>
                          <tr>
-                          <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333">RESERVATION NUMBER: <?php echo esc_html(sprintf(__('Order number: %d', 'dizzy-ticket-manager'), (int) $order_id)); ?></h3></td>
+                          <td align="center" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#333333"><?php echo esc_html(sprintf(__('Reservation Number: %d', 'dizzy-ticket-manager'), (int) $order_id)); ?></h3></td>
                          </tr>
                          <tr>
                           <td align="center" style="padding:10px 0 25px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#333333;font-size:14px">You can&nbsp;cancel your&nbsp;reservation by reaching us via phone.</p></td>
