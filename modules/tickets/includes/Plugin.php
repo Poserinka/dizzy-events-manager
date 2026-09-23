@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Dizzy\Tickets;
 
+use Dizzy\Emails\Mailer;
+
 defined('ABSPATH') || exit;
 
 final class Plugin

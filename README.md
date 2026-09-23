@@ -18,6 +18,7 @@ Version 4 bundles the former standalone Dizzy plugins as modules inside Dizzy Ev
 * Social Media and Poster Generator
 * Tickets and check-in
 * WAnotify
+* Emails
 
 The modules continue using their original database tables, WordPress options, post metadata, roles, capabilities, REST routes, webhook routes and cron hook names. If an old standalone plugin is still active, its bundled counterpart pauses automatically to prevent duplicate processing. After updating Dizzy Events Manager, deactivate the old standalone plugins and verify Events → Dizzy Suite before deleting their folders.
 

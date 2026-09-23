@@ -1,6 +1,6 @@
 # Reservation email templates
 
-These files control the HTML emails sent by Dizzy Reservations Manager.
+These files now live in the Emails module and control the HTML emails sent by Dizzy Reservations Manager.
 
 ## Templates
 

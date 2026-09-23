@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Reservations;
 
+use Dizzy\Emails\Mailer;
 use DateTimeImmutable;
 use RuntimeException;
 

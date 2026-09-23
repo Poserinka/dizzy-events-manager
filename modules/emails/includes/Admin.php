@@ -52,8 +52,8 @@ final class Admin
         }
         $templates = Settings::templates();
         $definitions = [
-            'ticket' => [__('Ticket purchased', 'dizzy-events-manager'), __('Sent after a successful ticket payment.', 'dizzy-events-manager'), 'modules/tickets/includes/Email/Templates/ticket-confirmed.php'],
-            'reservation' => [__('Reservation confirmed', 'dizzy-events-manager'), __('Sent when a reservation is confirmed.', 'dizzy-events-manager'), 'modules/reservations/includes/Email/Templates/reservation-confirmed.php'],
+            'ticket' => [__('Ticket purchased', 'dizzy-events-manager'), __('Sent after a successful ticket payment.', 'dizzy-events-manager'), 'modules/emails/includes/Templates/ticket-confirmed.php'],
+            'reservation' => [__('Reservation confirmed', 'dizzy-events-manager'), __('Sent when a reservation is confirmed.', 'dizzy-events-manager'), 'modules/emails/includes/Templates/reservation-confirmed.php'],
             'schedule' => [__('Shift reminder', 'dizzy-events-manager'), __('Sent approximately two hours before a published shift.', 'dizzy-events-manager'), 'modules/emails/includes/Templates/shift-reminder.php'],
         ];
         ?>

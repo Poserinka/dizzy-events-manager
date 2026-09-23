@@ -70,7 +70,7 @@ final class ShiftReminders
                 add_filter('wp_mail_from', $fromEmail);
                 add_filter('wp_mail_from_name', $fromName);
                 try {
-                    $sent = wp_mail(
+                    $sent = Delivery::send(
                         $email,
                         Settings::subject('schedule', __('Shift reminder', 'dizzy-events-manager')),
                         $html,

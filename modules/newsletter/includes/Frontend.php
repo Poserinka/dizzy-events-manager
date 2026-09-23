@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Newsletter;
 
+use Dizzy\Emails\Delivery;
 defined('ABSPATH') || exit;
 
 final class Frontend
@@ -125,7 +126,7 @@ final class Frontend
         }
         if (! $confirmed) {
             $url = add_query_arg(['dizzy_nl_action' => 'confirm', 'token' => $result['token']], home_url('/'));
-            wp_mail(
+            Delivery::send(
                 sanitize_email(wp_unslash((string) $_POST['email'])),
                 __('Confirm your newsletter subscription', 'dizzy-newsletter'),
                 sprintf(__('Please confirm your subscription: %s', 'dizzy-newsletter'), $url)

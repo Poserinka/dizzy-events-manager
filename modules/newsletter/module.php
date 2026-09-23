@@ -16,7 +16,7 @@ add_filter('cron_schedules', static function (array $schedules): array {
 
 require_once DIZZY_NL_DIR . 'includes/Database.php';
 require_once DIZZY_NL_DIR . 'includes/Repository.php';
-require_once DIZZY_NL_DIR . 'includes/CampaignSender.php';
+require_once DIZZY_EMAILS_PATH . 'includes/CampaignSender.php';
 require_once DIZZY_NL_DIR . 'includes/Frontend.php';
 require_once DIZZY_NL_DIR . 'includes/Admin.php';
 require_once DIZZY_NL_DIR . 'includes/Plugin.php';

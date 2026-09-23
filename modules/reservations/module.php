@@ -19,7 +19,6 @@ foreach ([
     'TableRepository.php',
     'EventGateway.php',
     'TicketGateway.php',
-    'Mailer.php',
     'ReservationService.php',
     'FrontendController.php',
     'MobileApiController.php',

@@ -1,7 +1,7 @@
 <?php
 /** @var array{employee_name:string,shift_date:string,start_time:string,end_time:string,position:string} $data */
 defined('ABSPATH') || exit;
-$logo = DIZZY_EVENTS_URL . 'modules/tickets/includes/Email/Templates/images/jazzcafe-dizzy-logo-black.png';
+$logo = DIZZY_EMAILS_URL . 'assets/images/jazzcafe-dizzy-logo-black.png';
 ?>
 <!doctype html>
 <html lang="en">

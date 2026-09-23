@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dizzy\Newsletter;
 
+use Dizzy\Emails\Delivery;
 use Throwable;
 
 defined('ABSPATH') || exit;
@@ -63,7 +64,7 @@ final class CampaignSender
             'Reply-To: ' . sanitize_email((string) $settings['reply_to']),
             'List-Unsubscribe: <' . esc_url_raw($unsubscribe_url) . '>',
         ];
-        return wp_mail($subscriber_email, $email_subject, $html, $headers);
+        return Delivery::send($subscriber_email, $email_subject, $html, $headers);
     }
 
     public function renderCampaignHtml(array $campaign, array $contact, bool $trackOpen = false): string
@@ -99,7 +100,7 @@ final class CampaignSender
             : '';
 
         ob_start();
-        include DIZZY_NL_DIR . 'includes/Email/Templates/newsletter.php';
+        include DIZZY_EMAILS_PATH . 'includes/Templates/newsletter.php';
         return (string) ob_get_clean();
     }
 

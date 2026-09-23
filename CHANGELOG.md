@@ -8,6 +8,13 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.3.1] - 2026-09-23
+
+### Changed
+
+- Consolidate ticket, reservation, newsletter and shift email templates, delivery classes, and shared images under the Emails module.
+- Route all bundled module mail through a single Emails delivery entry point without changing existing newsletter or reservation-status behavior.
+
 ## [4.3.0] - 2026-09-23
 
 ### Added

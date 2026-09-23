@@ -44,10 +44,19 @@ foreach ([
     \Dizzy\Reservations\TicketGateway::class,
     \Dizzy\Reservations\Plugin::class,
     \Dizzy\Emails\Settings::class,
+    \Dizzy\Emails\Delivery::class,
+    \Dizzy\Emails\Mailer::class,
     \Dizzy\Emails\ShiftReminders::class,
+    \Dizzy\Newsletter\CampaignSender::class,
 ] as $class) {
     if (! class_exists($class)) {
-        throw new RuntimeException('Missing bundled Reservations class: ' . $class);
+        throw new RuntimeException('Missing bundled module class: ' . $class);
+    }
+}
+
+foreach (['ticket-confirmed', 'reservation-confirmed', 'reservation-status', 'newsletter', 'shift-reminder'] as $template) {
+    if (! is_file(DIZZY_EMAILS_PATH . 'includes/Templates/' . $template . '.php')) {
+        throw new RuntimeException('Missing centralized email template: ' . $template);
     }
 }
 

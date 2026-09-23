@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dizzy\Reservations;
+namespace Dizzy\Emails;
 
 use RuntimeException;
 
@@ -15,29 +15,28 @@ final class Mailer
         return $this->deliver($email, $subject, wp_kses_post($message));
     }
 
-    /**
-     * Render an editable PHP/HTML email template.
-     *
-     * Templates live in includes/Email/Templates and receive the values in $data
-     * both as individual variables and through the $data array.
-     */
     public function sendTemplate(string $email, string $subject, string $template, array $data): bool
     {
-        if ($template === 'reservation-confirmed' && class_exists(\Dizzy\Emails\Settings::class)) {
-            if (! \Dizzy\Emails\Settings::enabled('reservation')) {
+        $key = match ($template) {
+            'ticket-confirmed' => 'ticket',
+            'reservation-confirmed' => 'reservation',
+            default => '',
+        };
+        if ($key !== '') {
+            if (! Settings::enabled($key)) {
                 return true;
             }
-            $subject = \Dizzy\Emails\Settings::subject('reservation', $subject);
-            $data['email_message'] = \Dizzy\Emails\Settings::message('reservation');
+            $subject = Settings::subject($key, $subject);
+            $data['email_message'] = Settings::message($key);
         }
         if (! preg_match('/^[a-z0-9-]+$/', $template)) {
             throw new RuntimeException('Invalid email template name.');
         }
 
-        $path = DIZZY_RESERVATIONS_PATH . 'includes/Email/Templates/' . $template . '.php';
+        $path = DIZZY_EMAILS_PATH . 'includes/Templates/' . $template . '.php';
 
         if (! is_file($path)) {
-            throw new RuntimeException('Reservation email template was not found: ' . $template);
+            throw new RuntimeException('Email template was not found: ' . $template);
         }
 
         $data = array_merge([
@@ -61,7 +60,7 @@ final class Mailer
         add_filter('wp_mail_from_name', $fromName);
 
         try {
-            return wp_mail(
+            return Delivery::send(
                 $email,
                 $subject,
                 $html,
