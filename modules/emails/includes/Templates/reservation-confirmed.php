@@ -104,15 +104,16 @@ a[x-apple-data-detectors],
                      </tr>
 					   <?php endif; ?>	
                      <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo esc_html((string) $date); ?></h3></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff">Your Reservation is Confirmed</h3></td>
+                     </tr>
+					 <tr>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo esc_html((string) $date); ?> · <?php echo esc_html((string) $time); ?></h3></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><?php if (! empty($email_message)) : ?><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo nl2br(esc_html((string) $email_message)); ?></h3><?php endif; ?></td>
+						<?php if (! empty($email_message)) : ?>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo nl2br(esc_html((string) $email_message)); ?></h3></td>
                      </tr>
-                     <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo esc_html((string) $time); ?></h3></td>
-                     </tr>
-					 
+					    <?php endif; ?>
                      <tr>
                       <td align="center" style="padding:10px 0;Margin:0"><span class="es-button-border" style="border-style:solid;border-color:#e54d62;background:#000000;border-width:2px;display:inline-block;border-radius:6px;width:auto"><a href="https://maps.app.goo.gl/t73PkgDRtb6RvKFMA" target="_blank" class="es-button" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#e54d62;font-size:20px;font-weight:normal;padding:10px 30px;display:inline-block;background:#000000;border-radius:6px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-style:normal;line-height:24px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #000000;text-transform:none;border-left-width:30px;border-right-width:30px">GOOGLE MAPS</a></span></td>
                      </tr>
