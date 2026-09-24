@@ -133,7 +133,7 @@ a[x-apple-data-detectors],
                       <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html(sprintf(__('Ticket Order ID: %d', 'dizzy-ticket-manager'), (int) $order_id)); ?></h3></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0 25px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#efefef;font-size:14px">You can&nbsp;cancel your&nbsp;reservation by reaching us via phone.</p></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0 25px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#efefef;font-size:14px">You can&nbsp;cancel your&nbsp;reservation by reaching us via phone.</p></td>
                      </tr>
                      <tr>
                       <td align="center" bgcolor="#212121" style="padding:15px 0;Margin:0;font-size:0">
@@ -154,7 +154,7 @@ a[x-apple-data-detectors],
                          <tr class="links">
                           <td width="33.33%" align="center" valign="top" bgcolor="#000000" style="Margin:0;border:0;padding:5px">
                            <div style="vertical-align:middle;display:block">
-                            <a target="_blank" href="https://dizzy.nl/unsubscribe" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'lato, 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Unsubscribe</a>
+                            <a target="_blank" href="https://dizzy.nl/unsubscribe" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Unsubscribe</a>
                            </div></td>
                           <td align="center" valign="top" width="33.33%" bgcolor="#000000" style="Margin:0;border:0;padding:5px;border-left:1px dashed #999999">
                            <div style="vertical-align:middle;display:block">
