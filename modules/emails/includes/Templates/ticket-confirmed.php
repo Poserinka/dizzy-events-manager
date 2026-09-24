@@ -121,7 +121,7 @@ a[x-apple-data-detectors],
                      </tr>
 					   <?php endforeach; ?>    
                      <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato, 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $customer_name); ?></h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $customer_name); ?></h3></td>
                      </tr>
                      <tr>
                       <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $customer_email); ?></h3></td>
