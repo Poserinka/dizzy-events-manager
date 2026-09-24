@@ -37,7 +37,7 @@ defined('ABSPATH') || exit;
       <w:DontUseAdvancedTypographyReadingMail/>
     </w:WordDocument>
     </xml><![endif]--><!--[if !mso]><!-- -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"><!--<![endif]-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"><!--<![endif]-->
   <style type="text/css">u + .body img ~ div div {
   display:none;
 }
@@ -104,14 +104,14 @@ a[x-apple-data-detectors],
                      </tr>
 					   <?php endif; ?>	
                      <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff">Your Reservation is Confirmed</h3></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:400;line-height:30px;color:#ffffff">Your Reservation is Confirmed</h3></td>
                      </tr>
 					 <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo esc_html((string) $date); ?> · <?php echo esc_html((string) $time); ?></h3></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:400;line-height:30px;color:#ffffff"><?php echo esc_html((string) $date); ?> · <?php echo esc_html((string) $time); ?></h3></td>
                      </tr>
                      <tr>
 						<?php if (! empty($email_message)) : ?>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:600;line-height:30px;color:#ffffff"><?php echo nl2br(esc_html((string) $email_message)); ?></h3></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:20px;font-style:normal;font-weight:400;line-height:30px;color:#ffffff"><?php echo nl2br(esc_html((string) $email_message)); ?></h3></td>
                      </tr>
 					    <?php endif; ?>
                      <tr>
@@ -119,25 +119,25 @@ a[x-apple-data-detectors],
                      </tr>
 					   
                      <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef"><?php echo esc_html((string) $name); ?></h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $name); ?></h3></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef"><?php echo esc_html((string) $email); ?></h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $email); ?></h3></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef"><?php echo esc_html((string) $phone); ?></h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef"><?php echo esc_html((string) $phone); ?></h3></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef">Guest&nbsp;Number: <?php echo esc_html((string) $guests); ?></h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef">Guest&nbsp;Number: <?php echo esc_html((string) $guests); ?></h3></td>
                      </tr>
 					 <?php if (! empty($table)) : ?>
 					 <tr>
-                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:600;line-height:27px;color:#efefef">Table: <?php echo esc_html((string) $table); ?><</h3></td>
+                      <td align="center" bgcolor="#000000" class="es-m-text" style="padding:10px 0;Margin:0"><h3 class="es-m-txt-c es-text-mobile-size-18" style="Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:18px;font-style:normal;font-weight:400;line-height:27px;color:#efefef">Table: <?php echo esc_html((string) $table); ?><</h3></td>
                      </tr>
 					 <?php endif; ?>
                      <?php require __DIR__ . '/partials/reservation-experience.php'; ?>
                      <tr>
-                      <td align="center" bgcolor="#000000" style="padding:10px 0 25px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#efefef;font-size:14px">You can&nbsp;cancel your&nbsp;reservation by reaching us via phone.</p></td>
+                      <td align="center" bgcolor="#000000" style="padding:10px 0 25px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#efefef;font-size:14px">You can&nbsp;cancel your&nbsp;reservation by reaching us via phone.</p></td>
                      </tr>
                      <tr>
                       <td align="center" bgcolor="#212121" style="padding:15px 0;Margin:0;font-size:0">
@@ -150,23 +150,23 @@ a[x-apple-data-detectors],
                        </table></td>
                      </tr>
                      <tr>
-                      <td align="center" bgcolor="#212121" style="padding:0 0 15px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">2026 © Jazzcafe Dizzy. All Rights Reserved.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">'s-Gravendijkwal 127 3021 EK, Rotterdam</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">010 477 3014</p></td>
+                      <td align="center" bgcolor="#212121" style="padding:0 0 15px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">2026 © Jazzcafe Dizzy. All Rights Reserved.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">'s-Gravendijkwal 127 3021 EK, Rotterdam</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;line-height:21px;letter-spacing:0;font-weight:normal;color:#999999;font-size:14px">010 477 3014</p></td>
                      </tr>
                      <tr>
-                      <td class="es-menu-color-per-item" style="padding:20px 0;Margin:0;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif">
+                      <td class="es-menu-color-per-item" style="padding:20px 0;Margin:0;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif">
                        <table width="100%" cellpadding="0" cellspacing="0" class="es-menu" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px">
                          <tr class="links">
                           <td width="33.33%" align="center" valign="top" bgcolor="#000000" style="Margin:0;border:0;padding:5px">
                            <div style="vertical-align:middle;display:block">
-                            <a target="_blank" href="https://dizzy.nl/unsubscribe" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Unsubscribe</a>
+                            <a target="_blank" href="https://dizzy.nl/unsubscribe" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Unsubscribe</a>
                            </div></td>
                           <td align="center" valign="top" width="33.33%" bgcolor="#000000" style="Margin:0;border:0;padding:5px;border-left:1px dashed #999999">
                            <div style="vertical-align:middle;display:block">
-                            <a href="https://dizzy.nl/privacy-policy" target="_blank" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Privacy Policy</a>
+                            <a href="https://dizzy.nl/privacy-policy" target="_blank" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Privacy Policy</a>
                            </div></td>
                           <td valign="top" width="33.33%" align="center" bgcolor="#000000" style="Margin:0;border:0;padding:5px;border-left:1px dashed #999999">
                            <div style="vertical-align:middle;display:block">
-                            <a target="_blank" href="https://dizzy.nl/terms-of-use" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Terms of Use</a>
+                            <a target="_blank" href="https://dizzy.nl/terms-of-use" style="mso-line-height-rule:exactly;text-decoration:none;font-family:'lato', 'helvetica neue', helvetica, arial, sans-serif;font-weight:normal;display:block;color:#ffffff;font-size:14px">Terms of Use</a>
                            </div></td>
                          </tr>
                        </table></td>
