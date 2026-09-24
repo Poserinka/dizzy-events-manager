@@ -51,11 +51,13 @@ final class TicketExperience
             $qrData = 'data:image/png;base64,' . base64_encode(wp_remote_retrieve_body($qrResponse));
         }
 
-        $timestamp = $start !== '' ? strtotime($start) : false;
+        $startDate = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $start, wp_timezone());
 
         wp_send_json_success([
             'event' => get_the_title((int) $ticket['event_id']),
-            'date' => $timestamp !== false ? wp_date(get_option('date_format') . ' – ' . get_option('time_format'), $timestamp, wp_timezone()) : $start,
+            'date' => $startDate instanceof \DateTimeImmutable
+                ? wp_date('d-F-Y · H.i', $startDate->getTimestamp(), wp_timezone())
+                : $start,
             'holder' => (string) $ticket['holder_name'],
             'type' => $ticketName !== '' ? $ticketName : __('Event Ticket', 'dizzy-ticket-manager'),
             'code' => strtoupper(substr($code, 0, 12)),

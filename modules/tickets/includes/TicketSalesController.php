@@ -221,9 +221,9 @@ final class TicketSalesController
             "SELECT start_datetime FROM {$wpdb->prefix}dizzy_event_occurrences WHERE id=%d LIMIT 1",
             (int) $ticket['occurrence_id']
         ));
-        $timestamp = $start !== '' ? strtotime($start) : false;
-        $date = $timestamp !== false
-            ? wp_date(get_option('date_format') . ' – ' . get_option('time_format'), $timestamp, wp_timezone())
+        $startDate = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $start, wp_timezone());
+        $date = $startDate instanceof \DateTimeImmutable
+            ? wp_date('d-F-Y · H.i', $startDate->getTimestamp(), wp_timezone())
             : $start;
         $url = $this->service->ticketUrl($code);
         $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=560x560&margin=24&data=' . rawurlencode($url);

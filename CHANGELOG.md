@@ -8,6 +8,12 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [4.3.4] - 2026-09-24
+
+### Changed
+
+- Show ticket dates as `DD-Month-YYYY · HH.mm` in 24-hour site-local time on ticket pages, modal previews and saved ticket images.
+
 ## [4.3.3] - 2026-09-23
 
 ### Changed
